@@ -1,0 +1,1094 @@
+#+TITLE: CS1231 Cheat Sheet
+#+DATE: [2018-08-28]
+#+LATEX_HEADER: \usepackage{indentfirst}
+#+LATEX_HEADER: \usepackage{parskip}  \setlength{\parindent}{15pt}
+#+LATEX_HEADER: \usepackage{sectsty}  \setcounter{secnumdepth}{2}
+#+LATEX_HEADER: \usepackage{titlesec} \newcommand{\sectionbreak}{\clearpage}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+#+OPTIONS: toc:2 author:nil
+
+* Proof Techniques
+
+** Proof by Construction
+
+_Strategy_: Prove \exist statements by finding an explicit solution. Alternatively, disprove \forall statements by finding an explicit counterexample.
+
+** Proving If-Then Statements
+
+_Strategy_: Assume P is true \rightarrow chain of logical deductions \rightarrow show that Q must be true. Thus P \rightarrow Q.
+
+** Proving For-All Statements
+
+_Strategy_: Take any particular arbitrarily chosen value (e.g. x). Show that if P(x) is true for this x, then it must be true that $\forall{}xP(x)$.
+
+(Example: proof that \forall{}a,b,c \in{} $\mathbb{Z}$, (a|b \wedge b|c) \rightarrow a|c)
+1. Take /any/ three integers a, b, c.
+2. Assume that a|b and b|c. \\
+  2.1. ... \\
+  2.x. /<Proof that a|c>/ 
+
+** Proof by Contraposition
+
+_Strategy_: Instead of proving P \rightarrow Q directly, you can prove \sim{}Q \rightarrow \sim{}P.
+
+Useful when dealing with if-then statements with an /absent/ form, by turning it into one with a /present/ form, so it's easier to manipulate.
+
+(Example: instead of proving that x^2 is irrational \rightarrow x is irrational, prove that x is rational \rightarrow x^2 is rational)
+
+** Proof by Contradiction
+
+_Strategy_: To prove that P is true, assume that \sim{}P is true. Then arrive at a contradiction using logical deductions. So the assumption must be false, i.e. P must be true.
+
+(Example: proving that $\sqrt{2}$ is irrational: assume that $\sqrt{2}$ is rational, then arrive at a contradiction)
+
+(Example: proving that 7 is not divisible by 3 by assuming that 3|7, then arrive at a contradiction)
+
+* Logic of Compound Statements
+
+** Logical Form and Logical Equivalence
+
+_Statement/proposition_ is a sentence that is true or false, but not both.
+
+_Negation_ of a statement variable /p/ is denoted /\sim{}p/.
+
+_Conjunction_ of /p/ and /q/ is denoted /p/ \wedge /q/.
+
+_Disjunction_ of /p/ and /q/ is denoted /p/ \vee /q/.
+
+_Statement form_ is an expression made up of _statement variables_ and _logical connectives_ that becomes a statement when actual statements are substituted for the component statement variables.
+
+_Logical equivalence_: two statement forms are logically equivalent if they have _identical truth values_ for each possible substitution of statements for statement variables.
+
+_Tautology_ is a statement form that is _always true_ regardless of truth values of statement variables.
+
+_Contradiction_ is a statement form that is _always false_ regardless of truth values of statement variables.
+
+_Theorem 2.1.1 Logical Equivalences_
+
+| Commutative laws           | $p \wedge q \equiv q \wedge p$                   | $p \vee q \equiv p \vee q$                   |
+| Associative laws           | $(p \wedge q) \wedge r \equiv p \wedge (q \wedge r)$       | $(p \vee q) \vee r \equiv p \vee (q \vee r)$       |
+| Distributive laws          | $p \wedge (q \vee r) \equiv (p \wedge q) \vee (p \wedge r)$ | $p \vee (q \wedge r) \equiv (p \vee q) \wedge (p \vee r)$ |
+| Identity laws              | $p \wedge true \equiv p$                    | $p \vee false \equiv p$                   |
+| Negation laws              | $p \vee \sim{p} \equiv true$                 | $p \wedge \sim{p} \equiv false$                |
+| Double negative law        | $\sim(\sim{p}) \equiv p$                     |                                   |
+| Idempotent laws            | $p \wedge p \equiv p$                       | $p \vee p \equiv p$                       |
+| Universal bound laws       | $p \vee true \equiv true$                 | $p \wedge false \equiv false$               |
+| De Morgan's laws           | $\sim{(p \wedge q)} \equiv \sim{p} \vee \sim{q}$        | $\sim{(p \vee q)} \equiv \sim{p} \wedge \sim{q}$        |
+| Absorption laws            | $p \vee (p \wedge q) \equiv p$                 | $p \wedge (p \vee q) \equiv p$                 |
+| Negation of true and false | $\sim{true} \equiv false$                 | $\sim{false} \equiv true$                 |
+
+** Conditional Statements
+
+_Conditional statements and their variants_
+- _Conditional_ of /q/ by /p/ is "if /p/ then /q/" or "/p/ implies /q/" denoted /p/ \rightarrow /q/. Hypothesis/antecedent \rightarrow conclusion/consequent.
+
+| Conditional | /p \rightarrow q/ | /\sim{}q \rightarrow \sim{}p/ | Contrapositive |
+| Converse    | /q \rightarrow p/ | /\sim{}p \rightarrow \sim{}q/ | Inverse        |
+
+_Implication law_: /p \rightarrow q \equiv \sim{}p \vee q/
+
+_Other forms_
+- _Necessary_: /p/ is a necessary condition for /q/ \equiv /q/ \rightarrow p
+- _Sufficient_: /p/ is a sufficient condition for /q/ \equiv /p/ \rightarrow q
+- _Biconditional_: /p/ if and only if /q/ \equiv /p/ \leftrightarrow /q/
+- _Only if_: /p/ only if /q/ \equiv /p/ \rightarrow /q/
+
+** Order of Operations
+
+1. \sim{}
+2. \wedge, \vee (coequal in order)
+3. \rightarrow, \leftrightarrow (coequal in order)
+
+** Valid and Invalid Arguments
+
+_Argument (form)_ is a sequence of statements (statement forms). The final statement is called the conclusion, all other statements are called premises.
+
+_Valid_: An argument is valid if no matter what statements are substituted for the statement variables, if the premises are true, the conclusion is also true.
+
+_Sound_: An argument is sound if and only if it is valid and all its premises are true.
+
+_Table 2.3.1 Rules of Inference_
+
+|--------------------+------------+---------|
+| Modus Ponens       | p \rightarrow q      |         |
+|                    | p          |         |
+|                    | \bull q        |         |
+|--------------------+------------+---------|
+| Modus Tollens      | p \rightarrow q      |         |
+|                    | \sim{}q         |         |
+|                    | \bull \sim{}p       |         |
+|--------------------+------------+---------|
+| Generalisation     | p          | q       |
+|                    | \bull p \vee q    | \bull p \vee q |
+|--------------------+------------+---------|
+| Specialisation     | p \wedge q      | p \wedge q   |
+|                    | \bull p        | \bull q     |
+|--------------------+------------+---------|
+| Conjunction        | p          |         |
+|                    | q          |         |
+|                    | \bull p \wedge q    |         |
+|--------------------+------------+---------|
+| Elimination        | p \vee q      | p \vee q   |
+|                    | \sim{}p         | \sim{}q      |
+|                    | \bull q        | \bull p     |
+|--------------------+------------+---------|
+| Transitivity       | p \rightarrow q      |         |
+|                    | q \rightarrow r      |         |
+|                    | \bull p \rightarrow r    |         |
+|--------------------+------------+---------|
+| Proof by Division  | p \vee q      |         |
+| Into cases         | p \rightarrow r      |         |
+|                    | q \rightarrow r      |         |
+|                    | \bull r        |         |
+|--------------------+------------+---------|
+| Contradiction Rule | \sim{}p \rightarrow false |         |
+|                    | \bull p        |         |
+|--------------------+------------+---------|
+
+* Logic of Quantified Statements
+
+** Predicates and Quantified Statements
+
+_Predicate_: a sentence that contains a finite number of variables and becomes a statement when specific values are substituted for the variables.
+
+_Domain_ of a predicate variable: set of all values that may be substituted in place of the variable.
+
+_Truth set_: If /P(x)/ is a predicate and /x/ has domain /D/, the _truth set_ is the set of all elements in /D/ that make /P(x)/ true when they are substituted for /x/.
+- Notation: Truth set of /P(x)/ is denoted $\{x \in D | P(x)\}$
+
+_Universal statement_: a statement of the form $\forall{}x \in D, Q(x)$
+- Defined _true_ iff /Q(x)/ is true for every /x/ in /D/
+- Defined _false_ iff /Q(x)/ is false for at least one /x/ in /D/
+- _Counterexample_: a value for x for which /Q(x)/ is false
+
+_Existential statement_: a statement of the form $\exists{}x \in D \text{ such that } Q(x)$
+- Defined _true_ iff /Q(x)/ is true for at least one /x/ in /D/
+- Defined _false_ iff /Q(x)/ is false for every /x/ in /D/
+
+_Notation_
+- $P(x) \Rightarrow Q(x)$ is equivalent to $\forall{}x, P(x) \rightarrow Q(x)$
+- $P(x) \Leftrightarrow Q(x)$ is equivalent to $\forall{}x, P(x) \leftrightarrow Q(x)$
+
+_Theorem 3.2.1 Negation of a Universal Statement_
+
+$\sim{}(\forall{}x \in D, P(x)) \equiv \exists{}x \in D, \sim{}P(x)$
+
+_Theorem 3.2.2 Negation of an Existential Statement_
+
+$\sim{}(\exists{}x \in D, P(x)) \equiv \forall{}x \in D, \sim{}P(x)$
+
+_Contrapositive, converse, inverse_
+| Conditional | $\forall{}x \in D, P(x) \rightarrow Q(x)$ | $\forall{}x \in D, \sim{}Q(x) \rightarrow \sim{}P(x)$ | Contrapositive |
+| Converse    | $\forall{}x \in D, Q(x) \rightarrow P(x)$ | $\forall{}x \in D, \sim{}P(x) \rightarrow \sim{}Q(x)$ | Inverse        |
+
+_Necessary and sufficient conditions, only if_
+- $\forall{}x, r(x) \text{ is a sufficient condition for } s(x)$ means $\forall{}x, r(x) \rightarrow s(x)$
+- $\forall{}x, r(x) \text{ is a necessary condition for } s(x)$ means $\forall{}x, s(x) \rightarrow r(x)$
+- $\forall{}x, r(x) \text{ only if } s(x)$ means $\forall{}x, r(x) \rightarrow s(x)$
+
+** Statements with Multiple Quantifiers
+
+_Multiply quantified statements_
+
+Can combine \exists{}/\forall{} together (if types are not mixed), and are interchangeable.
+
+$\forall{}x,y\in{}D, P(x,y) \> \equiv \> \forall{}x\in{}D, \forall{}y\in{}D, P(x,y)$
+
+$\exists{}x,y\in{}D, P(x,y) \> \equiv \> \exists{}x\in{}D, \exists{}y\in{}D, P(x,y)$
+
+_Negations of multiply-quantified statements_
+
+$\sim{}(\forall{}x\in{}D, \exists{}y\in{}E, P(x,y)) \> \equiv{} \> \exists{}x\in{}D, \forall{}y\in{}E, \sim{}P(x,y)$
+
+$\sim{}(\exists{}x\in{}D, \forall{}y\in{}E, P(x,y)) \> \equiv{} \> \forall{}x\in{}D, \exists{}y\in{}E, \sim{}P(x,y)$
+
+_Order of quantifiers_
+
+If the types (\forall/\exists) are the same, _can_ interchange order of quantifiers.
+
+If the types (\forall/\exists) are different, _cannot_ interchange order of quantifiers.
+
+$\forall{}x\in{}D, \exists{}y\in{}D, P(x,y) \> \not\equiv \> \exists{}y\in{}D, \forall{}x\in{}D, P(x,y)$
+
+** Arguments with Quantified Statements
+
+_Rule of universal instantiation_: If some property is true for everything in a set, then it is true for any particular thing in the set.
+
+|-------------------------+-------------------------------------|
+| Universal Modus Ponens  | $\forall{}x, P(x) \rightarrow Q(x)$                   |
+|                         | $P(a) \text{ for a particular } a$  |
+|                         | $\bullet{} Q(a)$                            |
+|-------------------------+-------------------------------------|
+| Universal Modus Tollens | $\forall{}x, P(x) \rightarrow Q(x)$                   |
+|                         | $\sim{}Q(a) \text{ for a particular } a$ |
+|                         | $\bullet{} \sim{}P(a)$                           |
+|-------------------------+-------------------------------------|
+| Universal transitivity  | $\forall{x}, P(x) \rightarrow Q(x)$                 |
+|                         | $\forall{x}, Q(x) \rightarrow R(x)$                 |
+|                         | $\bullet{}\forall{x}, P(x) \rightarrow R(x)$                |
+|-------------------------+-------------------------------------|
+
+_Valid argument form_: no matter what particular predicates are substituted for the predicate symbols in its premises, if the resulting premise statements are all true, then the conclusion is also true.
+
+|----------------------------------+-------------------------------------|
+| Converse error (quantified form) | $\forall{}x, P(x) \rightarrow Q(x)$                   |
+|                                  | $Q(a) \text{ for a particular } a$  |
+|                                  | $\bullet{} P(a)$                            |
+|----------------------------------+-------------------------------------|
+| Inverse error (quantified form)  | $\forall{}x, P(x) \rightarrow Q(x)$                   |
+|                                  | $\sim{}P(a) \text{ for a particular } a$ |
+|                                  | $\bullet{} \sim{}Q(a)$                           |
+|----------------------------------+-------------------------------------|
+
+* Number Theory
+
+** Divisibility
+
+_Divisibility_
+
+$d|n \leftrightarrow \exists{}k\in{}\mathbb{Z} \text{ such that } n = dk$
+
+_Theorem 4.1.1 Linear Combination_
+
+$\forall{}a,b,c \in \mathbb{Z}, a|b \wedge a|c \rightarrow a|(bx+cy) \text{ } \forall{}x,y\in{}\mathbb{Z}$
+
+_Theorem 4.3.1 (Epp)_
+
+$\forall{}a,b,c\in{}\mathbb{Z^{+}}, a|b \rightarrow a\le{}b$
+
+_Theorem 4.3.2 (Epp)_
+
+$\forall{}d\in\mathbb{Z}, d|1 \rightarrow d = \pm{}1$
+
+_Theorem 4.3.3 (Epp) Transitivity of Divisibility_
+
+$\forall{}a,b,c\in{}\mathbb{Z}, a|b \text{ and } b|c \rightarrow a|c$
+
+** Primes
+
+_Prime and Composite_
+
+$n \text{ is prime } \leftrightarrow \forall{}r,s\in\mathbb{Z^{+}}, n=rs \rightarrow (r=1 \text{ and } s=n) \text{ or } (r=n \text{ and } s=1)$
+
+$n \text{ is composite } \leftrightarrow \exists{}r,s\in\mathbb{Z^{+}}, n=rs \text{ and } (1<r<n) \text{ and } (1<s<n)$
+
+Every integer n>1 is either prime or composite.
+
+_Proposition 4.2.2_
+
+$\text{For any 2 primes } p \text{ and } p', \ p \: | \: p' \rightarrow p=p'$
+
+_Proposition 4.7.3 (Epp)_
+
+$\text{For any } a\in\mathbb{Z} \text{ and any prime } p, \ p \: | \: a \rightarrow p\nmid{}(a+1)$
+
+_Theorem 4.3.4 (Epp) Divisibility by a Prime_
+
+$\text{Any integer } n>1 \text{ is divisible by a prime number}$
+
+_Theorem 4.7.4 (Epp) Infinitude of Primes_
+
+$\text{The set of primes is infinite}$
+
+_Theorem 4.2.3_
+
+$\text{If } p \text{ is prime and } x_1, x_2 ... x_n \text{ are any integers such that } p|x_{1}x_{2}...x_{n}, \text{ then } p|x_{i} \text{ for some } x_{i} (1 \le i \le n)$
+
+_Theorem 4.3.5 (Epp) Unique Prime Factorization_
+
+$\text{Given any integer } n>1, \exists{}k\in\mathbb{Z^{+}} \text{ and } \exists{}\text{distinct prime numbers } p_{1},p_{2}...p_{k} \text{ and } \exists{}e_{1},e_{2}...e_{k}\in\mathbb{Z^{+}} \text{ such that } n={p_{1}}^{e_{1}}{p_{2}}^{e_{2}}...{p_{k}}^{e_{k}}$
+
+** Primality Testing
+
+_1) Trial Division_
+
+Test if n is divisible by all integers k between 2 and sqrt{n} (rounded up).
+
+_2) Sieve of Eratosthenes_
+
+Generate a list of primes using the sieve (crossing out all multiples of a number starting from 2, etc.). Check n against the list of primes.
+
+_3) Miller-Rabin probabilistic test_
+
+Tests for compositeness---if the tests come out positive, it is definitely composite, but if it's negative, it's /probably/ not. Run the test over and over to reduce the probability of a pseudoprime.
+
+** Well-Ordering Principle
+
+_Lower bound_
+
+An integer b is a lower bound for a set $X\subseteq{}\mathbb{Z}$ if b\le{}x \forall{}x\in{}X.
+
+*** Well-ordering principle I (Theorem 4.3.2)
+
+S has a _least element_ if a _non-empty_ set $S\subseteq{}\mathbb{Z}$ has a _lower bound_.
+- S is non-empty
+- $S\subseteq{}\mathbb{Z}$
+- S has a lower bound
+
+_Proposition 4.3.3 Uniqueness of least element_
+
+If a set $S\subseteq{}\mathbb{Z}$ has a least element, then the least element is unique.
+
+*** Well-ordering principle II (Theorem 4.3.2)
+
+S has a _greatest element_ if a _non-empty_ set $S\subseteq{}\mathbb{Z}$ has an _upper bound_.
+- S is non-empty
+- $S\subseteq{}\mathbb{Z}$
+- S has an upper bound
+
+_Proposition 4.3.4 Uniqueness of greatest element_
+
+If a set $S\subseteq{}\mathbb{Z}$ has a greatest element, then the greatest element is unique.
+
+** Quotient-Remainder Theorem
+
+_Quotient-remainder theorem_
+
+Given any integer /a/, and any positive integer /b/, $\exists!q,r\in{}\mathbb{Z}$ such that $a=bq+r$, where $0\le{}r<b$.
+
+_Representation of integers in base b_
+
+| $n = bq_0 + r_0$    |
+| $q_0 = bq_1 + r_1$   |
+| $q_1 = bq_2 + r_2$   |
+| ...               |
+| $q_{m-1} = bq_m + r_m$ | (process stops when q_m = 0)
+
+Read the remainders from bottom up to get (r_{m}r_{m-1}...r_{1}r_{0})_b
+
+Representation: n = (r_{m}r_{m-1}...r_{1}r_{0})_b = r_{m}b^{m} + r_{m-1}b^{m-1} + ... + r_{1}b + r_0
+
+** GCD
+
+_GCD(a,b)_ is the integer d satisfying: (where a and b are not both 0)
+- d|a and d|b
+- $\forall{}c\in{}\mathbb{Z}$, if c|a and c|b then c\le{}d
+
+GCD(0,0) is undefined.
+
+GCD can be found through prime factorization.
+
+_Existence of GCD (Prop 4.5.2)_
+
+For any $a,b\in{}\mathbb{Z}$, not both 0, their GCD exists and is unique
+
+_Euclid's algorithm_
+
+GCD(a,0) = /a/
+
+GCD(a,b) = GCD(b,r) where r is the remainder of a/b (or a mod b)
+
+_Bezout's identity_
+
+There exists $x,y\in{}\mathbb{Z}$ such that $ax+by = d$, where /d/ = GCD(a,b) and /a/ and /b/ are not both 0.
+
+i.e. GCD(a,b) can be expressed as a linear combination of a and b
+
+_Relatively prime_
+
+/a/, /b/ are relatively prime (coprime) \leftrightarrow GCD(a,b) = 1
+
+_Theorem 4.2.3_
+
+If /p/ is prime and x_{1},x_{2}...x_{n} are integers such that $p|x_{1}x_{2}...x_{n}$, then $p|x_{i}_{}$ for some 1\le{}i\le{}n
+
+_Proposition 4.5.5_
+
+$\forall{}a,b\in{}\mathbb{Z}$, not both 0, if /c/ is a common divisor of /a/ and /b/, then c|GCD(a,b)
+
+** LCM
+
+_LCM(a,b)_ for any non-zero integers a,b, is the positive integer m such that:
+- a|m and b|m
+- $\forall{}c\in\mathbb{Z^{+}}$, if a|c and b|c, then m\le{}c
+
+GCD(a,b) \cdot LCM(a,b) = ab
+
+** Modulo Arithmetic
+
+*** Congruence modulo
+
+m \equiv n (mod d) \leftrightarrow d | (m-n), where m,n\in{}$\mathbb{Z}$, d\in$\mathbb{Z^{+}}$
+
+_Theorem 8.4.1 (Epp): Modular equivalences_
+
+1. a \equiv b (mod n)
+2. n | (a-b)
+3. a = b + kn, for some k\in{}$\mathbb{Z}$
+4. a and b have same remainder when divided by n
+5. a mod n = b mod n
+
+_Theorem 8.4.3 (Epp): Modulo arithmetic_
+
+Suppose a \equiv c (mod n) and b \equiv d (mod n), where a,b,c,d,n\in$\mathbb{Z}$ with n>1.
+
+1. (a+b) \equiv (c+d) (mod n)
+2. (a-b) \equiv (c-d) (mod n)
+3. ab \equiv cd (mod n)
+4. a^m \equiv c^m (mod n) \forall{}m\in$\mathbb{Z^{+}}$
+
+_Corollary 8.4.4 (Epp): Further modulo arithmetic_
+
+1. ab \equiv [(a mod n)(b mod n)] mod n
+2. ab mod n = [(a mod n)(b mod n)] mod n
+3. a^m \equiv (a mod n)^m (mod n)
+
+*** Inverses
+
+_Multiplicative inverse modulo n_
+
+If as \equiv 1 (mod n), then s is the multiplicative inverse of a modulo n. aa^{-1} \equiv 1 (mod n), and a^{-1}a \equiv 1 (mod n)
+
+_Theorem 4.7.3 Existence of modulo inverse_
+
+For any integer a, a^{-1} exists iff a and n are coprime.
+
+(Find a^{-1} (mod n) by running the Extended Euclidean Algorithm!)
+
+_Corollary 4.7.4 Special case: n is prime_
+
+All integers a in range 0<a<p have multiplicative inverses (mod p) if p is prime (because gcd(a,p) = 1 if 0<a<p)
+
+_Theorem 8.4.9 (Epp): Cancellation law for modulo arithmetic_
+
+If ab \equiv ac (mod n) where a and n are coprime, then b \equiv c (mod n), \forall{}a,b,c,n with n > 1
+
+* Induction
+
+** Regular Induction
+
+_Proof (by Mathematical Induction)_
+1. \forall{}n \in \text{Domain}, let P(n) = <statement>.
+2. _Base case_: n = <base> \\
+  2.x /<Show that P(base) is true>/
+3. _Inductive step_: for any k \in \text{Domain}, \\
+  3.1 Assume that P(k) is true, i.e. ...  (Strong induction: Assume that P(i) is true for <base>\le{}i\le{}k) \\
+  3.2 Consider the k+1 case: \\
+  3.x /<Show that P(k+1) is true>/
+4. So by Mathematical Induction, P(n) is true \forall{}n \in \text{Domain}. QED.
+
+** Strong Induction
+
+Like regular induction (as above), but make a stronger assumption in the inductive step: instead of assuming that P(k) is true, assume that P(base) until P(k) is true.
+
+* Sequences and Recursion
+
+** Sequences
+
+_Explicit formula_: $a_n = f(n)$ for some function f, where you can calculate the n^th term directly. (*Cannot guess f of an infinite sequence with finite number of terms!)
+
+_Recurrence relation_: tells you how a_n is related to a_{n-1}, a_{n-2}..., /initial conditions/ e.g. a_0 = 0, a_1 = 1
+
+** Summation and Product
+
+_Summing_ a sequence yields another sequence.
+$$\sum_{i=m}^{n}a_i = a_m + a_{m+1} + ... + a_n = S_n, \forall{}n\in{}\mathbb{N} \ \text{  e.g. } \sum_{i=0}^{n} = \frac{n(n+1)}{2} = triangle(n)$$
+
+_Multiplying_ a sequence also yields another sequence.
+$$\prod_{i=m}^{n}a_i = a_m \times{} a_{m+1} \times{} \dots \times{} a_n = P_n, \forall{}n\in{}\mathbb{N} \ \text{  e.g. } \prod_{i=0}^{n}i = n!$$
+
+_Theorem 5.1.1 (Epp)_
+
+If a_m, a_{m+1}, a_{m+2}... and b_m, b_{m+1}, b_{m+2}... are sequences of real numbers, the following holds for n \ge m:
+
+$$\sum_{k=m}^{n}a_k + \sum_{k=m}^{n}b_k = \sum_{k=m}^{n}(a_k+b_k)$$
+$$c\cdot{}\sum_{k=m}^{n}a_k = \sum_{k=m}^{n}c\cdot{}a_k$$
+$$\prod_{k=m}^{n}a_k \cdot \prod_{k=m}^{n}b_k = \prod_{k=m}^{n}(a_k \cdot{} b_k)$$
+
+Note: lower and upper limits must be the same!
+
+_Changing variables_
+
+$$\sum_{k=1}^{n+1}\frac{k}{n+k} \rightarrow \sum_{j=0}^{n}\frac{j+1}{n+j+1} \rightarrow \sum_{k=0}^{n}\frac{k+1}{n+k+1} \ \text{ (sub } k = j+1 \text{)}$$
+
+** Common Sequences
+
+_Arithmetic sequence_
+
+$a_n = \begin{cases} a & \text{ if } n=0 \\ a_{n-1} + d & \text{ otherwise} \end{cases}$
+
+Explicit formula: $a_n = a + (n-1)d$
+
+Sequence of sum of first /n/ terms: $S_n = \frac{n}{2}[2a + (n-1)d]$
+
+_Geometric sequence_
+
+$a_n = \begin{cases} a & \text{ if } n=0, \\ ra_{n-1} & \text{ otherwise } \end{cases}$
+
+Explicit formula: $a_n = ar^n$
+
+Sequence of sum of first /n/ terms: $S_n = \frac{a(r^n-1)}{r-1}$ and if |r|<1, $S_{\infty} = \frac{a}{1-r}$
+
+_Square numbers_: $f(n) = n^2 = \text{sum of first n odd numbers}$
+
+_Triangle numbers_: $f(n) = \frac{n(n+1)}{2} = \text{sum of first n+1 integers}$
+
+_Fibonacci numbers_: $\begin{cases} 0 & \text{ if } n = 0 \\ 1 & \text{ if } n = 1 \\ F_{n-1}+F_{n-2} & \text{ otherwise} \\ \end{cases}$
+
+_Binomial numbers_: $\begin{cases} 1 & \text{ if } r = 0 \text{ and } n \ge 0 \\ {n-1\choose{r}} + {n-1\choose{r-1}} & \text{ if } 0<r\le{}n \\ 0 & \text{ otherwise} \\ \end{cases}$
+
+_Some identities_:
+- ${n\choose{r}} = {n\choose{n-r}}$
+- $\sum_{r=0}^{n}{n\choose{r}} = 2^n$
+- $\sum_{r=0}^n{n\choose{r}} = 2 \times{} \sum_{r=0}^{n-1}{n-1\choose{r}}$
+
+** Solving Recurrences
+
+_Guess and check_
+
+Calculate a few terms, guess the pattern, and check using induction.
+
+_Second-order linear homogeneous recurrence relation with constant coefficients_
+
+$a_k = Aa_{k-1} + Ba_{k-2}, \: \forall{}k\in{}\mathbb{Z}_{k\ge{}k_0}$
+
+_Theorem 5.8.3 (Epp) Distinct-Roots Theorem_
+
+For the above relation, if the characteristic equation $t^2-At-B = 0$ has 2 distinct roots /r/ and /s/, then explicit formula = $a_n = Cr^n + Ds^n$, where C and D are determined by initial conditions a_0 and a_1 (use substitution).
+
+_Theorem 5.8.5 (Epp) Single-Roots Theorem_
+
+(Same as above, but) if the characteristic equation $t^2-At-B = 0$ has a SINGLE real root /r/, then explicit formula: $a_n = Cr^n + Dnr^n$, where C and D are determined by initial conditions a_0 and a_1 (use substitution).
+
+* Sets
+
+** Introduction
+
+_Subset_: $S \subseteq T \leftrightarrow \forall{}x\in{}S, x\in{}T$
+
+_Proper subset_: $S \subset T \leftrightarrow S \subseteq T \ \wedge \ \exists{}x \ (x\in{}T \wedge x\notin{}S)$
+
+** Basic Set Theory
+
+_Universal set_: $U$ contains all objects.
+
+_Empty set_: $\phi$ or $\{\}$ has no elements.
+
+_Power set of S, $\mathcal{P}$(S)_: set whose elements are all possible subsets of S. Has 2^{|S|} elements.
+
+_Proposition 6.2.3 Proving set equality_
+
+$X \subseteq Y \wedge Y \subseteq X \ \leftrightarrow \ X=Y$
+
+_Corollary 6.2.5 (Epp) Empty set is unique_
+
+** Operations on Sets
+
+_Union_: $A \cup B = \{x\in{}U \ | \ x\in{}A \vee x\in{}B\}$
+
+_Intersection_: $A \cap B = \{x\in{}U \ | \ x\in{}A \wedge x\in{}B\}$
+
+_Disjoint_: S and T are disjoint \leftrightarrow $S \cap T = \phi$
+
+_Mutually disjoint_: Let V be a set of sets. V is mutually disjoint \leftrightarrow every 2 distinct sets in V is disjoint.
+
+$\forall{X,Y}\in{}V \ (X\ne{}Y \rightarrow X\cap{}Y = \phi)$
+
+_Partition_: V (a set of non-empty subsets of S) is a _partition_ of S if:
+- Sets in V are mutually disjoint
+- Union of sets in V = S
+- (Each element in S belongs to 1 and only 1 set in V)
+
+_Non-symmetric difference_: $S - T = \{ \ y\in{}U \ | \ y\in{}S \wedge y\notin{}T \ \}$
+
+_Symmetric difference_: $S \ominus T = \{ \ y\in{}U \ |\ y\in{}S \oplus y\in{}T \ \}$
+
+_Complement_: $A^c = U - A$ such that $x\in{}A \rightarrow x\notin{}A^c$
+
+_Theorem 6.2.1 (Epp) Subset relations_
+
+| Inclusion of intersection      | $A \cap B \subseteq A$ | $A \cap B \subseteq B$ |
+| Inclusion in union             | $A \subseteq A \cup B$ | $B \subseteq A \cup B$ |
+| Transitive property of subsets | $A \subseteq B \wedge B \subseteq C \rightarrow A \subseteq C$ |                     |
+
+_Theorem 6.2.2 (Epp) Set identities_
+
+| Commutative laws      | $A \cup B = B \cup A$         | $A \cap B = B \cap A$         |
+| Associative laws      | $(A\cup{}B)\cup{}C = A\cup(B\cup{}C)$     | $(A\cap{}B)\cap{}C = A\cap{}(B\cap{}C)$     |
+| Distributive laws     | $A\cup{}(B\cap{}C) = (A\cup{}B)\cap(A\cup{}C)$ | $A\cap{}(B\cup{}C) = (A\cap{}B)\cup(A\cap{}C)$ |
+| Identity laws         | $A \cup \phi = A$             | $A \cap U = A$             |
+| Complement laws       | $A \cup A^c = U$            | $A \cap A^c = \phi$            |
+| Double complement law | $(A^c)^c = A$             |                         |
+| Idempotent laws       | $A \cup A = A$             | $A \cap A = A$             |
+| Universal bound laws  | $A \cup U = U$             | $A \cap \phi = \phi$             |
+| De Morgan's laws      | $(A\cup{}B)^c = A^{c}\cap{}B^c$   | $(A\cap{}B)^{c} = A^{c}\cup{}B^c$   |
+| Absorption laws       | $A\cup{}(A\cap{}B) = A$           | $A\cap{}(A\cup{}B) = A$           |
+| Complements           | $U^c = \phi$                | $\phi^c = U$                |
+| Set difference        | $A-B = A\cap{}B^c$            |                         |
+
+_Theorem 6.2.3 (Epp) Intersection and Union with a subset_
+
+$A \subseteq B \rightarrow (A \cap{} B = A) \ \wedge \ (A \cup{} B = B)$
+
+* Relations
+
+** Introduction to Relations
+
+_Ordered pair (x,y)_: object with first element /x/, second element /y/
+
+_Cartesian product S\times{}T_: set of all ordered pairs (x,y) where x\in{}S, y\in{}T
+
+** Relations
+
+_Binary relation $\mathrel{R}$ from S to T_: subset of S\times{}T
+- $s \mathrel{R} t \equiv (s,t) \in \mathrel{R}$
+- $s \not \mathrel{R} t \equiv (s,t) \notin \mathrel{R}$
+
+_Domain of $\mathrel{R}$, Dom($\mathrel{R}$)_: the set $\{ \ s\in{}S \ | \ \exists{}t\in{}T \ (s \mathrel{R} t) \ \}$
+
+_Image of $\mathrel{R}$, Im($\mathrel{R}$)_: the set $\{ \ t\in{}T \ | \ \exists{}s\in{}T \ (s \mathrel{R} t) \ \}$ (also known as /range/)
+
+_Codomain of $\mathrel{R}$, coDom($\mathrel{R}$)_: the set $T$
+
+_Proposition 8.2.5_
+
+$Im(\mathrel{R}) \subseteq coDom(\mathrel{R})$ where $\mathrel{R}$ is a binary relation
+
+_Inverse of $\mathrel{R}$, $\mathrel{R}^{-1}$_: the relation from T to S, where $\{ \ (t,s)\in{}T\times{}S \ | \ (s,t) \in{} \mathrel{R} \ \}$ i.e. $\forall{}s\in{}S, \forall{}t\in{}T, (s \mathrel{R} t \leftrightarrow t \mathrel{R}^{-1} s)$
+
+_Composition of $\mathrel{R}$ with $\mathrel{R}'$, $\mathrel{R}' \circ \mathrel{R}$_: where $\mathrel{R} \subseteq S\times{}T$ $\mathrel{R}' \subseteq T\times{}U$, is the relation from $S$ to $U$ such that $\forall{}s\in{}S, \forall{}u\in{}U (s \mathrel{R'\circ{}R} u \leftrightarrow (\exists{}t\in{}T (s \mathrel{R} t \wedge t \mathrel{R}' u)))$
+- i.e. s\in{}S and u\in{}U are related iff there is a 'path' from s to u, through some intermediate element t\in{}T
+
+_Proposition 8.2.9 Composition is associative_
+
+$\mathrel{R''\circ{}R'\circ{}R} \ = \ \mathrel{(R''\circ{}R')\circ{}R} \ = \ \mathrel{R''\circ{}(R'\circ{}R)}$
+
+_Proposition 8.2.10 Inverse of composite_
+
+$\mathrel{(R'\circ{}R)^{-1}} \ = \ \mathrel{R^{-1} \circ{} R'^{-1}}$
+
+** Properties of Relations on a Set
+
+Let A be a set, $\mathrel{R}$ be a relation on A.
+
+_Reflexive_: $\mathrel{R}$ is reflexive \leftrightarrow $\forall{}x\in{}A \ (x \mathrel{R} x)$
+
+_Symmetric_: $\mathrel{R}$ is symmetric \leftrightarrow $\forall{}x,y\in{}A \ (x \mathrel{R} y \rightarrow y \mathrel{R} x)$
+
+_Transitive_: $\mathrel{R}$ is transitive \leftrightarrow $\forall{}x,y,z\in{}A \ (x \mathrel{R} y \wedge y \mathrel{R} z \rightarrow x \mathrel{R} z)$
+
+** Equivalence Relations
+
+_Equivalence relation_: $\mathrel{R}$ is an equivalence relation \leftrightarrow $\mathrel{R}$ is reflexive, symmetric, and transitive
+
+_Equivalence class of x, [x]_: $[x] = \{ \ y\in{}A \ | \ x \mathrel{R} y \ \}$ where $\mathrel{R}$ is an equivalence relation on A (i.e. all related to x)
+
+_Theorem 8.3.4 (Epp) Partition induced by an equivalence relation_
+
+Let $\mathrel{R}$ be an equivalence relation on A. Then the set of distinct equivalence classes form a /partition/ of A.
+
+_Theorem 8.3.1 (Epp) Equivalence relation induced by a partition_
+
+Let S_1, S_2... be a partition of A. Then there exists an /equivalence relation/ $\mathrel{R}$ on A where equivalence classes make up that partition.
+
+** More Definitions
+
+_Transitive closure of $\mathrel{R}$, $\mathrel{R^t}$_ is a relation such that:
+- $\mathrel{R^t}$ is transitive
+- $\mathrel{R} \subseteq \mathrel{R^t}$
+- If $S$ is any other transitive relation such that $\mathrel{R} \subseteq S$, then $\mathrel{R^t} \subseteq S$ (i.e. $\mathrel{R^t}$ is the /smallest superset/ that is transitive)
+
+_Reflexive closure_ and _symmetric closure_ are defined similarly
+
+_Repeated compositions_
+
+$\mathrel{R^n} \ \ = \ \ \mathrel{R} \circ \mathrel{R} \circ \ldots \mathrel{R} \ \ = \ \ \bigodot_{i=1}^{n}\mathrel{R}$
+
+_Proposition 8.5.2 Finding the transitive closure_
+
+$\mathrel{R^t} = \bigcup_{i=1}^{\infty}\mathrel{R^i}$ i.e. $\mathrel{R^1} \cup \mathrel{R^2} \cup \mathrel{R^3} \cup \ldots$
+
+** Partial and Total Orders
+
+_Partial order_: \preceq is a partial order \leftrightarrow \preceq is /reflexive/, /anti-symmetric/, and /transitive/ (where \preceq is a binary relation)
+- _Anti-symmetric_: $\mathrel{R}$ is anti-symmetric \leftrightarrow $\forall{}x,y\in{}A \ (x \mathrel{R} y \wedge y \mathrel{R} x) \rightarrow x = y$
+
+_Total order_: A partial order \preceq is a total order \leftrightarrow $\forall{}x,y\in{}A \ (x \preceq y \vee y \preceq x)$ (i.e. it is a partial order where all x,y are comparable)
+- _Comparable_: Elements /a/ and /b/ are comparable \leftrightarrow $a \preceq b \vee b \preceq a$ (w.r.t some partial order \preceq)
+- E.g. $(\mathbb{Z}, \le)$ is a total order
+
+** Max, Min, Well-ordered
+
+For \preceq as a partial order on A,
+- _Maximal_: An element /x/ is maximal \leftrightarrow $\forall{}y\in{}A \ (x \preceq y \rightarrow x = y)$
+- _Maximum_: An element $\top$ is maximum \leftrightarrow $\forall{}x\in{}A \ (x \preceq \top)$
+- _Minimal_: An element /x/ is minimal \leftrightarrow $\forall{}y\in{}A \ (y \preceq x \rightarrow x = y)$
+- _Minimum_: An element $\bot$ is minimum \leftrightarrow $\forall{}x\in{}A \ (\bot \preceq x)$
+
+_Well-ordered_: $A$ is well-ordered \leftrightarrow $\forall{}S\in\mathcal{P}(A) \ (S\neq{}\phi \rightarrow \exists{}x\in{}S \ \ \forall{}y\in{}S \ (x \preceq y))$ for some total order \preceq, i.e. every non-empty subset contains a minimum element
+- E.g. $(\mathbb{Z^{+}}, \le)$ is well-ordered, but $(\mathbb{Z}, \le)$ is not
+
+* Functions
+
+** Functions
+
+_Function_: f is a function from S to T, $f:S\rightarrow{}T$ \leftrightarrow f a relation where $\forall{}x\in{}S, \exists!y\in{}T \ (x \ f \ y)$
+
+_Pre-image_: x is a pre-image of y \leftrightarrow for some x\in{}S, \exists{}y\in{}T such that f(x)=y
+
+_Inverse image_
+- Inverse image of y = $\{ \ x\in{}S \ | \ f(x)=y \ \}$ i.e. set of all its pre-images
+- Inverse image of U = $\{ \ x\in{}S \ | \ \exists{}y\in{}U, f(x)=y \ \}$ i.e. set of all pre-images of all elements of U
+
+_Restriction_: restriction of f to U is the set $\{ \ (x,y)\in{}U\times{}T \ | \ f(x)=y \ \}$
+
+** Function Properties
+
+Let $f:S\rightarrow{}T$ be a function.
+
+_Injective_: $f:S\rightarrow{}T$ is injective/one-one \leftrightarrow $\forall{}y\in{}T, \forall{}x_{1},x_{2}\in{}S \ (f(x_1)=y \wedge f(x_2)=y) \rightarrow x_1=x_2$
+
+_Surjective_: $f:S\rightarrow{}T$ is surjective/onto \leftrightarrow $\forall{}y\in{}T, \exists{}x\in{}S \ (f(x) = y)$
+
+_Bijective_: $f:S\rightarrow{}T$ is bijective \leftrightarrow $f$ is both injective and surjective
+
+_Inverse_: $f$ is bijective \leftrightarrow $f^{-1}$ is a function
+
+** Composition
+
+Let $f:S\rightarrow{}T$ and $g:T\rightarrow{}U$ be two functions.
+
+_Composition_: $g \circ f:S\rightarrow{}U$ is a function where $(g \circ f)(x) = g(f(x))$
+
+_Identity function on A, I_A_: $\forall{}x\in{}A \ (I_A(x) = x)$
+
+_Proposition 7.3.3 Composing with inverse gives identity_
+
+$f^{-1} \circ f = I_A$ where $f:A\rightarrow{}A$ is injective
+
+$f \circ f^{-1} = I_A$ where $f:A\rightarrow{}A$ is bijective
+
+* Counting and Probability
+
+_Sample space_: Set of all possible outcomes of a random process
+
+_Event_: Subset of a sample space
+
+_N(A)_: Number of elements in event A
+
+$P(E) = \frac{N(E)}{N(S)}$, where S is a finite sample space, all outcomes are equally likely, E is an event in S
+
+_Theorem 9.1.1 Number of elements in a list_
+
+There are $n-m+1$ integers from m to n inclusive.
+
+** Possibility Trees and Multiplication Rule
+
+_Probability tree_: Keeps track of all possibilities of situations that happen in order
+
+_Theorem 9.2.1 Multiplication Rule_
+
+An operation of /k/ steps (where step 1 has n_1 ways, step 2 has n_2 ways) can be performed in $n_1 \times n_2 \times \dots \times n_k$ ways. The steps must be independent.
+
+_Permutation_: A permutation of a set of /n/ objects is an *ordering* of the objects in a row.
+$\#Permutations = n!$
+
+_r-Permutation_: A r-permutation of a set of /n/ elements, P(n, r) is an ordered selection of /r/ elements from that set.
+
+_Theorem 9.2.3 r-Permutations from a set of /n/ elements_
+
+$P(n, r) = \frac{n!}{(n-r)!}$
+
+** Counting Elements of Disjoint Sets
+
+_Theorem 9.3.1 Addition Rule_
+
+$N(A) = N(A_1) + N(A_2) + \dots + N(A_k)$, where $A = A_1 \cup A_2 \cup \dots \cup A_k$ (A is the union of mutually disjoint sets)
+
+_Theorem 9.3.2 Difference Rule_
+
+$N(A-B) = N(A) - N(B)$, where $B \subseteq A$
+
+_Probability of complement_
+
+$P(A^C) = 1 - P(A)$
+
+_Theorem 9.3.3 Inclusion/Exclusion Rule for 2 or 3 sets_
+
+$N(A \cup B) = N(A) + N(B) - N(A \cap B)$
+
+$N(A \cup B \cup C) = N(A) + N(B) + N(C) - N(A \cap B) - N(A \cap C) - N(B \cap C) + N(A \cap B \cap C)$
+
+** Pigeonhole Principle
+
+_Pigeonhole principle_: A function from a finite set to a smaller finite set cannot be one-to-one/injective.
+
+_Generalized pigeonhole principle_
+
+For any function $f:X\rightarrow{}Y$ (where X has /n/ elements, Y has /m/ elements), for any positive integer /k/ such that $k < \frac{n}{m}$, there exists some $y\in{}Y$ such that /y/ is the image of at least /k+1/ distinct elements of X.
+
+_Generalized pigeonhole principle (contrapositive)_
+
+For any function $f:X\rightarrow{}Y$ (where X has /n/ elements, Y has /m/ elements), if for all $y\in{}Y$ $f^{-1}(y)$ has at most /k/ elements, then X has at most /km/ elements, i.e. $n<km$.
+
+_Theorem 9.4.2_
+
+For a function $f:X\rightarrow{}Y$ (where X and Y have the same number of elements), /f/ is one-to-one \leftrightarrow /f/ is onto.
+
+** Combinations
+
+_Combination_: A subset of a set.
+
+_r-Combination_: A r-Combination of a set of /n/ elements is a subset with /r/ elements.
+
+_Theorem 9.5.1 r-Combinations from a set of /n/ elements_
+
+${n\choose{}r}^{} = \frac{n!}{r!(n-r!)} = \frac{P(n,r)}{r!}$, so we can deduce $P(n,r) = r! \times C(n,r)$
+
+_Theorem 9.5.2 Permutations of sets with repeated/indistinguishable elements_ (think MISSISSIPPI)
+
+$\#Permutations = {{n}\choose{}{n_1}} \times {{n - n_1}\choose{}{n_2}} \times {{n-n_1-n_2}\choose{}{n_3}} \times \dots \times {{n-n_1- \dots -n_{k_1}}\choose{}{n_k}} = \frac{n!}{n_1!\times{}n_2!\times{}\dots{}\times{}n_k!}$
+
+(where n_1 elems are indistinguishable from one another, n_2 elems are indistinguishable from one another, etc.)
+
+** r-Combinations with Repetition Allowed
+
+_Multiset_: a multiset of size /r/ is a r-combination with repetition allowed
+
+_Theorem 9.6.1 Number of r-combinations with repetition allowed_
+
+$\#\text{Number of ways} = {{r+n-1}\choose{}{r}}$
+
+** Summary
+
+| Select /r/ of /n/ elements | Order matters | Order does NOT matter |
+|------------------------+---------------+-----------------------|
+| Repetition allowed     | $r^k$          | ${{r+n-1}\choose{r}}$ |
+| Repetition NOT allowed | $P(n,r)$      | $C(n,r)$              |
+
+** Pascal's Formula and Binomial Theorem
+
+_Pascal's formula_: ${{n+1}\choose{r}} = {n\choose{r}} + {n\choose{r-1}}$
+
+_Theorem 9.7.2 Binomial Theorem_
+
+$(a+b)^n = \sum_{k=0}^{n} {n\choose{k}}a^{n-k}b^k = a^n + {n\choose{1}}a^{n-1}b^1 + {n\choose{2}}a^{n-2}b^2 + \dots + {n\choose{n-1}}a^{1}b^{n-1} + b^n$
+
+** Probability Axioms and Expected Value
+
+_Probability axioms_: (let S be a sample space, P be a probability function)
+- $0 \le P(A) \le 1$
+- $P(\phi) = 0$ and $P(S) = 1$
+- $P(A \cup B) = P(A) + P(B) - P(A \cap B)$
+- $P(A^C) = 1-P(A)$
+
+_Expected value_ of a process = $\sum_{k=1}^{n}a_{k}p_{k} = a_{1}p_1 + a_{2}P_2 + \dots + a_{n}p_n$ (where a_i is an outcome with probability p_i)
+
+_Linearity of expectation_: holds true regardless of whether the events are independent!
+
+$E(X+Y) = E(X) + E(Y)$
+
+$E(\sum_{i=1}^{n}c_{i}X_i) = \sum_{i=1}^{n}(c_i \times E(X_i))$
+
+** Conditional Probability, Bayes' Theorem, Independent Events
+
+_Conditional probability_: $P(B|A) = \frac{P(B\cap{}A)}{P(A)}$ i.e. $P(A\cap{}B) = P(B|A)\times{}P(A)$
+
+_Theorem 9.9.1 Bayes' Theorem_
+
+$P(B_k|A) = \frac{P(A|B_k)\times{}P(B_k)}{P(A|B_1)\times{}P(B_1) \: + \: P(A|B_2)\times{}P(B_2) \: + \: \dots \: + \: P(A|B_n)\times{}P(B_n)}$
+
+where sample space S is a union of mutually disjoint events B_1 to B_n
+
+_Independent events_: A and B are independent \leftrightarrow $P(A\cap{}B) = P(A)\times{}P(B)$
+
+_Pairwise independent_: A, B, C are pairwise independent \leftrightarrow A and B, A and C, B and C are independent
+
+_Mutually independent_: A, B, C are mutually independent \leftrightarrow A, B, C are pairwise independent and $P(A\cap{}B\cap{}C) = P(A)\times{}P(B)\times{}P(C)$
+
+* Graphs and Trees
+
+** Graphs
+
+_Graph_: $G = \{V, E\}$ where $E(G)$ contains $e = \{v, w\} \text{ for } v,w\in{}V(G)$
+- Edges _incident_ on v: edges with v as one of its endpoints
+- Edges _adjacent_ to e: edges with a common endpoint to e
+- Vertices _adjacent_ to v: vertices connected by a common edge
+
+_Directed graph_: $G = \{V, D\}$ where $D(G)$ contains $e = (v, w)$
+
+_Simple graph_: undirected graph with no loops or parallel edges
+
+_Complete graph on /n/ vertices, K_n_: a simple graph with /n/ vertices, exactly 1 edge connecting each distinct pair of vertices. $\#edges = {n\choose2}$
+
+_Complete bipartite graph on (m,n) vertices, K_{m,n}_: simple graph with distinct vertices v_1 to v_m, w_1 to w_m where:
+- Edge between each v_i to each w_j, no edge between any v_i to v_k or any w_i to w_l
+- $\#edges = m \times{} n$
+
+_Degree of vertex v, deg(v)_: #edges incident on v, where loops (if any) are counted twice
+
+_Total degree of graph G_: sum of degrees of all the vertices of G
+
+_Theorem 10.1.1 Handshake Theorem_
+
+$\text{Total degree of G} = 2\times{}\text{\#edges in G}$
+
+So total degree is even, and there is an even number of vertices with odd degrees.
+
+** Trails, Paths, and Circuits
+
+_Walk from /v/ to /w/_: Finite alternating sequence of adjacent vertices and edges of G
+
+_Trail from /v/ to /w/_: Walk from /v/ to /w/ with _no repeated edges_
+
+_Path from /v/ to /w/_: Trail from /v/ to /w/ with _no repeated vertices_
+
+_Closed walk_: Walk that starts and ends _at same vertex_
+
+_Circuit/cycle_: Closed walk that is non-trivial with _no repeated edges_
+
+_Simple circuit/cycle_: Circuit with _no repeated vertices_ (except first and last)
+
+|                | Repeated edge? | Repeated vertex?    | Starts and ends at same pt? | Must have at least 1 edge? |
+|----------------+----------------+---------------------+-----------------------------+----------------------------|
+| Walk           | OK             | OK                  | OK                          | X                          |
+| Trail          | X              | OK                  | OK                          | X                          |
+| Path           | X              | X                   | X                           | X                          |
+| Closed walk    | OK             | OK                  | \check                           | X                          |
+| Circuit        | X              | OK                  | \check                           | \check                          |
+| Simple circuit | X              | Only first and last | \check                           | \check                          |
+
+_Connected vertices_: v and w are connected \leftrightarrow there is a walk from v to w
+
+_Connected graph_: for all vertices v and w, they are connected i.e. there is a walk from v to w
+
+_Lemma 10.2.1_
+- If G is _connected_, any v,w\in{}V(G) can be connected by a _path_
+- If vertices v,w\in{}V(G) are part of a _circuit_, and you _remove 1 edge_ in the circuit, there still exists a _trail_ from v to w
+- If G is _connected_ and G contains a _circuit_, then can _remove 1 edge_ in the circuit _without disconnecting_ G
+
+_Connected component_: graph H is a connected component of G \leftrightarrow H is a connected subgraph, and it is the largest possible (no other connected subgraph is a superset of H, containing vertices/edges not in H)
+
+_Euler circuit_: A circuit that contains every vertex and every edge (i.e. starts and ends at same vertex, uses every edge exactly once, every vertex at least once)
+
+_Eulerian graph_: A graph with an Euler circuit
+
+_Theorem 10.2.4_
+
+A graph has an Euler circuit \leftrightarrow the graph is connected and every vertex has a positive even degree
+
+_Euler trail_: A trail from v to w that contains every vertex and every edge (i.e. Euler circuit but can start and end at different vertices)
+
+_Corollary 10.2.5_
+
+A graph has an Euler trail from v to w \leftrightarrow the graph is connected, every vertex has a positive even degree except v and w (odd degree)
+
+_Hamiltonian circuit_: A simple circuit that includes every vertex of G (i.e. starts and ends at same vertex, uses every vertex exactly once except first/last)
+
+_Hamiltonian graph_: A graph with a Hamiltonian circuit
+
+_Proposition 10.2.6_
+
+If graph G has a Hamiltonian circuit, then G has a subgraph H where:
+- H has every vertex of G, H is connected
+- H has same number of edges as vertices
+- Every vertex of H has degree 2
+
+** Matrix Representations of Graphs
+
+_Adjacency matrix_: (a_{ij}) represents number of edges from v_i to v_j. Undirected adjacency matrices are always symmetric.
+
+_Theorem 10.3.1_
+
+A graph G with connected components G_1 to G_k can be represented as the follows, with A_i representing the adjacency matrix of G_i:
+
+$$\begin{bmatrix} A_1 & 0 & \dots & 0 \\ 0 & A_2 & \dots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \dots & A_k \\ \end{bmatrix}$$
+
+_Theorem 10.3.2 Number of walks of length N_
+
+(i,j)-entry of A^n = #walks of length n from v_i to v_j
+
+** Planar Graphs
+
+_Isomorphism_: G is isomorphic to G' \leftrightarrow there exists one-to-one correspondences (mappings) from each vertex to another vertex, each edge to another edge
+
+_Theorem 10.4.1 Graph isomorphism as an equivalence relation_
+
+Let R be the relation of graph isomorphism on a set of graphs S. Then R is an equivalence relation on S.
+
+_Planar graph_: A graph that can be drawn on a 2D plane without crossing edges
+
+_Euler's formula_: $f = e - v + 2$
+
+** Trees
+
+_Tree_: a connected graph that is circuit-free
+
+_Forest_: a graph that is circuit-free and NOT connected
+
+_Lemma 10.5.1_
+
+Any non-trivial tree has at least one vertex of degree 1. (actually, at least two vertices)
+
+_Leaf_: A vertex in a tree with degree 1, i.e. terminal vertex
+
+_Internal vertex_: A vertex in a tree (with \ge3 vertices) with degree > 1
+
+_Theorem 10.5.2_
+
+Any tree with n vertices (n>0) has n-1 edges.
+
+_Theorem 10.5.4_
+
+If G is a _connected_ graph with n vertices and n-1 edges, then G is a tree.
+
+** Rooted Trees
+
+_Rooted tree_: a tree in which one vertex is designated as the root
+- _Level_ of the root = 0
+
+_Binary tree_: a rooted tree in which every parent has no more than 2 children
+
+_Full binary tree_: a rooted tree in which every parent has exactly 2 children
+
+_Theorem 10.6.1 Full Binary Tree Theorem_
+
+If T is a full binary tree with /k/ internal vertices, then T has (2k+1) vertices and (k+1) terminal vertices.
+
+_Theorem 10.6.2 Height and Terminal Vertices of a Binary Tree_
+
+A binary tree T with height /h/ and /t/ terminal vertices => $t\le2^h$ and $log_{2}t\le{}h$
+
+_BFS_: Traverse the tree level by level, starting from root and exploring adjacent vertices
+
+_DFS_: Traverse the tree by exploring immediate neighbours recursively
+
+** Spanning Trees and Shortest Paths
+
+_Spanning tree for G (connected graph)_: a tree containing every vertex of G
+
+_Proposition 10.7.1_
+
+Every connected graph with $n$ vertices has a spanning tree with $n-1$ edges.
+
+_Minimum spanning tree for G (connected weighted graph)_: a spanning tree with minimum total weight
+
+_Kruskal's algorithm_: Greedy, repeatedly pick edge of minimum weight that doesn't create a circuit
+
+_Prim's algorithm_: Greedy, start from a vertex /v/ and explore outwards, adding the edge of minimum weight that connects a vertex in the current tree to another vertex NOT in the current tree
+
+* Epp
+
+** Inequalities
+
+_T17_: /Trichotomy law/ For arbitrary real numbers a and b, exactly 1 of the 3 relations a < b, b < a, or a = b holds.
+
+_T18_: /Transitive Law/ If a < b and b < c, then a < c.
+
+_T19_: If a < b, then a + c < b + c (/addition/)
+
+_T20_: If a < b and c > 0, then ac < bc (/multiplication with +ve/)
+
+_T21_: If a \ne 0, then a^2 > 0 (/square > 0/)
+
+_T22_: 1 > 0.
+
+_T23_: If a < b and c < 0, then ac > bc (/multiplication with -ve/)
+
+_T24_: If a < b, then -a > -b. In particular, if a < 0, then -a > 0. (/taking negatives/)
+
+_T25_: If ab > 0, then both a and b are positive or both are negative. (/ab > 0/)
+
+_T26_: If a < c and b < d, then a+b < c+d. (/adding inequalities/)
+
+_T27_: If 0 < a < c and 0 < b < d, then 0 < ab < cd (/multiplying inequalities/)
