@@ -1,0 +1,241 @@
+#+TITLE: MA1102R Cheatsheet
+#+DATE: [2019-03-02]
+#+LATEX_CLASS: article
+#+LATEX_HEADER: \usepackage{parskip}  \setlength{\parindent}{0pt} \setlength{\parskip}{2pt}
+#+LATEX_HEADER: \usepackage{sectsty} \setcounter{secnumdepth}{1} \allsectionsfont{\raggedright}
+#+LATEX_HEADER: \usepackage{enumitem} \setlist[1]{itemsep=-2pt} \setlist[itemize]{leftmargin=*} \setlist[enumerate]{leftmargin=*}
+#+LATEX_HEADER: \usepackage{titlesec} \titleformat{\section}{\large\bfseries\raggedright}{\thesection.}{\hspace{5pt}}{} \titleformat*{\subsection}{\footnotesize\bfseries\raggedright} \titlespacing{\section}{0pt}{6pt}{2pt} \titlespacing{\subsection}{0pt}{4pt}{0pt}
+#+LATEX_HEADER: \usepackage[a4paper, landscape, margin=0.3in]{geometry}
+#+LATEX_HEADER: \usepackage{multicol}
+#+OPTIONS: author:nil title:nil toc:nil
+
+\centering
+\header{MA1102R Cheatsheet}
+
+\raggedright
+\begin{multicols*}{4}
+\footnotesize
+
+* Functions
+
+\centering
+
+$csc(\theta) = \frac{1}{sin(\theta)}$ \\
+$sec(\theta) = \frac{1}{cos(\theta)}$ \\
+$cot(\theta) = \frac{1}{tan(\theta)}$
+
+$cos^2(\theta)+sin^2(\theta)=1$ \\
+$1+tan^2(\theta)=sec^2(\theta)$ \\
+$1+cot^2(\theta)=csc^2(\theta)$
+
+$cos(A+B) = cos(A)cos(B)-sin(A)sin(B)$ \\
+$sin(A+B) = sin(A)cos(B)+cos(A)sin(B)$
+
+$cos(2\theta)=cos^2(\theta)-sin^2(\theta)$ \\
+$sin(2\theta)=2sin(\theta)cos(\theta)$
+
+$cos^2(\theta)=\frac{1+cos(2\theta)}{2}$ \\
+$sin^2(\theta)=\frac{1-cos(2\theta)}{2}$
+
+\raggedright
+* Limits and Continuity
+
+** Limit
+
+Let $f(x)$ be defined on an open interval around c.
+
+$\lim_{x\to{}c}{f(x)} = L \text{ if } \forall\epsilon>0 \: \exists{}\delta{}>0 \text{ such that}$
+$|f(x)-L|<\epsilon \text{ whenever } 0<|x-c|<\delta{}$
+
+** Finding limits
+
+1. Solve $|f(x)-L|<\epsilon$ to find interval $(a,b)$ containing c, true for all x\ne{}c
+2. Find $\delta{}>0$ such that $(c-\delta,c+\delta)$ is within $(a,b)$
+
+** (T4) Sandwich Theorem
+
+Let $g(x)\le{}f(x)\le{}h(x) \: \forall{}x$ in some open interval around c.
+ $$\text{If } \lim_{x\to{}c}{g(x)} = \lim_{x\to{}c}{h(x)} = L \text{, then} \lim_{x\to{}c}{f(x)} =L$$
+
+** Continuity
+
+$f$ is continuous at c if left and right-limits agree with function value at $x=c$, i.e.:
+
+$$\lim_{x\to{}c}{f(x)}=f(c)$$
+
+** (T8) Properties of Continuous Functions
+
+Let $f$ and $g$ be continuous functions at $x=c$. Then these are also continuous at $x=c$: sums and differences ($f\pm{}g$), constant multiples, products and quotients, powers and roots
+
+** (T9) Compositions of Continuous Functions
+
+If $f$ is continuous at $c$ and $g$ is continuous at $f(c)$, then $g\circ{}f$ is continuous at $c$
+
+** (T10) Limits of Continuous Functions
+
+If $lim_{x\to{}c}{f(x)}=b$ and $g$ is continuous at $b$, then $lim_{x\to{}c}{g(f(x))}=g(b)$
+
+** (T11) Intermediate Value Theorem for Continuous Functions
+
+If $f$ is a continuous function on $[a,b]$ and $y_0$ is any value between $f(a)$ and $f(b)$, then $y_0=f(c)$ for some $c\in{}[a,b]$
+
+** Limits involving Infinity
+
+$\lim_{x\to{}\infty{}}{f(x)}=L \text{ if } \forall{}\epsilon{}>0 \: \exists{}M \text{ such that}$
+$|f(x)-L|<\epsilon{} \text{ whenever } x>M$
+\\
+$\lim_{x\to{}c}{f(x)}=\infty{} \text{ if } \forall{}B>0 \: \exists\delta{} \text{ such that }$
+$f(x)>B \text{ whenever } 0<|x-c|<\delta{}$
+
+* Derivatives
+
+** Derivative
+
+Derivative exists at $x=x_0$ if left and right derivatives exist there, and are equal
+
+\begin{equation*}
+\begin{align}
+f'(x) &= \lim_{h\to{}0}{\frac{f(x+h)-f(x)}{h}} \\
+&= \lim_{z\to{}x}{\frac{f(z)-f(x)}{z-x}}
+\end{align}
+\end{equation*}
+
+** (T1) Differentiability implies Continuity
+
+If $f$ has a derivative at $x=c$, then $f$ is continuous at $x=c$
+
+** Differentiation Rules
+
+\centering
+
+$\frac{d}{dx}(c)=0$ \hspace{0.5cm}
+$\frac{d}{dx}(cu)=c\cdot{}\frac{du}{dx}$
+
+$\frac{d}{dx}x^n=nx^n-1$ \hspace{0.5cm}
+$\frac{d}{dx}(u+v)=\frac{du}{dx}+\frac{dv}{dx}$
+
+$\frac{d}{dx}(uv)=u\frac{dv}{dx}+v\frac{du}{dx}$ \hspace{0.5cm}
+$\frac{d}{dx}(\frac{u}{v})=\frac{v\frac{du}{dx}-u\frac{dv}{dx}}{v^2}$
+
+\raggedright
+
+** Trigo Derivatives
+
+\centering
+$(\sin{x})'=\cos{x}$ \hspace{0.3cm}
+$(\cos{x})'=-\sin{x}$
+
+$(\tan{x})'=\sec^{2}{x}$ \hspace{0.3cm}
+$(\cot{x})'=-\csc^{2}{x}$
+
+$(\sec{x})'=\sec{x}\tan{x}$ \hspace{0.3cm}
+$(\csc{x})'=-\csc{x}\cot{x}$
+
+\raggedright
+
+** (T2) Chain Rule
+
+Let $g(x)$ be differentiable at $x$, and $f(u)$ be differentiable at $u=g(x)$.
+
+$$(f\circ{}g)'(x)=f'(g(x))\cdot{}g'(x)$$
+
+i.e. Let $y=f(u)$ and $u=g(x)$.
+$$\frac{dy}{dx}=\frac{dy}{du}\cdot\frac{du}{dx}$$
+
+** Implicit Differentiation
+
+1. Differentiate both sides of the equation wrt $x$, treating $y$ as a differentiable function of $x$.
+2. Collect terms with $\frac{dy}{dx}$ on one side of the equation to solve for it.
+
+** Linearization
+
+Linearization of $f$ at $a$, $L(x)=f(a)+f'(a)(x-a)$
+
+* Applications of Derivatives
+
+** Extreme Values
+
+$f$ has absolute maximum at $c$ if $f(x)\le{}f(c) \: \forall{}x\in{}D$
+
+$f$ has absolute minimum at $c$ if $f(x)\ge{}f(c) \: \forall{}x\in{}D$
+
+_Critical point_: an /interior/ point of $f$, where $f'(x)=0/\text{undefined}$.
+
+** (T1) Extreme Value Theorem
+
+If $f$ is continuous on $[a,b]$, then it has absolute max $M$ and absolute min $m$ in $[a,b]$.
+
+** (T2) 1^st Derivative of Local Extreme Values = 0
+
+If $f$ has local min/max at an /interior/ point $c\in{}D$, and $f'$ is defined at $c$, then $f'(c)=0$.
+
+** Finding Absolute Extrema
+
+- Find all critical points of $f$
+- Evaluate $f$ at all /critical/ points and /endpoints/
+- Take largest and smallest values
+
+** (T3) Rolle's Theorem
+
+Let $f$ be a /continuous/ function over $[a,b]$ and /differentiable/ at every point of its interior $(a,b)$.
+
+If $f(a)=f(b)$, then $\exists{}c\in{}(a,b)$ at which $f'(c)=0$
+
+** (T4) Mean Value Theorem
+
+(Same conditions as above)
+
+$\exists{}c\in{}(a,b)$ at which $\frac{f(b)-f(a)}{b-a}=f'(c)$
+
+_Corollary 1_: If $f'(x)=0 \: \forall{}x\in{}[a,b]$, then $f(x)=C$ for all such $x$
+
+_Corollary 2_: If $f'(x)=g'(x) \: \forall{}x\in{}[a,b]$, then $f(x)=g(x)+C$ for all such $x$
+
+_Corollary 3a_: If $f'(x)>0 \: \forall{}x\in{}[a,b]$, then $f$ is increasing on $[a,b]$. If $f'(x)<0$, then $f$ is decreasing.
+
+** 1^st Derivative Test
+
+- Local minimum: $f'$ moves from $-ve$ to $+ve$
+- Local maximum: $f'$ moves from $+ve$ to $-ve$
+- Local extremum: $f'$ does not change sign
+
+** Concavity
+
+- Concave up: $\;\;\;$ $f'$ /increasing/ on $I$ --- $f''$ $+ve$
+- Concave down: $f'$ /decreasing/ on $I$ --- $f''$ $-ve$
+
+_Point of inflection_: point where graph has tangent line, and /concavity/ changes. Here, $f''(c)=0/\text{undefined}$.
+
+But $f''(c)=0$ alone does not guarantee point of inflection.
+
+** (T5) 2^nd Derivative Test
+
+- Local maximum: $f'(c)=0$ and $f''(c)<0$
+- Local minimum: $f'(c)=0$ and $f''(c)>0$
+- TEST FAILS IF: $f'(c)=0$ and $f''(c)=0$
+
+** Newton's Method
+
+$x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}$, with initial guess $x_0$
+
+* Integrals
+
+** Riemann sum
+
+Partition a closed interval $[a,b]$, $P = \{x_{0}...x_{n}\}$.
+
+For each $k$ from 1 to $n$, choose $c_{k}\in{}[x_{k-1},x_{k}]$.
+
+_Riemann sum_ = $\sigma_{k=1}^{n}{\delta{x_k}\cdot{}f(c_k)}$
+
+_Norm_ of a partition, $||p||=\max_{k=1..n}\delta{x_k}$, i.e. the largest sub-interval
+
+** Definite Integral
+
+_Definite integral_ $J$ is the limit of Riemann sums $\sum_{k=1}^{n}f(c_k)\Delta{x_k}$, whereby $\forall{}\epsilon{}>0, \exists\delta{}>0$ such that for any partition $P=\{x_{0}...x_{n}\}$ with $||p||<\delta{}$ and any choice of $c_{k}\in{}[x_{k-1},x_k]$:
+
+$$\(\lvert \sum_{k=1}^{n}f(c_k)\Delta{x_k}-J \rvert\)<\epsilon{}$$
+
+$$\int_{a}^{b}f(x) \: dx=\lim_{||p||\to{}0}\sum_{k=1}^{n}(c_k)\Delta{x_k}$$
+
+\end{multicols*}
