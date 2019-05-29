@@ -1,10 +1,11 @@
 #+TITLE: MA1102R Cheatsheet
+#+AUTHOR: halfwhole
 #+DATE: [2019-03-02]
 #+LATEX_CLASS: article
 #+LATEX_HEADER: \usepackage{parskip}  \setlength{\parindent}{0pt} \setlength{\parskip}{2pt}
 #+LATEX_HEADER: \usepackage{sectsty} \setcounter{secnumdepth}{1} \allsectionsfont{\raggedright}
 #+LATEX_HEADER: \usepackage{enumitem} \setlist[1]{itemsep=-2pt} \setlist[itemize]{leftmargin=*} \setlist[enumerate]{leftmargin=*}
-#+LATEX_HEADER: \usepackage{titlesec} \titleformat{\section}{\large\bfseries\raggedright}{\thesection.}{\hspace{5pt}}{} \titleformat*{\subsection}{\footnotesize\bfseries\raggedright} \titlespacing{\section}{0pt}{6pt}{2pt} \titlespacing{\subsection}{0pt}{4pt}{0pt}
+#+LATEX_HEADER: \usepackage{titlesec} \titleformat{\section}{\normalsize\bfseries\raggedright}{\thesection.}{\hspace{5pt}}{} \titleformat*{\subsection}{\footnotesize\bfseries\raggedright} \titlespacing{\section}{0pt}{6pt}{2pt} \titlespacing{\subsection}{0pt}{4pt}{0pt}
 #+LATEX_HEADER: \usepackage[a4paper, landscape, margin=0.3in]{geometry}
 #+LATEX_HEADER: \usepackage{multicol}
 #+OPTIONS: author:nil title:nil toc:nil
@@ -14,19 +15,22 @@
 
 \raggedright
 \begin{multicols*}{4}
-\footnotesize
+\scriptsize
 
 * Functions
 
 \centering
 
-$csc(\theta) = \frac{1}{sin(\theta)}$ \\
-$sec(\theta) = \frac{1}{cos(\theta)}$ \\
-$cot(\theta) = \frac{1}{tan(\theta)}$
-
 $cos^2(\theta)+sin^2(\theta)=1$ \\
 $1+tan^2(\theta)=sec^2(\theta)$ \\
 $1+cot^2(\theta)=csc^2(\theta)$
+
+$csc(\theta) = \frac{1}{sin(\theta)}$ \hspace{0.15cm}
+$sec(\theta) = \frac{1}{cos(\theta)}$ \hspace{0.15cm}
+$cot(\theta) = \frac{1}{tan(\theta)}$
+
+$cos^2(\theta)=\frac{1+cos(2\theta)}{2}$ \hspace{0.4cm}
+$sin^2(\theta)=\frac{1-cos(2\theta)}{2}$
 
 $cos(A+B) = cos(A)cos(B)-sin(A)sin(B)$ \\
 $sin(A+B) = sin(A)cos(B)+cos(A)sin(B)$
@@ -34,10 +38,14 @@ $sin(A+B) = sin(A)cos(B)+cos(A)sin(B)$
 $cos(2\theta)=cos^2(\theta)-sin^2(\theta)$ \\
 $sin(2\theta)=2sin(\theta)cos(\theta)$
 
-$cos^2(\theta)=\frac{1+cos(2\theta)}{2}$ \\
-$sin^2(\theta)=\frac{1-cos(2\theta)}{2}$
+|       | $\pi/6$        | $\pi/4$        | $\pi/3$        |
+|-------+--------------+--------------+--------------|
+| $sin$ | $1/2$        | $1/\sqrt{2}$ | $\sqrt{3}/2$ |
+| $cos$ | $\sqrt{3}/2$ | $1/\sqrt{2}$ | $1/2$        |
+| $tan$ | $1/\sqrt{3}$ | $1$          | $\sqrt{3}$   |
 
 \raggedright
+
 * Limits and Continuity
 
 ** Limit
@@ -49,35 +57,45 @@ $|f(x)-L|<\epsilon \text{ whenever } 0<|x-c|<\delta{}$
 
 ** Finding limits
 
-1. Solve $|f(x)-L|<\epsilon$ to find interval $(a,b)$ containing c, true for all x\ne{}c
+1. Solve $|f(x)-L|<\epsilon$ to find interval $(a,b)$ containing $c$, $\forall{}x\ne{}c$
 2. Find $\delta{}>0$ such that $(c-\delta,c+\delta)$ is within $(a,b)$
 
 ** (T4) Sandwich Theorem
 
-Let $g(x)\le{}f(x)\le{}h(x) \: \forall{}x$ in some open interval around c.
- $$\text{If } \lim_{x\to{}c}{g(x)} = \lim_{x\to{}c}{h(x)} = L \text{, then} \lim_{x\to{}c}{f(x)} =L$$
+Let $g(x)\le{}f(x)\le{}h(x) \: \forall{}x$ in some open interval around $c$.
+
+\centering
+
+$\text{If } \lim_{x\to{}c}{g(x)} = \lim_{x\to{}c}{h(x)} = L \text{,}$
+$\text{then} \lim_{x\to{}c}{f(x)} =L$
+
+\raggedright
 
 ** Continuity
 
 $f$ is continuous at c if left and right-limits agree with function value at $x=c$, i.e.:
 
-$$\lim_{x\to{}c}{f(x)}=f(c)$$
+\centering
 
-** (T8) Properties of Continuous Functions
+$\lim_{x\to{}c}{f(x)}=f(c)$
+
+\raggedright
+
+** (T8) Properties of Continuous Fns
 
 Let $f$ and $g$ be continuous functions at $x=c$. Then these are also continuous at $x=c$: sums and differences ($f\pm{}g$), constant multiples, products and quotients, powers and roots
 
-** (T9) Compositions of Continuous Functions
+** (T9) Compositions of Continuous Fns
 
 If $f$ is continuous at $c$ and $g$ is continuous at $f(c)$, then $g\circ{}f$ is continuous at $c$
 
-** (T10) Limits of Continuous Functions
+** (T10) Limits of Continuous Fns
 
-If $lim_{x\to{}c}{f(x)}=b$ and $g$ is continuous at $b$, then $lim_{x\to{}c}{g(f(x))}=g(b)$
+If $\lim_{x\to{}c}{f(x)}=b$ and $g$ is continuous at $b$, then $\lim_{x\to{}c}{g(f(x))}=g(b)$
 
 ** (T11) Intermediate Value Theorem for Continuous Functions
 
-If $f$ is a continuous function on $[a,b]$ and $y_0$ is any value between $f(a)$ and $f(b)$, then $y_0=f(c)$ for some $c\in{}[a,b]$
+If $f$ is continuous on $[a,b]$ and $y_0 \in{} [f(a), f(b)]$, then $y_0=f(c)$ for some $c\in{}[a,b]$
 
 ** Limits involving Infinity
 
@@ -93,12 +111,7 @@ $f(x)>B \text{ whenever } 0<|x-c|<\delta{}$
 
 Derivative exists at $x=x_0$ if left and right derivatives exist there, and are equal
 
-\begin{equation*}
-\begin{align}
-f'(x) &= \lim_{h\to{}0}{\frac{f(x+h)-f(x)}{h}} \\
-&= \lim_{z\to{}x}{\frac{f(z)-f(x)}{z-x}}
-\end{align}
-\end{equation*}
+$f'(x) = \lim_{h\to{}0}{\frac{f(x+h)-f(x)}{h}} = \lim_{z\to{}x}{\frac{f(z)-f(x)}{z-x}}$
 
 ** (T1) Differentiability implies Continuity
 
@@ -137,15 +150,19 @@ $(\csc{x})'=-\csc{x}\cot{x}$
 
 Let $g(x)$ be differentiable at $x$, and $f(u)$ be differentiable at $u=g(x)$.
 
-$$(f\circ{}g)'(x)=f'(g(x))\cdot{}g'(x)$$
+\centering
+
+$(f\circ{}g)'(x)=f'(g(x))\cdot{}g'(x)$
+
+\raggedright
 
 i.e. Let $y=f(u)$ and $u=g(x)$.
-$$\frac{dy}{dx}=\frac{dy}{du}\cdot\frac{du}{dx}$$
 
-** Implicit Differentiation
+\centering
 
-1. Differentiate both sides of the equation wrt $x$, treating $y$ as a differentiable function of $x$.
-2. Collect terms with $\frac{dy}{dx}$ on one side of the equation to solve for it.
+$\frac{dy}{dx}=\frac{dy}{du}\cdot\frac{du}{dx}$
+
+\raggedright
 
 ** Linearization
 
@@ -216,7 +233,11 @@ But $f''(c)=0$ alone does not guarantee point of inflection.
 
 ** Newton's Method
 
+\centering
+
 $x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}$, with initial guess $x_0$
+
+\raggedright
 
 * Integrals
 
@@ -234,8 +255,431 @@ _Norm_ of a partition, $||p||=\max_{k=1..n}\delta{x_k}$, i.e. the largest sub-in
 
 _Definite integral_ $J$ is the limit of Riemann sums $\sum_{k=1}^{n}f(c_k)\Delta{x_k}$, whereby $\forall{}\epsilon{}>0, \exists\delta{}>0$ such that for any partition $P=\{x_{0}...x_{n}\}$ with $||p||<\delta{}$ and any choice of $c_{k}\in{}[x_{k-1},x_k]$:
 
-$$\(\lvert \sum_{k=1}^{n}f(c_k)\Delta{x_k}-J \rvert\)<\epsilon{}$$
+\centering
 
-$$\int_{a}^{b}f(x) \: dx=\lim_{||p||\to{}0}\sum_{k=1}^{n}(c_k)\Delta{x_k}$$
+$\(\lvert \sum_{k=1}^{n}f(c_k)\Delta{x_k}-J \rvert\)<\epsilon{}$
+
+$\int_{a}^{b}f(x) \: dx=\lim_{||p||\to{}0}\sum_{k=1}^{n}(c_k)\Delta{x_k} = Area$
+
+\raggedright
+
+Using Riemann sums, with equal sub-intervals:
+
+\centering
+
+$\int_{a}^{b}f(x) \: dx=\lim_{n\rightarrow{}\infty}\sum_{k=1}^{n}f(a+k\frac{b-a}{n}){(\frac{b-a}{n})}$
+
+\raggedright
+
+** (T1) Integrability of Continuous Fns
+
+$\int_{a}^{b}f(x) \: dx$ exists if $f$ is continuous over $[a,b]$ OR $f$ has /finitely many/ jump discontinuities over $[a,b]$
+
+** (T2) Definite Integral Rules
+
+\centering
+
+ $\int_{a}^{b}f(x) \: dx = - \int_{b}^{a} f(x) \: dx$
+ $\int_{a}^{b}[f(x)\pm{}g(x)] \: dx = \int_{a}^{b}f(x) \: dx \pm \int_{a}^{b}g(x) \: dx$
+ $\int_{a}^{b}f(x) \: dx + \int_{b}^{c}f(x) \: dx = \int_{a}^{c}f(x) \: dx$
+ $(min f) \cdot (b-a) \le \int_{a}^{b}f(x) \: dx \le (max f) \cdot (b-a)$
+ $\int_{a}^{b}f(x) \: dx \ge \int_{a}^{b}g(x) \: dx \text{ if } f(x)\ge{}g(x) \text { on } [a,b]$
+ 
+\raggedright
+
+** (T3) Mean Value Theorem for Definite Integrals
+
+If $f$ is continuous on $[a,b]$, then for some $c\in{}[a,b]$,
+
+\centering
+
+$f(c) = \frac{1}{b-a}\int_{a}^{b}f(x) \: dx$
+
+\raggedright
+
+** (T4) Fundamental Theorem of Calculus
+
+\centering
+
+$F'(x) = \frac{d}{dx}\int_{a}^{x}f(t) \: dt = f(x)$
+
+$\int_{a}^{b}f(x) \: dx = F(b)-F(a)$
+
+\raggedright
+
+** (T5) Net Change Theorem
+
+\centering
+
+$\text{Net change in } [a,b] = \int_{a}^{b}F'(x) \: dx = F(b)-F(a)$
+
+\raggedright
+
+*NOTE: When asked for area, it should always be positive => divide into sub-intervals where it crosses $x=0$ => integrate each, add absolute areas
+
+** (T6) Substitution Rule
+
+If $u=g(x)$ is differentiable, then
+
+\centering
+
+$\int{}f(g(x))\cdot{}g'(x) \: dx = \int{}f(u) \: du$
+
+\raggedright
+
+** (T7) Substitution in Definite Integrals
+
+\centering
+
+$\int_{a}^{b}f(g(x))\cdot{}g'(x) \: dx = \int_{g(a)}^{g(b)}f(u) \: du$
+
+\raggedright
+
+** (T8) Even and Odd Functions
+
+_Even function_: $\int_{-a}^{a}f(x) \: dx=2\cdot{}\int_{0}^{a}f(x) \: dx$
+
+_Odd function_: $\int_{-a}^{a}f(x) \: dx=0$
+
+** Area Between Curves
+
+\centering
+
+$A = \int_{a}^{b}[f(x)-g(x)] \: dx$
+
+\raggedright
+
+*NOTE: Cannot always split into 2 integrals!
+
+* Applications of Definite Integrals
+
+** Volume: Disk Method
+
+\centering
+
+$V_{x-axis} = \int_{a}^{b}A(x) \: dx = \int_{a}^{b}\pi{}[R(x)]^2 \: dx$
+
+$V_{y-axis} = \int_{c}^{d}A(y) \: dy = \int_{c}^{d}\pi{}[R(x)]^2 \: dy$
+
+\raggedright
+
+** Volume: Washer Method
+
+\centering
+
+$V_{x-axis} = \int_{a}^{b}A(x) \: dx = \int_{a}^{b}\pi{}([R(x)]^2-[r(x)]^2) \: dx$
+
+$V_{y-axis} = \int_{c}^{d}A(y) \: dy = \int_{c}^{d}\pi{}([R(x)]^2-[r(x)]^2) \: dy$
+
+\raggedright
+
+** Volume: Shell Method
+
+\centering
+
+$V_{x=L} = \int_{a}^{b}2\pi{}\cdot{}(x-L)\cdot{}f(x) \: dx$
+
+\raggedright
+
+** Arc Length
+
+\centering
+
+$L = \int_{a}^{b}\sqrt{1+[f'(x)]^2} \: dx = \int_{a}^{b}\sqrt{1+\frac{dy}{dx}^2} \: dx$
+
+$L = \int_{c}^{d}\sqrt{1+[g'(y)]^2} \: dy = \int_{a}^{b}\sqrt{1+\frac{dx}{dy}^2} \: dy$
+
+\raggedright
+
+** Area of Surface of Revolution
+
+\centering
+
+$S = \int_{a}^{b}2\pi{}y\sqrt{1+\frac{dy}{dx}^2} \: dx$
+
+$S = \int_{c}^{d}2\pi{}x\sqrt{1+\frac{dx}{dy}^2} \: dy$
+
+\raggedright
+
+** Centres of Mass
+
+Vertical strip (wrt $dx$)
+- Find $dm = \delta(x) \cdot (f(x)-g(x)) \cdot dx$
+- Find $(\tilde{x}, \tilde{y}) = (x, \frac{f(x)+g(x)}{2})$
+- $M = \int_{a}^{b}dm$
+- $(\bar{x}, \bar{y}) = (\frac{\int_{a}^{b}\tilde{x}\cdot{}dm}{M}, \frac{\int_{a}^{b}\tilde{y}\cdot{}dm}{M})$
+
+* Transcendental Functions
+
+** Inverse Functions and their Derivatives
+
+_One-to-one/injective_
+
+$f$ is /one-one/ if $f(x_1)\ne{}f(x_2)$ whenever $x_{1}\ne{}x_2$
+
+_Inverse function_: $f^{-1}(b) = a$ if $f(a) = b$
+- If $f$ has domain $D$ and range $R$, $f^{-1}$ has domain $R$ and range $D$
+- For $f^{-1}$ to exist, $f$ must be one-one
+- $f \circ f^{-1} = f^-1 \circ f = id$
+
+** (T) Derivative Rule for Inverses
+
+\centering
+
+$(f^{-1})'(b) = \frac{1}{f'(f^{-1}(b))}$
+
+\raggedright
+
+$(a,b)$ on $f$ and $(b,a)$ on $f^{-1}$: reciprocal gradients
+
+** Exponentials and Logarithms
+
+\centering
+
+$e^x$ and $ln\:x$ are inverse --- $e^(ln\:x)=ln(e^x)=x$ \\
+$a^x$ and $log_{a}x$ are inverse --- $log_{a}a^x = a^{log_{a}x} = x$
+$ln \: x = \int_{1}^{x}\frac{1}{t}dt$ \hspace{0.2cm}
+$ln \: e = \int_{1}^{e}\frac{1}{t}dt = 1$
+
+$a^x = e^{x \: ln \: a}$ and $x^{n} = e^{n \: ln \: x}$
+
+\raggedright
+
+_Properties_
+
+\centering
+
+$log_{a}xy = log_{a}x + log_{a}y$ \hspace{0.4cm}
+$log_{a}\frac{x}{y} = log_{a}x - log_{a}y$ \hspace{0.4cm}
+$log_{a}\frac{1}{y} = -log_{a}y$ \hspace{0.4cm}
+$log_{a}x^y = y\:log_{a}x$
+
+$e^{x}e^{y}=e^{x+y}$ \hspace{0.5cm}
+$e^{-x}=\frac{1}{e^x}$ \hspace{0.5cm}
+$\frac{e^x}{e^y}=e^{x-y}$ \hspace{0.5cm}
+$(e^x)^{r}=e^{rx}$ if /r/ is rational
+
+\raggedright
+
+_Derivatives and integrals_
+
+\centering
+
+$(ln\:x)' = \frac{1}{x}$ \hspace{0.4cm}
+$\int\frac{1}{x} \: dx = ln \: |x| + C$ \\
+$(e^x)' = e^x$ \hspace{0.4cm}
+$\int{}e^x \: dx = e^x + C$ \\
+$(a^x)' = a^{x}\:ln\:a$ \hspace{0.4cm}
+$\int{}a^{x}\:dx = \frac{a}{ln\:a} + C$ \\
+$(log_{a}x)' = \frac{1}{ln\:a} \cdot \frac{1}{x}$
+
+\raggedright
+
+** L'Hospital's Rule
+
+\centering
+
+$\lim_{x\rightarrow{}a}\frac{f(x)}{g(x)} =\lim_{x\rightarrow{}a}\frac{f'(x)}{g'(x)}$
+$\lim_{x\rightarrow{}a}f(x) =\lim_{x\rightarrow{}a}e^{ln \: f(x)} = e^\lim_{x\rightarrow{}a}ln \: f(x)}$ 
+
+\raggedright
+
+** Inverse Trigo Functions
+
+| Function | Domain   | Range                        |
+|----------+----------+------------------------------|
+| $sin^{-1}^{}$ | $-1\le{}x\le{}1$ | $-\frac{\pi}{2}\le{}y\le{}\frac{\pi}{2}$ |
+| $cos^{-1}$ | $-1\le{}x\le{}1$ | $0\le{}y\le{}\pi$                      |
+| $tan^{-1}$ | $-\infty\le{}x\le{}\infty$ | $-\frac{\pi}{2}\le{}y\le{}\frac{\pi}{2}$ |
+
+_Some relations_
+
+\centering
+
+$cos^{-1}(x) + cos^{-1}(-x) = \pi$
+$sin^{-1}(x) + cos^{-1}(x) = \frac{\pi}{2}$
+
+\raggedright
+
+_Derivatives of inverse trigo_
+
+\centering
+
+$(sin^{-1}x)' = \frac{1}{\sqrt{1-x^2}}$, $|x|<1$ \\
+$(cos^{-1}x)' = -\frac{1}{\sqrt{1-x^2}}$, $|x|<1$ \\
+$(tan^{-1}x)' = \frac{1}{1+x^2}$ \\
+$(cot^{-1}x)' = -\frac{1}{1+x^2}$ \\
+$(sec^{-1}x)' = \frac{1}{|x|\sqrt{x^2-1}}$, $|x|>1$
+$(csc^{-1}x)' = -\frac{1}{|x|\sqrt{x^2-1}}$, $|x|>1$
+
+\raggedright
+
+_Antiderivatives_
+
+\centering
+
+$\int\frac{1}{\sqrt{a^2-x^2}} \: dx = sin^{-1}(\frac{x}{a}) + C$, $x^2<a^2$ \\
+$\int\frac{1}{a^2+x^2} \: dx = \frac{1}{a} \: tan^{-1}(\frac{x}{a}) + C$ \\
+$\int\frac{1}{x\sqrt{x^2-a^2}} \: dx = \frac{1}{a} \: sec^{-1}(\frac{\lvert x \rvert}{a}) + C$, $|x|>a>0$
+
+\raggedright
+
+** Hyperbolic Functions
+
+\centering
+
+$sinh(x) = \frac{e^x-e^{-x}}{2}$ \hspace{0.5cm}
+$cosh(x) = \frac{e^x+e^{-x}}{2}$
+$csch(x) = \frac{1}{sinh(x)}$ \hspace{0.5cm}
+$sech(x) = \frac{1}{cosh(x)}$
+$tanh(x) = \frac{sinh(x)}{cosh(x)}$ \hspace{0.5cm}
+$coth(x) = \frac{cosh(x)}{sinh(x)}$
+
+$cosh^{2}x - sinh^{2}x = 1$ \\
+$sinh(2x) = 2sinh(x)cosh(x)$
+$cosh(2x) = cosh^{2}x + sinh^2{x}$
+$cosh^{2}x = \frac{1}{2}(cosh(2x)+1)$
+$sinh^{2}x = \frac{1}{2}(cosh(2x)-1)$ \\
+$tanh^{2}x = 1 - sech^{2}x$ \\
+$coth^{2}x = 1 + csch^{2}x$
+
+\raggedright
+
+_Derivatives and integrals_
+
+\centering
+
+$(sinh \: x)' = cosh \: x$ \hspace{0.5cm}
+$(cosh \: x)' = sinh \: x$
+$(tanh \: x)' = sech^{2} \: x$ \hspace{0.5cm}
+$(coth \: x)' = -csch^{2} \: x$
+$(sech \: x)' = -sech \: x \: tanh \: x$
+$(csch \: x)' = - csch \: x \: coth \: x$
+
+$\int sinh \: x \: dx = cosh \: x + C$ \hspace{0.5cm}
+$\int cosh \: x \: dx = sinh \: x + C$ \hspace{0.5cm}
+$\int sech^{2} x \: dx = tanh \: x + C$ \hspace{0.5cm}
+$\int csch^{2} x \: dx = -coth \: x + C$
+$\int sech \: x \: tanh \: x \: dx = -sech \: x + C$
+$\int csch \: x \: coth \: x \: dx = -csch \: x + C$
+
+\raggedright
+
+** Inverse Hyperbolic Functions
+
+_Identities_
+
+\centering
+
+$sech^{-1}x = cosh^{-1}\frac{1}{x}$ \\
+$csch^{-1}x = sinh^{-1}\frac{1}{x}$ \\
+$coth^{-1}x = tanh^{-1}\frac{1}{x}$
+
+\raggedright
+
+_Derivatives and integrals_
+
+\centering
+
+$(sinh^{-1}x)' = \frac{1}{\sqrt{1+x^2}}$ \\
+$(cosh^{-1}x)' = \frac{1}{\sqrt{x^2-1}}$, $x>1$ \\
+$\int{}sinh\:x = cosh\:x+C$ \\
+$\int{}cosh\:x = sinh\:x+C$
+
+\raggedright
+
+** Relative Rates of Growth
+
+| $f$ grows faster than $g$     | $\lim_{x\rightarrow{}\infty}\frac{f(x)}{g(x)}=\infty$            |
+| $f$ grows at same rate as $g$ | $\lim_{x\rightarrow{}\infty}\frac{f(x)}{g(x)}=L>0$          |
+
+* Techniques of Integration
+
+** Basic Integration Formulas
+
+\centering
+
+$\int{}\frac{1}{x}\:dx  = ln\lvert x\rvert+C$ \hspace{0.5cm}
+$\int{}a^x\:dx=\frac{1}{ln\:a}a^x+C$ \hspace{0.5cm}
+$\int{}sin\:x\:dx=-cos\:x+C$ \hspace{0.5cm}
+$\int{}cos\:x\:dx=sin\:x+C$ \hspace{0.5cm}
+$\int{}sec^{2}x\:dx=tan\:x+C$ \hspace{0.5cm}
+$\int{}csc^{2}x\:dx=-cot\:x+C$ \hspace{0.5cm}
+$\int{}sec\:x\:tan\:x\:dx=sec\:x+C$ \\
+$\int{}csc\:x\:cot\:x\:dx=-csc\:x+C$ \\
+$\int{}tan\:x\:dx=ln\lvert sec\:x\rvert+C$ \\
+$\int{}cot\:x\:dx = ln \:|sin\:x| + C$ \\
+$\int{}sec\:x\:dx = ln \:|sec\:x + tan\:x| + C$ \\
+$\int{}csc\:x\:dx = - ln \:|csc\:x + cot\:x| + C$
+
+\raggedright
+
+** Integration by Parts
+
+\centering
+
+$\int{}u(x) \cdot v'(x) \: dx = u(x) \cdot v(x) - \int{}v(x) \cdot u'(x) \: dx$
+
+\raggedright
+
+** Trigo Integrals
+
+\centering
+
+$\int{}sin^{m}x \: cos^{n}x \: dx = ?$
+
+\raggedright
+
+- If m is odd, then $sin^{m}x = (1-cos^{2}x)^{k} \cdot sin \: x$ where $m=2k+1$, then sub $u = cos \: x$
+- If n is odd, then $cos^{n}x = (1-sin^{2}x)^{k} \cdot cos \: x$ where $n=2k+1$, then sub $u = sin \: x$
+- If both are even, then sub $sin^{2}x = \frac{1-cos(2x)}{2}$, $cos^{2}x = \frac{1+cos(2x)}{2}$
+
+** Integration by Partial Fractions
+
+\centering
+
+E.g. $\frac{1}{x(x^2+1)^2} = \frac{A}{x} + \frac{Bx+C}{x^2+1} + \frac{Dx+E}{(x^2+1)^2}$
+
+\raggedright
+
+** Reduction formulas
+
+\centering
+
+$\int{}tan^{n}x \: dx = \frac{1}{n-1}tan^{n-1}x - \int{}tan^{n-2} \: dx$
+
+$\int{} (ln \: x)^n \: dx = x(ln\:x)^n - n\int{}(ln\:x)^{n-1}\:dx$
+
+$\int{}sin^{n}x\:cos^{m}x\:dx = -\frac{sin^{n-1}x\:cos^{m+1}x}{m+n} + \frac{n-1}{m+n}\int{}sin^{n-2}x\:cos^{m}x\:dx$, $(n\ne{}-m)$
+
+\raggedright
+
+** Improper Integrals (\infty)
+
+_Type I_
+
+$\int_{a}^{\infty}f(x)\:dx=\lim_{b\to{}\infty}\int_{a}^{b}f(x)\:dx$, cont. on $[a,\infty)$
+$\int_{-\infty}^{b}f(x)\:dx=\lim_{a\to{}-\infty{}}\int_{a}^{b}f(x)\:dx$, $(-\infty, b]$
+$\int_{-\infty}^{\infty}f(x)\:dx=\int_{-\infty}^{c}f(x)\:dx+\int_{c}^{\infty}f(x)\:dx$, $(-\infty,\infty)$
+
+_Type II_
+
+$\int_{a}^{b}f(x)\:dx=\lim_{c\to{}a^{+}}\int_{c}^{b}f(x)\:dx$, discont. at $a$
+$\int_{a}^{b}f(x)\:dx=\lim_{a\to{}b^{-}}\int_{a}^{c}f(x)\:dx$, discont. at $b$
+$\int_{a}^{b}f(x)\:dx=\int_{a}^{c}f(x)\:dx+\int_{c}^{b}f(x)\:dx$, discont. at $c$, $a<c<b$
+
+** (T2) Direct Comparison Test
+
+Let $0\le{}f(x)\le{}g(x)$ where $f$ and $g$ cont. on $[a,\infty)$
+
+- If $\int_{a}^{\infty}g(x)\:dx$ converges, $\int_{a}^{\infty}f(x)\:dx$ converges
+- If $\int_{a}^{\infty}f(x)\:dx$ diverges, $\int_{a}^{\infty}g(x)\:dx$ diverges
+
+** (T3) Limit Comparison Test
+
+Let $\lim_{x\to{}\infty{}}\frac{f(x)}{g(x)}=L$ where $0<L<\infty$
+- $\int_{a}^{\infty}f(x)\:dx$ and $\int_{a}^{\infty}g(x)\:dx$ both either converge or diverge
+
 
 \end{multicols*}
+
