@@ -1,0 +1,233 @@
+#+TITLE: ST2131 Cheatsheet
+#+DATE: [2019-09-26]
+#+LATEX_CLASS: article
+#+LATEX_HEADER: \usepackage{parskip}  \setlength{\parindent}{0pt} \setlength{\parskip}{2pt}
+#+LATEX_HEADER: \usepackage{sectsty} \setcounter{secnumdepth}{1} \allsectionsfont{\raggedright}
+#+LATEX_HEADER: \usepackage{enumitem} \setlist[1]{itemsep=-2pt} \setlist[itemize]{leftmargin=*} \setlist[enumerate]{leftmargin=*}
+#+LATEX_HEADER: \usepackage{titlesec} \titleformat{\section}{\large\bfseries\raggedright}{\thesection.}{\hspace{5pt}}{} \titleformat*{\subsection}{\footnotesize\bfseries\raggedright} \titlespacing{\section}{0pt}{6pt}{2pt} \titlespacing{\subsection}{0pt}{4pt}{0pt}
+#+LATEX_HEADER: \usepackage[a4paper, landscape, margin=0.3in]{geometry}
+#+LATEX_HEADER: \usepackage{multicol}
+#+OPTIONS: author:nil title:nil toc:nil
+
+\centering
+\header{ST2131 Cheatsheet}
+
+\raggedright
+\begin{multicols*}{3}
+\footnotesize
+
+* Random Variables
+
+** Cumulative Distribution Function (c.d.f.)
+
+\centering
+
+$F_{X}(x) = P(X \in{} (-\infty{},x]) = P(X\le{}x)$
+
+\raggedright
+
+** Probability Mass Function (p.m.f.)
+
+\centering
+
+$f_{X}(x) = P(X=x)$
+
+\raggedright
+
+** Probability Density Function (p.d.f)
+
+\centering
+
+$f_{X}(x) = \frac{dF_{X}(x)}{dx}$
+
+\raggedright
+
+- $\int_{-\infty}^{\infty{}}f_{X}(x) \ dx = 1$
+- $P(a<x<b) = \int_{a}^{b}f_{X}(x)$
+
+** Expectation
+
+\centering
+
+$E[X] = \begin{cases} \Sigma_{i} \ x_{i}f_{X}(x_i) & \text{ if discrete} \\ \int_{-\infty{}}^{\infty{}}x\cdot{}f_{X}(x) \ dx & \text{ if continuous} \end{cases}$
+
+$E[g(X)] = \begin{cases} \Sigma_{i} \ g(x_{i})f_{X}(x_i) & \text{ if discrete} \\ \int_{-\infty{}}^{\infty{}}g(x)\cdot{}f_{X}(x) \ dx & \text{ if continuous} \end{cases}$
+
+\raggedright
+
+- Comparison: if $P(X\ge{}a) = 1$, then $E[X] \ge{} a$
+- Linearity: $E[aX+b] = aE[X] + b$
+- $E[XY] = E[X] \cdot E[Y]$
+
+** Variance
+
+\centering
+
+$Var(X) = E[(X-\E[X])^2] = E[X^2] - E[X]^2$
+
+$\sigma{}_{X} = \sqrt{Var(X)}$
+
+\raggedright
+
+- $Var(aX+b) = a^2 \cdot{} Var(X)$
+- $Var(X+Y) = Var(X) + Var(Y)$ if X and Y are independent
+
+* Discrete Prob Distributions
+
+** Bernoulli Distribution
+
+\centering
+
+$X\sim{}Ber(p) \leftrightarrow P(X=1) = p \wedge P(X=0)= 1-p$
+
+\raggedright
+
+_Interpretation_: 1 trial with success or failure
+- _Mean_: $E[X] = p$
+- _Variance_: $Var(X) = p(1-p)$
+
+** Binomial Distribution
+
+\centering
+
+$Y = X_1 + X_2 + ... + X_n$
+
+$Y\sim{}Bin(n,p) \leftrightarrow P(Y=k) = {n \choose k} \ p^{k}(1-p)^{n-k}$
+
+\raggedright
+
+_Interpretation_: number of successes in /n/ trials
+- _Mean_: $E[X] = np$
+- _Variance_: $Var(X) = np(1-p)$
+
+** Poisson Distribution
+
+\centering
+
+$X\sim{}Pois(\lambda{}) \leftrightarrow P(X=k) = e^{-\lambda{}}\frac{\lambda{}^k}{k!}$
+
+\[ e^\lambda{} = \Sigma_{k=0}^{\infty{}}\frac{\lambda{}^k}{k!} = 1 + \lambda + \frac{\lambda^2}{2} + \frac{\lambda^3}{6} + ... \]
+
+\raggedright
+
+_Poisson Limit Theorem_
+
+Let $Y_{n}\sim{}Bin(n,\frac{\lambda{}}{n})$, $X\sim{}Pois(\lambda{})$. Then $lim_{n\rightarrow{}\infty{}}P(Y_{n}=k) = P(X=k)$
+
+- _Mean_: $E[X] = \lambda{}$
+- _Variance_: $Var(X) = \lambda{}$
+
+** Discrete Uniform Distribution
+
+\centering
+
+$P(X=x_i) = \frac{1}{n}$
+
+\raggedright
+
+- _Mean_: $E[X] = \frac{1}{n} \Sigma_{i=1}^{n}x_i$
+- _Variance_: $Var(X) = E[X^2] - E[X] = \frac{1}{n} \Sigma_{i=1}^{n}x_{i}^2 - (\frac{1}{n} \Sigma_{i=1}^{n}x_i)^2$
+
+** Geometric Distribution
+
+\centering
+
+$X\sim{}Geom(p) \leftrightarrow P(X=k) = p(1-p)^{k-1}$
+
+Tail probability: $P(X\ge{}k) = (1-p)^{k-1}$
+
+\raggedright
+
+_Interpretation_: waiting time for 1st success
+- Memoryless: $P(X=i+k \ | \ X=k) = P(X=i)$
+- _Mean_: $E[X] = \frac{1}{p}$
+- _Variance_: $Var(X) = \frac{1-p}{p^2}$
+
+** Negative Binomial Distribution
+
+\centering
+
+(don't remember me)
+
+$X\sim{}NB(r, p) \leftrightarrow P(X=n) = {n-1 \choose r-1} \ p^r (1-p)^{n-r}$
+
+\raggedright
+
+Sum of /r/ iid Geom(p) random variables
+
+_Interpretation_: waiting time for /r/ successes
+- _Mean_: $E[X] = \frac{r}{p}$
+- _Variance_: $Var(X) = \frac{r(1-p)}{p^2}$
+
+** Hypergeometric Distribution
+
+\centering
+
+(don't remember me)
+
+$X\sim{}H(n,N,m) \leftrightarrow P(X=i) = \frac{{m \choose i}{N-m \choose n-i}}{N \choose n}$
+
+\raggedright
+
+_Interpretation_: number of successes in choosing /n/ of /N/, where /m/ of /N/ give success and /(N-m)/ of /N/ give failure (without replacement!)
+- _Mean_: $E[X] = n \cdot \frac{m}{N}$
+- _Variance_: $Var(X) = \frac{N-n}{N-1} \cdot n \cdot \frac{m}{N}(1-\frac{m}{N})$
+
+* Continuous Prob Distributions
+
+** Uniform Distribution
+
+\centering
+
+$X\sim{}U(a,b) \ \leftrightarrow \ f_{X}(x) = \frac{1}{b-a}1_{[a,b]}(x) = \begin{cases} \frac{1}{b-a} & \text{if } x\in{}(a,b) \\ 0 & \text{if } x\notin{}(a,b) \end{cases}$
+
+\raggedright
+
+- _Mean_: $E[X] = \frac{a+b}{2}$
+- _Variance_: $Var(X) = \frac{(b-a)^2}{12}$
+
+** Exponential Distribution (rmb pdf)
+
+\centering
+
+$X\sim{}Exp(\lambda{}) \ \leftrightarrow \ f_{X}(x) = \begin{cases} \lambda{}e^{-\lambda{}x} & \text{if} \ x>0 \\ 0 & \text{if} \ x \le 0 \end{cases}$
+
+\raggedright
+
+_Intepretation_: waiting time for one event to happen
+- \lambda{} is rate at which 'clock' ticks
+- Similar to /geometric distribution/ (limit as time interval \rightarrow 0)
+- Memoryless: $P(X\ge{}s+t \ | \ X\ge{}t) = P(X\ge{}s)$
+- _Mean_: $E[X] = \frac{1}{\lambda}$
+- _Variance_: $Var(X) = \frac{1}{\lambda{}^{2}}$
+- _Tail probability_: $P(X > t) = e^{-\lambda{}t}$
+
+** Gamma Distribution (no rmb pdf)
+
+\centering
+
+$X\sim{}\Gamma{}(\alpha{}, \lambda{}) \ \leftrightarrow \ f_{X}(x) = \begin{cases} \frac{\lambda{}^{\alpha}}{\Gamma(\alpha)}x^{\alpha-1}e^{-\lambda{}x} & x > 0 \\ 0 & x \le 0 \end{cases}$
+
+\raggedright
+
+_Interpretation_: waiting time for \alpha events to happen
+- $\Gamma(x) = \int_{0}^{\infty}x^{\alpha{}-1}e^{-x} \ dx$
+- Sum of \alpha independent $Exp(\lambda)$ RVs
+- Similar to negative binomial
+- _Mean_: $E[X] = \frac{\alpha}{\lambda}$
+- _Variance_: $Var(X) = \frac{\alpha}{\lambda{}^2}$
+
+** Normal Distribution (rmb pdf!)
+
+\centering
+
+$X\sim{}N(\mu{},\sigma^2) \ \leftrightarrow \ f_{X}(x) = \frac{1}{\sqrt{2\pi{}\sigma{}^2}}e^{-\frac{(x-\mu)^2}{2\sigma{}^2}}$
+
+$Z=\frac{X-\mu}{\sigma}\sim{}N(0,1)$
+
+\raggedright
+
+- _Mean_: $E[X] = \mu$
+- _Variance_: $Var(X) = \sigma^2$
+
+\end{multicols*}
