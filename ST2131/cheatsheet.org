@@ -49,15 +49,15 @@ $f_{X}(x) = \frac{dF_{X}(x)}{dx}$
 
 \centering
 
-$E[X] = \begin{cases} \Sigma_{i} \ x_{i}f_{X}(x_i) & \text{ if discrete} \\ \int_{-\infty{}}^{\infty{}}x\cdot{}f_{X}(x) \ dx & \text{ if continuous} \end{cases}$
+$E[X] = \begin{cases} \Sigma_{i} \ x_{i} \cdot f_{X}(x_i) & \text{ if discrete} \\ \int_{-\infty{}}^{\infty{}}x\cdot{}f_{X}(x) \ dx & \text{ if continuous} \end{cases}$
 
-$E[g(X)] = \begin{cases} \Sigma_{i} \ g(x_{i})f_{X}(x_i) & \text{ if discrete} \\ \int_{-\infty{}}^{\infty{}}g(x)\cdot{}f_{X}(x) \ dx & \text{ if continuous} \end{cases}$
+$E[g(X)] = \begin{cases} \Sigma_{i} \ g(x_{i}) \cdotf_{X}(x_i) & \text{ if discrete} \\ \int_{-\infty{}}^{\infty{}}g(x)\cdot{}f_{X}(x) \ dx & \text{ if continuous} \end{cases}$
 
 \raggedright
 
 - Comparison: if $P(X\ge{}a) = 1$, then $E[X] \ge{} a$
 - Linearity: $E[aX+b] = aE[X] + b$
-- $E[XY] = E[X] \cdot E[Y]$
+- $E[XY] = E[X] \cdot E[Y]$ if X and Y are independent
 
 ** Variance
 
@@ -126,7 +126,7 @@ $P(X=x_i) = \frac{1}{n}$
 \raggedright
 
 - _Mean_: $E[X] = \frac{1}{n} \Sigma_{i=1}^{n}x_i$
-- _Variance_: $Var(X) = E[X^2] - E[X] = \frac{1}{n} \Sigma_{i=1}^{n}x_{i}^2 - (\frac{1}{n} \Sigma_{i=1}^{n}x_i)^2$
+- _Variance_: $Var(X) = E[X^2] - E[X]^2 = \frac{1}{n} \Sigma_{i=1}^{n}x_{i}^2 - (\frac{1}{n} \Sigma_{i=1}^{n}x_i)^2$
 
 ** Geometric Distribution
 
@@ -165,7 +165,7 @@ _Interpretation_: waiting time for /r/ successes
 
 (don't remember me)
 
-$X\sim{}H(n,N,m) \leftrightarrow P(X=i) = \frac{{m \choose i}{N-m \choose n-i}}{N \choose n}$
+$X\sim{}H(n,N,m) \leftrightarrow P(X=i) = \frac{{m \choose i}{N-m \choose n-i}}{{N \choose n}}$
 
 \raggedright
 
