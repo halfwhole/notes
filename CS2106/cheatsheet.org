@@ -1,0 +1,323 @@
+#+TITLE: Cheatsheet
+#+DATE: [2019-10-05]
+#+LATEX_CLASS: article
+#+LATEX_HEADER: \usepackage{parskip}  \setlength{\parindent}{0pt} \setlength{\parskip}{2pt}
+#+LATEX_HEADER: \usepackage{sectsty} \setcounter{secnumdepth}{1} \allsectionsfont{\raggedright}
+#+LATEX_HEADER: \usepackage{enumitem} \setlist[1]{itemsep=-2pt} \setlist[itemize]{leftmargin=*} \setlist[enumerate]{leftmargin=*}
+#+LATEX_HEADER: \usepackage{titlesec} \titleformat{\section}{\large\bfseries\raggedright}{\thesection.}{\hspace{5pt}}{} \titleformat*{\subsection}{\footnotesize\bfseries\raggedright} \titlespacing{\section}{0pt}{6pt}{2pt} \titlespacing{\subsection}{0pt}{4pt}{0pt}
+#+LATEX_HEADER: \usepackage[a4paper, landscape, margin=0.3in]{geometry}
+#+LATEX_HEADER: \usepackage{multicol}
+#+OPTIONS: author:nil title:nil toc:nil
+
+\centering
+\header{CS2106 Cheatsheet}
+
+\raggedright
+\begin{multicols*}{3}
+\footnotesize
+
+* Process Abstraction
+
+** Processes
+
+_Process_: abstraction for information required to describe a /running program/.
+- _Memory context_: text, data, stack, heap
+- _Hardware context_: registers, PC/FP/SP
+- _OS context_: process properties, resources used
+
+_Process table_: contains all PCBs
+- _PCB_: contains information about the entire execution context for a process
+
+** UNIX Process Abstraction
+
+Process state diagram
+- Ready
+- Running
+- Stopped (paused, really): on STOP signal
+- Suspend: blocked and waiting for I/O
+- Zombie
+
+System calls: ~fork()~, ~execl()~, ~wait()~, etc.
+
+* Process Scheduling
+
+_Scheduler_: part of OS that decides what and when to run processes
+
+Scheduling policies either /preemptive/ or /non-preemptive/
+- Preemptive: scheduler can pick another process even if running process isn't done
+- Non-preemptive: stays scheduled until it ends/gives up CPU voluntarily
+
+** Batch Processing
+
+Criteria
+- Low /turnaround time/ (i.e. finish time - arrival time)
+- High /throughput/
+- High /CPU utilisation/
+
+_First-Come First-Served (FCFS)_
+- No starvation
+- Problem: /convoy effect/ -- short I/O processes and long CPU processes block one another => lead to either I/O or CPU idling
+
+_Shortest Job First (SJF)_
+- Starvation possible
+- Can predict CPU time using exponential moving average
+
+$Predicted_{n+1} = \alpha{}Actual_n + (1-\alpha{})Predicted_n$
+
+_Shortest Remaining Time (SRT)_
+- /Preemptive/
+- Starvation possible
+- Takes care of short jobs quickly, even if they arrive late
+
+** Interactive Processing
+
+Criteria
+- Low /response time/
+- High /predictability/ (low variation in response time)
+
+Periodic scheduler
+- Can be implemented using /timer interrupt/ handler, which invokes the scheduler
+- Interval of timer interrupt (ITI): \sim{}1-10ms
+- Time quantum: multiple of ITI that determines execution duration given to process
+
+_Round Robin (RR)_
+- Queue of tasks, pick first and execute. When quantum elapses, put at back of queue
+- No starvation
+
+_Priority Scheduling_
+- Assign priority to each task, pick task with highest priority
+- Starvation possible
+- Problem: priority inversion
+
+_Multi-Level Feedback Queue (MLFQ)_
+- Reduce priority if job uses up entire time slice, retain priority otherwise
+- Adaptive because it learns process behaviour
+- Minimises both response time for I/O-bound processes, turnaround time for CPU bound processes
+
+_Lottery Scheduling_
+- Each process gets tickets. Randomly pick a ticket, grant winner the resource
+- Responsive
+- Good level of control: process can distribute its tickets to children
+- Simple implementation
+
+* Inter-Process Communication
+
+Methods
+- Shared memory: easy but synchronisation problems
+- Message passing harder to use but no need synchronise
+- UNIX pipes
+- UNIX signals: signals are asynchronous notifications about an event. Recipients of signals must handle it using handlers
+
+* Threads
+
+_Threads_: lightweight alternative to processes --- can have multiple threads in a single processes, no need for entire memory duplication/IPC
+
+Shared resources
+- Memory context: text, data, heap
+- OS context: PID, other resources
+
+Not shared resources
+- Stack
+- Registers
+- Identification e.g. thread ID
+  
+** Processes vs. Threads
+
+Unlike process switches that require changing OS and hardware and memory context, thread switches require changing only registers and stack (i.e. FP/SP registers)
+
+Which is faster? Not always true that one is faster than the other -- e.g. ~malloc~ on threads could make it slower. *Measure*!
+
+* Synchronisation
+
+_Race condition_: when execution outcome depends on order in which shared resources are accessed/modified
+
+Synchronisation problems only arise when:
+- Shared
+- Mutable
+- Access
+
+_Deadlock_: when all processes are blocked, so no progress
+
+** Critical Section
+
+Properties of correct critical sections
+- Mutual exclusion
+- Progress
+- Bounded wait
+- Independence: process NOT executing in critical section should NOT block other processes
+
+** Test and Set
+
+~TestAndSet <reg>, <memory location>~ --- atomic instruction!
+- Loads ~<memory location>~ into ~<register>~
+- Basically returns value inside, and sets it to 1 regardless (locked)
+- Returns 1 if it's locked, 0 if it's unlocked
+
+#+BEGIN_SRC c
+  void EnterCS(int *lock) {
+    while (TestAndSet(lock) == 1);
+  }
+
+  void ExitCS(int *lock) { *lock = 0; }
+#+END_SRC
+
+** Peterson's Algorithm
+
+#+BEGIN_SRC c
+  Want[0] = 1;
+  Turn = 1;
+  // wait only if it isn't your turn
+  while (Want[1] && Turn == 1);
+  // ...
+  Want[0] = 0;
+
+  Want[1] = 1;
+  Turn = 0;
+  while (Want[0] && Turn == 0);
+  // ...
+  Want[1] = 0;
+#+END_SRC
+
+** Semaphore
+
+_Semaphore_: High-level abstraction. Contains a non-negative integer value, 2 atomic operations:
+- ~Wait(S)~ --- if S \le 0, blocks (goes to sleep); S-- on proceeding
+- ~Signal(S)~ --- S++, wakes up 1 sleeping process (if any)
+
+_Mutex/binary semaphore_: Semaphore where S = 1
+
+* Synchronisation Problems
+
+** Producer Consumer
+
+_Producer_: produce items only when buffer is not full
+
+_Consumer_: consume items only when buffer is not empty
+
+Initially, ~notFull~ = size of buffer, ~notEmpty~ = 0
+
+#+BEGIN_SRC c
+  // PRODUCER
+  while (true) {
+    wait(notFull);
+    wait(mutex);
+    // ...
+    signal(mutex);
+    signal(notEmpty);
+  }
+
+  // CONSUMER
+  while (true) {
+    wait(notEmpty);
+    wait(mutex);
+    // ...
+    signal(mutex);
+    signal(notFull);
+  }
+#+END_SRC
+
+** Readers Writers
+
+Can have multiple readers at once, but not multiple writers
+- This solution can starve your writers
+
+#+BEGIN_SRC c
+  // READER
+  while (true) {
+    wait(mutex);
+    nReader++;
+    if (nReader == 1)
+      wait(roomEmpty);
+    signal(mutex);
+    // ...
+    wait(mutex);
+    nReader--;
+    if (nReader == 0)
+      signal(roomEmpty);
+    signal(mutex);
+  }
+
+  // WRITER
+  while (true) {
+    wait(roomEmpty);
+    // ...
+    signal(roomEmpty);
+  }
+#+END_SRC
+
+** Dining Philsophers
+
+_Limited eater solution_: initially, seats = 4
+
+#+BEGIN_SRC c
+  while (true) {
+    wait(seats);
+    wait(chopstick[LEFT]);
+    wait(chopstick[RIGHT]);
+    // ...
+    signal(chopstick[LEFT]);
+    signal(chopstick[RIGHT]);
+    signal(seats);
+  }
+#+END_SRC
+
+_Tanenbaum solution_
+
+#+BEGIN_SRC c
+  void philosopher(int i) {
+    while (true) {
+      takeChopsticks(i);
+      putChopsticks(i);
+    }
+  }
+
+  void takeChopsticks(int i) {
+    wait(mutex);
+    state[i] = HUNGRY;
+    safeToEat(i);
+    signal(mutex);
+    wait(s[i]); // hmm
+  }
+
+  void putChopsticks(int i) {
+    wait(mutex);
+    state[i] = THINKING;
+    safeToEat(LEFT);
+    safeToEat(RIGHT);
+    signal(mutex);
+  }
+
+  void safeToEat(int i) {
+    if (state[i] == HUNGRY &&
+        state[LEFT] != EATING &&
+        state[RIGHT] != EATING) {
+      state[i] = EATING;
+      signal(s[i]); // hmm
+    }
+  }
+#+END_SRC
+
+** General Semaphore from Mutex
+
+#+BEGIN_SRC c
+  int count = N;
+
+  GeneralWait() {
+    wait(mutex);
+    count--;
+    if (count < 0) {
+      signal(mutex);
+      wait(queue);
+    }
+    signal(mutex);
+  }
+
+  GeneralSignal() {
+    wait(mutex);
+    count++;
+    if (count <= 0) signal(queue);
+    else signal(mutex);
+  }
+#+END_SRC
+
+\end{multicols*}
