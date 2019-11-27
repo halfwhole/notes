@@ -7,10 +7,11 @@
 #+LATEX_HEADER: \usepackage{titlesec} \titleformat{\section}{\large\bfseries\raggedright}{\thesection.}{\hspace{5pt}}{} \titleformat*{\subsection}{\footnotesize\bfseries\raggedright} \titlespacing{\section}{0pt}{6pt}{2pt} \titlespacing{\subsection}{0pt}{4pt}{0pt}
 #+LATEX_HEADER: \usepackage[a4paper, landscape, margin=0.3in]{geometry}
 #+LATEX_HEADER: \usepackage{multicol}
+#+LATEX_HEADER: \usepackage{amsmath}
 #+OPTIONS: author:nil title:nil toc:nil
 
 \centering
-\header{ST2131 Cheatsheet}
+\header{ST2131: Probability}
 
 \raggedright
 \begin{multicols*}{3}
@@ -42,6 +43,9 @@ $f_{X}(x) = \frac{dF_{X}(x)}{dx}$
 
 \raggedright
 
+image.png
+
+
 - $\int_{-\infty}^{\infty{}}f_{X}(x) \ dx = 1$
 - $P(a<x<b) = \int_{a}^{b}f_{X}(x)$
 
@@ -63,7 +67,7 @@ $E[g(X)] = \begin{cases} \Sigma_{i} \ g(x_{i}) \cdotf_{X}(x_i) & \text{ if discr
 
 \centering
 
-$Var(X) = E[(X-\E[X])^2] = E[X^2] - E[X]^2$
+$Var(X) = E[(X-E[X])^2] = E[X^2] - E[X]^2$
 
 $\sigma{}_{X} = \sqrt{Var(X)}$
 
@@ -229,5 +233,232 @@ $Z=\frac{X-\mu}{\sigma}\sim{}N(0,1)$
 
 - _Mean_: $E[X] = \mu$
 - _Variance_: $Var(X) = \sigma^2$
+
+* Approximations
+
+** Binomial \rightarrow Normal
+
+_Criteria_: $Var(X) = np(1-p)$ is large enough (say \ge10)
+
+** Binomial \rightarrow Poisson
+
+_Criteria_: $p \approx 0$ and $n$ is large such that $np \approx \lambda$ and $np(1-p) \approx \lambda$
+
+** Any iid \rightarrow Normal
+
+_Central Limit Theorem_: with large /n/, sum of iids gives normal distribution
+
+** Continuity Correction (to Normal)
+
+Let X be discrete, let Y be normal approximation.
+
+$P(X=k) \approx P(k-\frac{1}{2}<Y<k+\frac{1}{2})$
+
+(If you're taking say $2X$, you need double the continuity correction!)
+
+* Function of Random Variables
+
+_Question_: What is the distribution of $Y=g(X)$ given $X$ and $g$?
+
+_Procedure_: (Idea is to find $F_y(y)$ and then $f_{Y}(y)$, which describes the distribution)
+- $F_{Y}(y) = P(Y\le{}y) = P(g(X)\le{}y) = P(X\le{}h(y)) = \ldots \text{ (integral of } f_X(x) \text{ over some interval)}$
+- $f_{Y}(y) = \frac{d}{dy}F_{Y}(y) = \ldots$
+
+(See more examples!)
+
+* Joint Probability: Marginal and Conditional
+
+** Joint p.m.f
+
+$$f_{X,Y}(x,y) = P(X=x, Y=y)$$
+
+** Joint p.d.f
+
+$$f_{X,Y}(x,y) = \frac{\partial{}F_{X,Y}(x,y)}{\partial{}x\partial{}y} = \frac{\partial{}F_{X,Y}(x,y)}{\partial{}y\partial{}x}$$
+
+** Marginal p.m.f
+
+Sum joint p.m.f over all possible values of /y/
+
+$$f_{X}(x) = P(X=x) = \Sigma_{y}f_{X,Y}(x,y)$$
+
+** Marginal p.d.f
+
+Integrate joint p.d.f over all possible values of /y/
+
+$$f_{X}(x) = \int{}f_{X,Y}(x,y) \ dy$$
+
+** Conditional p.m.f and p.d.f
+
+$$f_{X|Y}(x|y) = \frac{f_{X|Y}(x,y)}{f_{Y}(y)}$$
+
+** Independence of RVs
+
+X and Y are independent \leftrightarrow{} $f_{X,Y}(x,y) = f_{X}(x) \cdot f_{Y}(y)$
+
+** Expectation of function of RVs
+
+_Discrete_
+
+$E[g(X,Y)] = \Sigma_(x,y)g(x,y)\cdot{}f_{X,Y}(x,y)$
+
+_Continuous_
+
+$E[g(X,Y)] = \int{}\int{} g(x,y)\cdot{}f_{X,Y}(x,y) \ dx \ dy$
+
+* Covariance
+
+\begin{align*}
+Cov(X,Y) &= E[(X-E[X])(Y-E[Y])] \\
+&= E[XY] - E[X]\cdot{}E[Y]
+\end{align*}
+
+To find $Cov(X,Y)$:
+- Find $E[X]$, $E[Y]$, $E[XY]$
+- Use $Cov(X,Y) = E[XY] - E[X]\cdot{}E[Y]$
+
+_Properties of covariance_
+- $Cov(X,Y) = E[XY]$ if $E[X] = 0$ or $E[Y] = 0$
+- $Cov(X,Y) = 0$ if $X$ and $Y$ are independent
+- $Cov(aX+\alpha, bY+\beta) = ab\cdot{}Cov(X,Y)$
+- $Cov(X,X) = Var(X)$
+
+** Sum of Variance of RVs
+
+$$Var(X_1 + ... + X_n) = \Sigma\limits_{i=1}^{n}Var(X_i) + 2\cdot{}\Sigma\limits_{1\le{}i<j\le{}n}Cov(X_{i},X_{j})$$
+
+** Correlation Coefficient
+
+$\rho(X,Y) = \frac{Cov(X,Y)}{\sigma_{X}\cdot{}\sigma_{Y}}$
+
+_Properties of correlation coefficient_
+- $\rho(X,Y) = Cov(\tilde{X},\tilde{Y})$ where $\tilde{X}=\frac{X-E[X]}{\sigma_{X}}$
+- $\rho(aX+b, cY+d) = \rho(X,Y)$
+- $-1 \le \rho(X,Y) \le 1$
+- $\rho(X,Y) = 1$ if $Y=aX$ for some $a>0$
+- $\rho(X,Y) = -1$ if $Y=aX$ for some $a<0$
+  
+* Sum of Independent RVs
+
+What's the distribution of $X+Y$?
+
+$f_{X+Y}(z) = (f_x * f_Y)(z) = \int f_{X}(z-y)\cdot{}f_{Y}(y) \ dy = \int f_{X}(x) \cdot{} f_{Y}(z-y) \ dx$
+
+_Exponential_
+
+$X,Y\sim{}Exp(\lambda)$ \rightarrow $f_{X+Y}(z) = \lambda^2 ze^{-\lambda{}z}$ $(z>0)$
+
+_Gamma_
+
+$X\sim{}\Gamma{}(\alpha,\lambda), Y\sim{}\Gamma{}(\beta{},\lambda{})$ \rightarrow $X+Y\sim{}\Gamma{}(\alpha+\beta, \lambda)$
+
+_Poisson_
+
+$X\sim{}Pois(\lambda_1), Y\sim{}Pois(\lambda_2)$ \rightarrow $X+Y\sim{}Pois(\lambda_1+\lambda_2)$
+
+* Multi-Dimensional Change of Variables
+
+Let $\overrightarrow{X}=(X_{1},X_{2})$ with p.d.f $f_{\overrightarrow{X}}(x_1, x_2)$
+
+Let $\overrightarrow{g}=(g_1, g_2)$ with inverse $\overrightarrow{h}=(h_1, h_2)$
+
+Let $\overrightarrow{Y}=(g_1(\overrightarrow{X}), g_2(\overrightarrow{X}))$
+
+$$f_{\overrightarrow{Y}}(\overrightarrow{y}) = \frac{f_{\overrightarrow{X}}(\overrightarrow{x})}_{}{|J_{\overrightarrow{g}}(\overrightarrow{x})|}} = f_{\overrightarrow{X}}(\overrightarrow{x})|J_{\overrightarrow{h}}(\overrightarrow{y})|$$
+
+$$J_{\overrightarrow{g}}(\overrightarrow{x}) = \begin{vmatrix}
+\dfrac{\partial{}g_1}{\partial{}x_1}(\overrightarrow{x}) & \dfrac{\partial{}g_1}{\partial{}x_2}(\overrightarrow{x}) \\
+\dfrac{\partial{}g_2}{\partial{}x_1}(\overrightarrow{x}) & \dfrac{\partial{}g_2}{\partial{}x_2}(\overrightarrow{x})
+\end{vmatrix}$$
+
+_Steps for multi-dimensional change of variables_
+1. Transformation $\overrightarrow{g}$
+2. Range of $\overrightarrow{g}$ (and so $\overrightarrow{Y}$)
+3. Inverse $\overrightarrow{h}$
+4. Jacobian ($J_{\overrightarrow{g}}(\overrightarrow{x})$ or $J_{\overrightarrow{g}}(\overrightarrow{x})$, usually latter)
+
+\Rightarrow Profit! You can use formula to find $f_{\overrightarrow{Y}}(\overrightarrow{y})$.
+
+(We usually substitute $f_{\overrightarrow{X}}(\overrightarrow{x})$ for $f_{\overrightarrow{X}}(\overrightarrow{h}(\overrightarrow{y}))$.)
+
+* Multivariate Standard Normals
+
+Let $\overrightarrow{X}=(X_1, \ldots, X_n)$ be multivariate normal with mean $\overrightarrow{\mu}$ and covariance matrix $\Sigma$.
+
+$$f_{\overrightarrow{X}}(\overrightarrow{x}) = \frac{1}{\sqrt{(2\pi)^n det(\Sigma)}} e^{-\frac{1}{2}(\overrightarrow{x}-\overrightarrow{\mu})^{T} \Sigma^{-1} (\overrightarrow{x}-\overrightarrow{\mu})}$$
+
+Multivariate normal fully determined by $\overrightarrow{\mu}$ and $\Sigma$.
+- \Sigma is symmetric and positive-definite
+- $f(\overrightarrow{x}) = Ce^{-Q(\overrightarrow{x})}$ where $Q(\overrightarrow{x})$ is some quadratic polynomial
+
+_Properties of multivariate normal_
+- If $\Sigma_{ii}=\sigma_{i}^2$ and $\Sigma_{ij}=0$ for $i\ne{}j$, then $X_1 \ldots X_n$ are independent with $X_{i}\sim{}N(\mu_{i},\sigma_{i}^2)$
+- Affine transformations of i.i.d standard normal \rightarrow multivariate normal
+- Affine transformations of multivariate normal \rightarrow{} multivariate normal
+- All multivariate normals can be expressed as affine transformations of i.i.d standard normals
+- Marginal distributions are also multivariate normals, but of a lower dimension
+
+(More details: see the book.)
+
+* Bivariate Standard Normals
+
+_Helpful things_ (2x2)
+- $A = \begin{pmatrix}a & b \\ c & d\end{pmatrix} \rightarrow A^{-1} = \dfrac{1}{det A} \begin{pmatrix}d & -b \\ -c & a\end{pmatrix}$
+- $det A = ad-bc$
+
+(See more examples!)
+
+* Expectation, Reloaded
+
+$$E[g(\overrightarrow{X})] = \begin{cases}
+\Sigma_{\overrightarrow{x}} g(\overrightarrow{x})f(\overrightarrow{x}) & \text{ if discrete} \\
+\int g(\overrightarrow{x})f(\overrightarrow{x}) & \text{ if continuous}
+\end{cases}$$
+
+** Conditional Expectation
+
+$$E[g(X)|Y=y] = \begin{cases}
+\Sigma_{x}g(x)\cdot{}f_{X|Y}(x|y) & \text{ if discrete} \\
+\int g(x)\cdot{}f_{X|Y}(x|y) & \text{ if continuous}
+\end{cases}$$
+
+_Properties of conditional expectations_
+- $E[g(X)|A] = \frac{E[g(X)1_{A}]}{P(A)}$
+- $E[g(X)] = \Sigma{}E[g(X)|A_i]\cdot{}P(A_i)$ for some partition $A_{i}\ldots{}A_{n}$
+- $E[g(X,Y)] = E[E[g(X,Y)|Y]]$ and $P(A) = E[P(A|Y)]$
+- $E[g(X)|Y] = E[g(X)]$ if $X$ and $Y$ are independent
+- $E[g(X)\cdot{}h(Y)|X] = g(X)\cdot{}E[h(Y)|X]$
+
+** Conditional Variance
+
+$$\begin{align}
+Var(X|Y) &= E[(X-E[X|Y])^2|Y] \\
+&= E[X^2|Y] - E[X|Y]^2
+\end{align}$$
+
+$$Var(X) = E[Var(X|Y)] + Var(E[X|Y])$$
+
+* Moment Generating Functions
+
+$$M_{X}(t) = E[e^{tX}]$$
+
+$M_{x}$ is well-defined if $M_{X}(t)<\infty$ $\forall{}t\in{}(-\eta{},\eta{})$ for some $\eta{}>0$
+
+$$E[X^k] = M^{(k)}(0) = [\frac{d^{k}M(t)}{d^{k}t}]_{t=0}$$
+- $E[X] = M'(0)$
+- $E[X^2] = M''(0)$
+
+_Properties_
+- $M_{X+Y}(t) = M_{X}(t) \cdot{} M_{Y}(t)$ (if $X$ and $Y$ are independent)
+- $X$ and $Y$ have the same distribution if $M_{X}(t) = M_{Y}(t)$
+
+** Common MGFs
+
+| Bernoulli   | $1-p+pe^t$        |
+| Binomial    | $(1-p+pe^t)^n$     |
+| Exponential | $\dfrac{\lambda{}}{\lambda{}-t}$ |
+| Poisson     | $e^{-\lambda{}(1-e^t)}$     |
+
+
 
 \end{multicols*}
