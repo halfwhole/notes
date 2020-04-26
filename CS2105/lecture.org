@@ -1,0 +1,1327 @@
+#+TITLE: CS2105 Lecture Notes
+#+DATE: [2020-01-21]
+#+LATEX_HEADER: \usepackage{indentfirst}
+#+LATEX_HEADER: \usepackage{parskip}  \setlength{\parindent}{15pt}
+#+LATEX_HEADER: \usepackage{sectsty}  \setcounter{secnumdepth}{3}
+#+LATEX_HEADER: \usepackage{titlesec} \newcommand{\sectionbreak}{\clearpage}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+#+LATEX_HEADER: \usepackage[outputdir=Output]{minted}
+#+OPTIONS: toc:2 author:nil
+
+* Introduction
+
+** Internet
+
+Components to the internet:
+- Hosts/end systems (i.e. end nodes): /clients/ and /servers/
+- Communication links (i.e. edges)
+- Packet switches (i.e. internal nodes): /routers/ and /switches/
+
+_Network edge_: made out of hosts
+- Access network: network that physically connects hosts to the first router (edge router)
+
+_Network core_: mesh of interconnected routers, that forward packets from source to destination
+
+** Concepts
+
+$\text{Link bandwidth} = \text{Transmission rate of link}$
+
+$\text{Packet transmission delay} = \frac{L \ (bits)}{R \ (bits/sec)}$, packet of $L$ bits and transmission rate $R$ bps
+
+$\text{End-end delay} = \frac{NL}{R}$: one-directional movement with $N$ switches in between (assuming no propagation delay)
+- _Store-and-forward_: entire packet must arrive at router before being transmitted
+
+_Routing_: determining the source-destination route taken by packets
+
+_Forwarding_: moving packets from a router's input to output
+
+** Internet Structure
+
+[[./lecture-ISPs.png]]
+
+- _Access ISPs_: connected to hosts
+- _Regional ISPs_: connect access nets to one another
+- _Global ISPs_: connected to one another via peering links, IXPs (Internet Exchange Points)
+
+** Delay, Loss, Throughput
+
+_Queueing_: when arrival rate exceeds transmission rate of link
+
+_Delay_: when packets have to wait in a queue
+
+_Loss_: when buffer fills up at switch, so packets are dropped
+
+_Throughout_: rate at which bits are transferred between sender and receiver
+- Note: throughput is how much is being transferred, bandwidth is the theoretical upper bound!
+
+_Sources of packet delay_: $\text{delay} = d_{proc} + d_{queue} + d_{trans} + d_{drop}$
+- Nodal processing $d_{proc}$: check bit errors and determine output link
+- Queueing delay $d_{queue}$: depends on congestion level, buffer size
+- Transmission delay $d_{trans} = \frac{L}{R}$ for packet length $L$ bits and transmission rate/link bandwidth $R$ bps: time to push out packet
+- Propagation delay $d_{prop} = \frac{d}{s}$ for physical link length $d$ and propagation speed $s$: time to travel from one end of link to another
+
+** Protocol Layers and Service Models (Overview)
+
+_Protocol_ defines message format, order of messages sent and received, and rules on sending and receiving messages
+
+_Protocol layers_: each layer implements a service, and relies on lower layers to provide their services
+
+_Internet Protocol Stack_
+- Switch: link + physical
+- Router: /network/ + link + physical
+
+| Network Layer | Network Unit |
+|---------------+--------------|
+| Application   | Message      |
+| Transport     | Segment      |
+| Network       | Datagram     |
+| Link          | Frame        |
+| Physical      |              |
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-protocol-stack.png]]
+
+* Application Layer
+
+_Client-server architecture_: server is always on, with permanent IP address; client communicates with server, can have dynamic IP address
+
+_Socket_: an abstraction for application processes to communicate with one another over a network
+- Identifier for a process: *IP address + port number* (!)
+
+** HTTP (Hypertext Transfer Protocol)
+
+HTTP is the web's application layer protocol
+- Uses the client-server model
+- Web pages consist of _objects_ (e.g. HTML file, JPEG image, audio file); each object is addressable by _URL_ (host name + path name)
+- _TCP port 80_
+- _Stateless_ protocol (unlike TCP): does not keep information about past requests
+
+*** Persistent vs. Non-Persistent HTTP
+
+~Connection: keep-alive~ requests for a persistent connection
+
+_Non-persistent_: 1 object sent per TCP connection. Default for HTTP 1.0
+- HTTP response time: 2\times{}RTT + file transmission time
+
+#+ATTR_LATEX: :width 350px
+[[./lecture-non-persistent.png]]
+
+_Persistent_: multiple objects can be sent per TCP connection. Default for HTTP 1.1
+- As little as 1 RTT per referenced object
+
+*** HTTP request message
+
+In ASCII. Each line ends with ~\r\n~
+
+_Method types_: ~GET~, ~POST~, ~HEAD~, ~PUT~ (1.1), ~DELETE~ (1.1)
+
+#+ATTR_LATEX: :width 400px
+[[./lecture-http-request-format.png]]
+
+#+BEGIN_SRC http
+GET /somedir/page.html HTTP/1.1\r\n   # request line
+Host: www.someschool.edu\r\n          # header lines
+Connection: close\r\n                 # ...
+User-agent: Mozilla/5.0\r\n           # ...
+Accept-language: fr\r\n               # ...
+\r\n
+<...body...>                          # body
+#+END_SRC
+
+*** HTTP response message
+
+_Status codes_: ~200 OK~, ~301 Moved Permanently~, ~400 Bad Request~, ~404 Not Found~, ~505 HTTP Version Not Supported~, ...
+
+#+ATTR_LATEX: :width 400px
+[[./lecture-http-response-format.png]]
+
+#+BEGIN_SRC http
+HTTP/1.1 200 OK\r\n                                # status line
+Connection: close\r\n                              # header lines
+Date: Tue, 18 Aug 2015 15:44:04 GMT\r\n            # ...
+Server: Apache/2.2.3 (CentOS)\r\n                  # ...
+Last-Modified: Tue, 18 Aug 2015 15:11:03 GMT\r\n   # ...
+Content-Length: 6821\r\n                           # in BYTES (of the body only)
+Content-Type: text/html\r\n                        # ...
+\r\n
+<...data...>                                       # data
+#+END_SRC
+
+*** Cookies
+
+Cookies help to store state
+
+_Components to cookies_
+1. Cookie header line in HTTP response
+2. Cookie header line in the following HTTP request
+3. Cookie file kept on client's host (managed by browser)
+4. Server website has backend database to store cookie entries
+
+#+ATTR_LATEX: :width 400px
+[[./lecture-cookies.png]]
+
+*** Web Caches/Proxy Server
+
+_Web cache/proxy server_: satisfies HTTP requests on behalf of an origin web server, keeps track of recently requested objects
+- If object in cache, cache returns object
+- Otherwise, cache request object from origin, and returns it to client
+
+#+ATTR_LATEX: :width 300px
+#+ATTR_ORG: :width 300px
+[[./lecture-web-cache.png]]
+
+_Conditional GET_
+- Problem: what if origin server updates their copy of an object? Then cache's object might be stale
+- Solution: cache sends /conditional GET/ to verify it's up-to-date: it's a ~GET~ with ~If-Modified-Since:~ header line
+
+** DNS (Domain Name System)
+
+DNS features
+- Goal: translate by giving mappings between domain name and IP address.
+- UDP port 53 (possible to use TCP, esp. with larger packet sizes)
+
+DNS is both:
+1. A /distributed/ database implemented in a /hierarchy/ of DNS servers
+2. An application-layer protocol that allows hosts to query the distributed database
+
+*** Local DNS server
+
+When host makes DNS query, it is first sent to _local DNS server_ (cache) provided by ISP
+- If found, simply returns it
+- Otherwise, forwards the query into hierarchy, starting with root DNS server
+
+(Often, local name servers cache TLD servers, so don't need visit root name servers)
+
+*** Distributed, Hierarchical Database
+
+3 classes of DNS servers
+- Root DNS servers: (400+ worldwide)
+- Top-level domain (TLD) DNS servers: (e.g. com, org, net, edu)
+- Authoritative DNS servers (organisation's own DNS server, provides the actual mapping)
+
+*** Caching and Updating
+
+Mapping is cached by DNS server when it learns it
+- _Time-to-live (TTL)_: cache entries timeout after TTL (\sim{}2 days?)
+- Cache entries might be out-of-date if IP address changes before all TTLs expire worldwide
+
+*** Iterative vs. Recursive Queries
+
+#+ATTR_LATEX: :width 300px
+#+ATTR_ORG: :width 300px
+[[./lecture-dns-iterative-query.png]]
+
+- Iterative: contacted DNS server replies with the name of a lower-level server to contact next
+- Recursive: contacted DNS server handles all the work on behalf of client, and returns actual mapping
+- Typically, local DNS server contacts DNS servers that handle the query /iteratively/, before returning mapping to requesting host /recursively/
+
+* Socket Programming
+
+_Socket_: interface between application process and end-to-end transport protocol (TCP/UDP)
+
+** Identifiers
+
+(\star) To identify a process, we need *IP address + port number*!
+
+_Port number_: 16-bit integer (1-1023 reserved for standard use)
+
+** UDP: unreliable datagram, connectionless
+
+Server has 1 socket to receive ALL clients.
+- _Client_: attaches IP destination address + port number /to every packet/
+- _Server_: extracts IP sender address + port number from every packet
+
+UDP is unreliable, so data might be lost or received out of order
+
+*** UDP Client
+
+#+BEGIN_SRC python
+from socket import *
+serverName = 'hostname'
+serverPort = 12000
+
+clientSocket = socket(AF_INET, SOCK_DGRAM)
+message = ...
+clientSocket.sendto(message.encode(), (serverName, serverPort))
+receivedMessage, serverAddress = clientSocket.recvfrom(2048) # buffer size
+print(receivedMessage.decode())
+clientSocket.close()
+#+END_SRC
+
+*** UDP Server
+
+#+BEGIN_SRC python
+from socket import *
+serverPort = 12000
+serverSocket = socket(AF_INET, SOCK_DGRAM)
+serverSocket.bind(('', serverPort))
+
+while True:
+    message, clientAddress = serverSocket.recvfrom(2048)
+    outMessage = message.decode().upper()
+    serverSocket.sendto(outMessage.encode(), clientAddress)
+#+END_SRC
+
+** TCP: reliable byte stream, connection-oriented
+
+Server has 1 welcome socket for ALL clients, but for communications, 1 socket for EACH client.
+- _Client_: creates socket, specifying IP destination address + port number
+- _Server_: creates /welcome/ socket (port 80); when contacted by client, create new /connection/ socket to communicate
+
+*** TCP Client
+
+#+BEGIN_SRC python
+from socket import *
+serverName = 'hostName'
+serverPort = 12000
+
+clientSocket = socket(AF_INET, SOCK_STREAM)
+clientSocket.connect((serverName, serverPort))
+
+message = ...
+clientSocket.send(message.encode())
+receivedMessage = clientSocket.recv(1024)
+print(receivedMessage.decode())
+clientSocket.close()
+#+END_SRC
+
+*** TCP Server
+
+#+BEGIN_SRC python
+from socket import *
+serverPort = 12000
+
+serverSocket = socket(AF_INET, SOCK_STREAM)
+serverSocket.bind(('', serverPort))
+serverSocket.listen(1) # welcome socket: max number of queued connections
+
+while True:
+    connectionSocket, address = serverSocket.accept()
+    message = connectionSocket.recv(1024).decode()
+    outMessage = message.upper()
+    connectionSocket.send(outMessage.encode())
+    connectionSocket.close()
+#+END_SRC
+
+* Transport Services and Protocols
+
+_Transport layer_: logical communication between /processes/ (runs only in hosts)
+- Sender: breaks application layer _messages_ into _segments_, passes down to network layer
+- Receiver: reassembles _segments_ into _messages_, passes up to application layer
+
+_Network layer_: logical communication between /hosts/
+- Unreliable "best effort"
+
+** TCP vs. UDP
+
+| TCP                 | UDP                   |
+|---------------------+-----------------------|
+| Connection-oriented | Connectionless        |
+| Flow control        | No flow control       |
+| Congestion control  | No congestion control |
+
+| Application            | Application layer protocol | Transport protocol |
+|------------------------+----------------------------+--------------------|
+| Email                  | SMTP                       | TCP                |
+| Remote terminal access | Telnet                     | TCP                |
+| Web                    | HTTP                       | TCP                |
+| File transfer          | FTP                        | TCP                |
+| Streaming multimedia   | HTTP, RTP                  | TCP/UDP            |
+| Internet telephony     | SIP, RTP, proprietary      | TCP/UDP            |
+
+* UDP (User Datagram Protocol)
+
+UDP adds very little on top of IP, it's still unreliable
+- _Connectionless multiplexing/de-multiplexing_ (deliver data from hosts to processes based on port number)
+- _Checksum_
+
+** Connectionless De-Multiplexing
+
+Use /port number/ to differentiate between processes. Segments with same destination IP + port number will always be directed to same socket, even from a different source IP
+
+** Checksum
+
+- Treat UDP segment as sequence of _16-bit integers_
+- _Binary addition_ of every 16-bit integer, /add carry to result/
+- Checksum = _1s complement_ of added number
+
+** UDP Segments
+
+Header size: 64 bits (8 bytes)
+- Length field is in /bytes/, length of /ENTIRE/ UDP segment
+
+#+ATTR_LATEX: :width 300px
+#+ATTR_ORG: :width 300px
+[[./lecture-udp-segment.png]]
+
+* Principles of Reliable Data Transfer
+
+Possible errors over an unreliable channel:
+- Bit errors in data/feedback
+- Packet loss in data/feedback
+
+** RDT 1.0: Totally reliable
+
+Totally reliable channel: simple protocol
+- Sender: wait for data from layer above \rightarrow send across channel
+- Receiver: wait for data from channel \rightarrow extract and push to layer above
+
+** RDT 2.0: Corruption in data
+
+Bit errors in data sent: use checksum to detect errors, along with ACK/NAK
+
+_Receiver_
+- Receiver gets good data \rightarrow send ACK
+- Receiver gets corrupt data \rightarrow send NAK
+
+_Sender_
+- Sender gets ACK \rightarrow sends next packet
+- Sender gets NAK \rightarrow sends same packet
+
+** RDT 2.1: Corruption in data + ACK/NAK
+
+Bit errors in acknowledgement too: use checksum on acknowledgement too; introduce alternating seq# 0/1
+
+_Receiver_
+- Receiver gets good data with prev seq# \rightarrow send ACK and wait for same seq#
+- Receiver gets good data with same seq# \rightarrow send ACK and wait for next seq#
+- Receiver gets corrupt data \rightarrow send NAK and wait for same seq#
+
+_Sender_
+- Sender gets good ACK \rightarrow move on to send next packet with next seq#
+- Sender gets corrupt response or NAK \rightarrow resend old packet with old seq#
+
+** RDT 2.2: NAK-free protocol
+
+_Idea_: Instead of sending NAK, send ACK of most recent good packet!
+
+_Receiver_
+- Receiver gets good data with same seq# \rightarrow sent ACK of same seq#
+- Receiver gets corrupt data or prev seq# \rightarrow send ACK of prev seq#
+
+_Sender_
+- Sender gets good ACK with same seq# \rightarrow move on to send next packet with next seq#
+- Sender gets corrupt ACK or prev seq# \rightarrow resend old packet with old seq#
+
+** RDT 3.0: Corruption and Loss
+
+_Idea_: to deal with packet loss, introduce a /timer/: sender retransmits if it times out; resend ONLY when timeout occurs (not when receiving old ACK anymore)
+- Corner case: the packet is not lost, just delayed
+- Problem: may have low /utilisation/ (fraction of time the sender is busy sending)
+- $U_{sender} = \frac{L/R}{RTT + L/R}$ where $D_{trans} = L/R$
+- Solution: introduce /pipelining/, where sender can send multiple unacknowledged packets at once
+
+** Pipelining: Go-Back-N
+
+Sliding window of size $N$ consecutive un-ACKed packets
+- ONLY 1 timer
+- Cumulative ACKs
+- Sender remembers ONLY send base; upon timeout, retransmits the send base and all higher seq# packets in window
+- Receiver remembers ONLY the expected seq# and /discards/ any packet that does not have expected seq#; acknowledges ONLY the expected seq#
+
+** Pipelining: Selective Repeat
+
+Sliding window of size $N$ consecutive un-ACKed packets
+- 1 timer PER un-ACKed packet
+- Non-cumulative (individual) ACKs
+- Sender remembers send base, and status and timer for EACH un-ACKed packet; upon timeout, retransmits the offending packet ONLY
+- Receiver remembers recv base, and buffers out-of-order packets; acknowledges EACH correctly received packet individually
+
+* TCP (Transmission Control Protocol)
+
+- Point-to-point: one sender and receiver only
+- Connection-oriented
+- Full /duplex/ data: bi-directional data flow in a connection
+- Reliable, in-order byte stream
+- Pipelined: sliding window size is set dynamically from congestion/flow control
+
+#+ATTR_LATEX: :width 320px
+#+ATTR_ORG: :width 320px
+[[./lecture-tcp-send-receive-buffers.png]]
+
+(\star) Send and receive buffers are created after handshaking on *BOTH* sides! \rightarrow bi-directional data transfer
+
+_Maximum segment size (MSS)_: 1460 bytes = 1500 -- 40 (size of TCP+IP headers)
+- Limited by _maximum transmission unit (MTU)_, the largest link-layer frame (e.g. 1500 bytes for Ethernet)
+
+** Connection-Oriented De-Multiplexing
+
+How to figure out which socket to send to?
+- TCP socket identified by /4-tuple/: (source IP, source port, dest IP, dest port)
+
+** TCP Segments
+
+Header: typically 20 bytes (can be more)
+
+#+ATTR_LATEX: :width 280px
+#+ATTR_ORG: :width 280px
+[[./lecture-tcp-segment.png]]
+
+*** Sequence/Acknowledgement Number
+
+TCP works on /cumulative ACK/
+- _Sequence number_: /byte stream index/ of first byte in segment's data
+- _Acknowledgement number_: sequence number of next byte expected from the other side
+
+How does receiver deal with out-of-order segments?
+- Up to them! Can either buffer or not buffer---just return the next expected sequence number
+
+*** Receive Window
+
+_Receive Window (rwnd)_: number of bytes receiver is willing to accept
+- rwnd = size of free buffer space
+- For /flow control/: ensure receiver buffer doesn't overflow
+
+#+ATTR_LATEX: :width 300px
+#+ATTR_ORG: :width 300px
+[[./lecture-receive-window.png]]
+
+*** Other components
+
+_Header length_ and _options_: TCP header can extend beyond 20 bytes to include options, where header length specifies the total length of TCP header. But this isn't really used in practice
+- Header length is 4 bits long,  represents size of entire header in multiples of 4 bytes
+- Typical value is 5 (for header size = 20 bytes), largest value is 15 (for header size = 60 bytes)
+
+_Bits_
+- (\times) ~URG~: urgent data
+- (\star) ~ACK~: acknowledgement
+- (\times) ~PSH~: push data now (gets up to application layer ASAP)
+- (\star) ~RST~: reset (server tells client that the socket/process is not for use)
+- (\star) ~SYN~: synchronisation
+- (\star) ~FIN~: finish
+
+** TCP Connection Management
+
+*** 3-Way Handshake
+
+_Handshake_: agree to establish connection, and agree on connection parameters (e.g. both initial sequence numbers)
+- ~SYN~ \rightarrow
+- \leftarrow ~SYNACK~
+- ~ACK~ \rightarrow
+
+States
+- Client: ~LISTEN~ \rightarrow ~SYN_SENT~ \rightarrow ~ESTAB~
+- Server: ~LISTEN~ \rightarrow ~SYN_RCVD~ \rightarrow ~ESTAB~
+
+#+ATTR_LATEX: :width 300px
+#+ATTR_ORG: :width 300px
+[[./lecture-tcp-handshake.png]]
+
+*Note: can send data in the final ~ACK~!
+
+*** Closing a Connection
+
+Closing a connection: timed wait by client = 2 \times max segment lifetime (~ACK~ and ~FIN~ can be combined into ~FINACK~)
+- ~FIN~ \rightarrow
+- \leftarrow ~ACK~
+- <data...>
+- \leftarrow ~FIN~
+- ~ACK~ \rightarrow
+
+States
+- Client: ~ESTAB~ \rightarrow ~FIN_WAIT_1~ \rightarrow ~FIN_WAIT_2~ \rightarrow ~TIMED_WAIT~ \rightarrow ~CLOSED~
+- Server: ~ESTAB~ \rightarrow ~CLOSE_WAIT~ \rightarrow ~LAST_ACK~ \rightarrow ~CLOSED~
+
+#+ATTR_LATEX: :width 300px
+#+ATTR_ORG: :width 300px
+[[./lecture-tcp-close-connection.png]]
+
+** TCP Reliable Data Transfer
+
+*** TCP Sender Events
+
+1. Data received from application layer
+   - If not already running, start timer
+   - Create segment and pass to IP
+   - NextSeqNum += length(data)
+2. Timeout
+   - Retransmit ONLY oldest unACKed packet
+   - Restart timer
+3. ACK received, ACK value = /y/
+   - If ACK acknowledges previously unACKED segments, update sliding window + start timer if there are still unACKed segments
+
+*** TCP Receiver Events
+
+1. In-order segment arrives with expected seq#, all up to seq# ACKed
+   - Delayed ACK---wait up to 500ms for next segment before sending ACK
+2. In-order segment arrives with expected seq#, segment has ACK pending
+   - Immediately send ONE cumulative ACK for both in-order segments
+3. Out-of-order segment arrives with higher-than-expected seq# (there's a gap!)
+   - Immediately send duplicate ACK with seq# of next expected byte
+4. Segment arrives that fills gap
+   - Immediately send ACK if the segment fills up lower end of gap
+
+*** TCP Timeout Interval
+
+$TimeoutInterval = EstimatedRTT + 4 \cdot DevRTT$
+- $EstimatedRTT = (1-\alpha) \cdot{} EstimatedRTT + \alpha \cdot{} SampleRTT$, $\alpha \approx \frac{1}{8}$
+- $DevRTT = (1-\beta) \cdot DevRTT + \beta{} \cdot{} \vert{}SampleRTT-EstimatedRTT\vert{}$, $\beta{} \approx \frac{1}{4}$
+- ($SampleRTT$ measures time from transmitting segment to receiving ACK, ignoring retransmissions)
+
+*** TCP Fast Retransmit
+
+_Idea_: sender can detect packet loss before timeout, using duplicate ACKs, so can resend the last packet earlier.
+- 4 ACKs for the same sequence number \rightarrow resend the oldest unACKed segment
+
+* Network Layer
+
+(Note: /routers/ go through network layer, switches do not)
+
+** Network Layer Functions
+
+1. _Routing_: determine route packets should take along path from source to destination
+   - _Routing algorithms_: determine the forwarding table used by routers
+2. _Forwarding_: move packets from router's input link to the appropriate output link
+
+** Planes
+
+1. _Control plane_: network-wide logic; determines how datagram is /routed/
+   - Traditional routing algorithms: implemented in routers
+   - Software-defined networking (SDN): implemented in remote servers
+2. _Data plane_: local, per-router function; determines how datagram is /forwarded/
+
+#+ATTR_ORG: :width 400px
+#+ATTR_LATEX: :width 400px
+[[./lecture-routing-forwarding-control-data-plane.png]]
+
+* IP (Internet Protocol)
+
+** IP Address
+
+_IP address_: 32-bit identifier for a host/router /interface/
+- Each IP address is associated with an interface
+
+_Interface_: the connection between host/router and physical link
+- Routers typically have multiple interfaces
+- Host can have more than one interface! (e.g. wired Ethernet, wireless 802.11)
+
+(How are the interfaces connected?)
+- Wired Ethernet interfaces connected by Ethernet switch (used for LANs)
+- Wireless WiFi interfaces connected by WiFi base station
+
+** Subnets
+
+#+ATTR_ORG: :width 300px
+#+ATTR_LATEX: :width 300px
+[[./lecture-subnet.png]]
+
+_Subnet_: a network formed by a group of "directly interconnected" hosts
+- Directly interconnected: hosts in the same subnet can physically connect with each other without any intervening router; connect to the outside world with a router
+- How many subnets are there? Remove the routers \rightarrow check the number of isolated networks
+
+** CIDR (Classless InterDomain Routing)
+
+CIDR is the internet's address assignment strategy
+
+Two parts to an IP address of form /a.b.c.d/x/
+- Network (subnet) prefix: $x$ bits
+- Host ID: $32-x$ bits
+
+When an outside router forwards a datagram to the subnet, only $x$ bits need to be considered \rightarrow reduces size of forwarding table
+
+** Subnet Mask
+
+_Subnet mask_: made by setting all network prefix bits to 1, all host ID bits to 0
+- Bitwise AND operation with IP address \rightarrow can determine which network it belongs to
+
+** Special IP addresses
+
+| IP address                       | Use                                                               |
+|----------------------------------+-------------------------------------------------------------------|
+| 0.0.0.0/8                        | Non-routable meta-address, for special use                        |
+|----------------------------------+-------------------------------------------------------------------|
+| 127.0.0.0/8                      | Loopback address, used for local testing                          |
+|----------------------------------+-------------------------------------------------------------------|
+| 10.0.0.0/8 (10.255.255.255)      | Private addresses, can be used without                            |
+| 172.16.0.0/12 (172.31.255.255)   | any coordination with an Internet registry                        |
+| 192.168.0.0/16 (192.168.255.255) |                                                                   |
+|----------------------------------+-------------------------------------------------------------------|
+| 255.255.255.255/32               | Broadcast address, all hosts on same subnet will receive datagram |
+
+** Hierarchical Addressing: Route Aggregation
+
+Hierarchical: each tier is responsible for receiving packets for all its smaller networks, by aggregating their IP addresses
+
+#+ATTR_ORG: :width 350px
+#+ATTR_LATEX: :width 350px
+[[./lecture-hierarchical-addressing.png]]
+
+More specific routes: when an organisation changes ISP, the ISP can simply add and advertise another entry to neighbouring routers
+- _Longest prefix matching_ (match as much as possible) to deconflict
+
+** Managing IP addresses
+
+_ICANN_ allocates IP addresses, manages global root DNS servers, assign domain names and resolves disputes
+
+Getting IP addresses
+- Organisations' block of IP addresses: buy from registry or rent from ISP's address space
+- Routers' IP addresses: usually hard-coded manually
+- Hosts' IP addresses: dynamically get address from server using /DHCP/
+
+#+ATTR_ORG: :width 350px
+#+ATTR_LATEX: :width 350px
+[[./lecture-ip-address-allocation.png]]
+
+** DHCP (Dynamic Host Configuration Protocol)
+
+_DHCP_: application layer protocol, where host doesn't even have an IP address (plug-and-play)
+- Returns IP address for host
+- Returns address of first-hop router for client
+- Returns name and IP address of DNS server
+- Returns network mask
+
+DHCP runs over /UDP/
+- Server: port 67
+- Client: port 68
+
+#+ATTR_ORG: :width 450px
+#+ATTR_LATEX: :width 450px
+[[./lecture-dhcp.png]]
+
+DHCP process: [client uses src 0.0.0.0, dest is always 255.255.255.255]
+- DHCP discover \rightarrow
+- \leftarrow DHCP offer
+- DHCP request \rightarrow
+- \leftarrow DHCP ACK
+
+* IPv4
+
+** IPv4 Datagram Format
+
+#+ATTR_LATEX: :width 450px
+#+ATTR_ORG: :width 450px
+[[./lecture-ipv4-datagram-format.png]]
+
+Length refers to total length (e.g. 500 bytes), not data length (e.g. 480 bytes)
+
+** IP Fragmentation and Reassembly
+
+Why need to fragment and reassemble?
+- Each link can have different MTU (maximum transfer unit), i.e. maximum amount of data a link-level frame can carry
+- If IP datagrams are too large, needs to be fragmented, then reassembled afterwards
+
+#+ATTR_LATEX: :width 400px
+#+ATTR_ORG: :width 400px
+[[./lecture-ip-fragmentation.png]]
+
+_Flag (frag flag)_:
+- 1 if there is next fragment from same segment
+- 0 if this is the last fragment
+
+_Offset_: expressed in units of /8 bytes/
+
+|                      | Length | ID | Flag | Offset |
+|----------------------+--------+----+------+--------|
+| Before fragmentation |   1200 | x  |    0 |      0 |
+|----------------------+--------+----+------+--------|
+|                      |    500 | x  |    1 |      0 |
+|                      |    500 | x  |    1 |     60 |
+| After fragmentation  |    240 | x  |    0 |    120 |
+
+** Network Address Translation (NAT)
+
+_NAT_ maps one address space into another, commonly used to hide private IP address space behind a single public IP address
+
+_WAN_: the Internet --- use public IP addresses
+- All datagrams leaving local network have the /same/ source NAT IP address
+
+_LAN_: local network --- use private IP addresses
+- Within local network, hosts use private IP addresses for communication
+
+#+ATTR_LATEX: :width 400px
+#+ATTR_ORG: :width 400px
+[[./lecture-ip-nat.png]]
+
+_NAT translation table_: implemented by NAT routers
+- Store mapping from WAN to LAN: (NAT IP address, new port #) \leftrightarrow (source IP address, port #)
+- Translate outgoing datagrams: source \rightarrow NAT
+- Translate incoming datagrams: NAT \rightarrow source
+
+|---------------------+--------------------|
+| WAN side            | LAN side           |
+|---------------------+--------------------|
+|---------------------+--------------------|
+| 137.132.228.5, 5001 | 172.26.184.3, 3213 |
+| ...                 | ...                |
+|---------------------+--------------------|
+
+_Benefits of NAT_
+- Only one public IP for NAT router
+- Can change host addresses in local network without affecting outside world
+- Can change ISP without changing addresses of hosts in local network
+- Security concerns: hosts inside local network are not explicitly addressable and visible to outside world
+
+_Challenges of NAT_
+- Host can reach out to server with public IP address, but host cannot reach out to another private host (because other NAT doesn't know which to send to)
+- Peer-to-peer applications don't work directly: might need third-party helper node
+
+* Routing Algorithms
+
+_AS (Autonomous System)_: Internet is a hierarchy of ASs (eg. ISPs), each controls its own routers and links
+
+_Intra-AS routing_: finds a path between two routers within an AS
+- Commonly used protocols: RIP, OSPF
+
+_Inter-AS routing (not covered)_: handles interfaces between ASs
+
+** Intra-AS routing
+
+_Problem_: How to find the fastest path between one router and another?
+
+_Representation_: Graph where vertices are routers, edges are physical links between routers, weights are costs (e.g. congestion level, bandwidth, latency, etc.) \rightarrow shortest path problem
+
+** "Link State" Algorithms (not examinable)
+
+Routers know the entire network topology and all link costs
+- Routers periodically broadcast link costs to each other
+- _Solution_: each router runs Dijkstra's algorithm locally
+
+** "Distance Vector" Algorithms
+
+Routers know only their direct neighbours and link costs to neighbours
+- Routers exchange "local views" with neighbours, update their own "local views" based on neighbours' views
+- _Solution_: iterative process of computation
+  1. Swap local view with direct neighbours
+  2. Update own local view
+  3. Repeat until no more change to local view
+
+Let $c(x,y)$ be the cost between routers $x$ and $y$, $d_{x}(y)$ be the least-cost distance from $x$ to $y$ from $x$'s view.
+
+$$\text{Bellman-Ford equation:} \ \ d_{x}(y) = \min_{v} \{ \ c(x,v) + d_{v}(y) \ \}$$
+
+#+ATTR_LATEX: :width 250px
+#+ATTR_ORG: :width 250px
+[[./lecture-bellman-ford-equation.png]]
+
+\newpage
+
+_Algorithm_
+- Each router sends its distance vectors to its direct neighbours
+- If $x$ finds that $y$ is advertising a cheaper path to $z$,
+  - $x$ will update its distance to $z$
+  - $x$ will note that packets for $z$ should be sent to $y$ \rightarrow used to create $x$'s forwarding table
+- After several exchanges, all routers will know least-cost paths to all other hosts
+
+** RIP (Routing Information Protocol)
+
+_RIP_: implements the Distance Vector algorithm
+- Cost = number of hops (insensitive to network congestion)
+- Entries in routing table are aggregated subnet masks (so we are routing to destination subnet)
+- UDP port 520: exchange routing table every 30s
+- "Self-repair": if no update from neighbouring router for 3 minutes, assume neighbour has failed
+- Distributed, iterative, asynchronous
+
+** ICMP (Internet Control Message Protocol)
+
+_ICMP_: used by hosts and routers to communicate network-level information
+- Error reporting: unreachable host/network/port/protocol
+- Echo request/reply (used by ping)
+- ICMP messages carried in IP datagrams: ICMP header starts after IP header
+
+_ICMP message format_
+- /Type/
+- /Code/
+- /Checksum/
+- (Others)
+
+| Type | Code | Description                  |
+|------+------+------------------------------|
+|    8 |    0 | Echo request (ping)          |
+|    0 |    0 | Echo reply (ping)            |
+|    3 |    1 | Destination host unreachable |
+|    3 |    3 | Destination port unreachable |
+|   11 |    0 | TTL expired                  |
+|   12 |    0 | Bad IP header                |
+
+- /ping/: checks if a remote host will respond to us. Not always available nowadays
+- /traceroute/: sends messages of 1 TTL, 2 TTL, etc. \rightarrow see path of routers
+
+* Link Layer
+
+_Network layer_: communication between any two hosts, however many intermediate nodes
+
+_Link layer_: sends datagram between adjacent nodes over a single link
+- IP datagrams are encapsulated in link-layer /frames/ for transmission
+
+** Link Layer Services
+
+- _Framing_: encapsulates datagram in a frame, adding /header/ and /trailer/
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-link-layer-framing.png]]
+
+- _Link access control_: when multiple nodes /share/ a single link, need to coordinate which nodes can send frames at a certain point of time (sort of like scheduling)
+
+- _Reliable delivery_: some protocols do this: often used on error-prone links (e.g. wireless), but not low bit-error links (e.g. fiber)
+
+- _Error detection_: errors usually caused by signal attenuation or noise. Receiver detects errors, and depending on protocol, may signal for retransmission or simply drop frame
+
+- _Error correction_: receiver can identify and correct bit errors without needing retransmission
+
+** Link Layer Implementation
+
+Implemented in hardware: "adapter" (aka NIC) or on a chip
+- E.g. ethernet card/chipset, 802.11 card
+
+Routers are semi-autonomous, implementing both link and physical layers
+
+** Error Detection and Correction
+
+*** Checksum
+
+Not implemented in link layer usually
+
+*** Parity Checking
+
+_Single bit parity_: can detect single bit errors in data
+- Even parity: total #1s is even \rightarrow 0, otherwise 1 (this is the default, just sum total #1s)
+- Odd parity: total #1s is odd \rightarrow 0, otherwise 1
+
+#+ATTR_LATEX: :width 200px
+[[./lecture-one-bit-parity.png]]
+
+_Two-dimensional bit parity_: can detect and correct single bit errors in data
+- Use the 2D matrix to find row and column of flipped bit
+
+#+ATTR_LATEX: :width 250px
+[[./lecture-2d-bit-parity.png]]
+
+*** Cyclic Redundancy Check (CRC)
+
+Commonly used in link layer
+
+_Idea_: divide the data by the generator to get a remainder
+- $D$: data bits, as a binary number
+- $G$: generator of $r+1$ bits, agreed by sender and receiver beforehand
+- $R$: will generate CRC of $r$ bits
+- Division is equivalent to XOR in binary
+- Sender sends $(D, R)$, receiver divides $(D, R)$ by $G$ (known beforehand) \rightarrow error if remainder is not 0
+
+_Example_:
+- $D=101110$, $G=1001$, $r=3$ \rightarrow $R=011$
+- Sender sends $101110\vert{}011$
+
+#+ATTR_LATEX: :width 150px
+[[./lecture-crc-division.png]]
+
+\newpage
+
+** Multiple Access Links and Protocols
+
+*** Two Types of Network Links
+
+_Point-to-point link_: sender and receiver connected by a dedicated link
+- Example protocols: Point-to-Point Protocol (PPP), Serial Line Internet Protocol (SLIP)
+
+#+ATTR_LATEX: :width 250px
+[[./lecture-point-to-point-link.png]]
+
+_Broadcast link_ (shared medium): multiple nodes connected to a shared broadcast channel
+- When node transmits a frame, channel broadcasts the frame and every other node receives a copy
+- Problem: /collisions/ if a node receives multiple frames at the same time
+- Solution: /multiple access protocols/ (channel partitioning/taking turns/random access)
+
+#+ATTR_LATEX: :width 250px
+[[./lecture-broadcast-link.png]]
+
+*** Channel Partitioning Protocols
+
+Divide channel into fixed smaller pieces (e.g. time slots/frequency), each piece allocated to a node exclusively
+
+_TDMA (Time Division Multiple Access)_
+- Channel accessed in rounds, where each node gets a fixed time slot
+- Unused slots go idle
+
+#+ATTR_LATEX: :width 250px
+[[./lecture-tdma.png]]
+
+_FDMA (Frequency Division Multiple Access)_
+- Channel spectrum divided into frequency bands, where each node gets a fixed frequency band
+- Unused transmission time in frequency bands go idle
+
+#+ATTR_LATEX: :width 250px
+[[./lecture-fdma.png]]
+
+*** Taking Turns Protocols
+
+_Polling_
+- Master node invites slave node to transmit in turn
+- Concerns: polling overhead (minor), single point of failure on master node
+
+#+ATTR_LATEX: :width 130px
+[[./lecture-polling.png]]
+
+_Token Passing_
+- Control token passed from one node to the next sequentially
+- Concerns: token overhead (minor), single point of failure on token
+
+#+ATTR_LATEX: :width 130px
+[[./lecture-token-passing.png]]
+
+*** Random Access Protocols
+
+Allow collisions to happen, but /detect/ and /recover/ from them
+
+_Slotted ALOHA_
+- Assume all frames of equal size, time divided into equal slots, nodes transmit only at beginning of slot
+- If collision happens, node retransmits frame in every subsequent slot with probability $p$ until success
+
+#+ATTR_LATEX: :width 450px
+[[./lecture-slotted-aloha.png]]
+
+_Pure (unslotted) ALOHA_
+- Time not divided into slots, no synchronisation
+- When there is a new frame, transmit immediately
+- Chance of collision increases: frame sent at $t_0$ collides with other frames sent in $(t_0-1, t_0+1)$ \rightarrow utilisation is /worse/ than slotted ALOHA (about half)
+
+#+ATTR_LATEX: :width 350px
+[[./lecture-pure-aloha.png]]
+
+_CSMA (Carrier Sense Multiple Access)_
+- Sense the channel before transmission
+  - If channel is sensed /idle/, transmit frame
+  - If channel is sensed /busy/, defer transmission
+- Collisions may still happen: both nodes sense idle at same time, and start transmission after (because of /propagation delay/, nodes don't hear each others' transmission immediately)
+
+#+ATTR_LATEX: :width 220px
+[[./lecture-csma-collisions.png]]
+
+_CSMA/CD (Collision Detection)_
+- CSMA, where you /abort transmission/ when collision is detected \rightarrow reduce channel wastage
+- Retransmit after a random amount of time
+- (Used in early Ethernet)
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-csma-cd.png]]
+
+(\star) /Minimum frame size/ in CSMA: if frame size too small, collision may not be detected \rightarrow no retransmission
+
+#+ATTR_LATEX: :width 200px
+[[./lecture-csma-minimum-frame-size.png]]
+
+_CSMA/CA (Collision Avoidance)_
+- Difficult to detect collisions in some systems (hidden node problem)
+- Receiver needs to return ACK if frame received is OK
+- (Used in wireless LANs)
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-csma-ca-hidden-node.png]]
+
+** Switched Local Area Networks
+
+*** MAC Address
+
+_MAC/Physical Address_: every adapter has one, used to send and receive link layer frames
+- 48 bits long (e.g. ~5C-F9-DD-E8-E3-D2~)
+- Usually burned in NIC ROM, sometimes software settable
+- Every MAC address is supposed to be /unique/---first 3 bytes identifies vendor of an adapter
+- When adapter receives frame, it checks if destination MAC address matches its own:
+  - If yes, take the frame and extract the datagram
+  - If no, simply discard the frame
+
+| IP Address                          | MAC Address                                  |
+|-------------------------------------+----------------------------------------------|
+| 32 bits                             | 48 bits                                      |
+| Network-layer address               | Link-layer address                           |
+| Moves /datagrams/ from source to dest | Moves /frames/ over a single link              |
+| Dynamically assigned, hierarchical  | Permanent, identifies the hardware (adapter) |
+
+*** Address Resolution Protocol (ARP)
+
+_Question_: how to translate IP addresses \leftrightarrow MAC addresses?
+
+_ARP Table_: each IP node (host/router) has one
+- ~<IP address, MAC address, TTL>~: stores mapping from IP to MAC addresses
+
+_Sending frame in /same/ subnet_
+- If $A$ knows $B$'s MAC address from ARP table: create and send frame with $B$'s MAC address
+- If $A$ doesn't know $B$'s MAC address: broadcast /ARP query packet/ containing $B$'s IP address, setting dest MAC to ~FF-FF-FF-FF-FF-FF~ \rightarrow only $B$ replies to $A$ with its MAC address \rightarrow $A$ stores $B$'s IP-MAC mapping in its ARP table
+
+_Sending frame in /different/ subnet_
+- $A$ sets dest MAC to $R$'s MAC address, and dest IP to $B$'s IP
+- $R$ will create a new frame with $B$'s MAC address
+
+#+ATTR_LATEX: :width 420px
+[[./lecture-mac-send-another-subnet.png]]
+
+** Ethernet
+
+_Local Area Network (LAN)_: network that interconnects computers in a geographical area, e.g. university campus. Can consist of multiple subnets
+- LAN technologies: token ring, ethernet, Wi-Fi, others; ethernet is the dominant wired technology
+
+*** Physical Layer Media
+
+- _Twisted Pair Copper Connectors_: usually shorter (<100m)
+- _Optical Fibre Connectors_: can be much longer (hundreds of km)
+
+*** Physical Topology
+
+- _Bus topology_: all nodes can collide with one another
+- _Star topology_: /switch/ in center, nodes do not collide (point-to-point connection)
+
+#+ATTR_LATEX: :width 280px
+[[./lecture-bus-star-topology.png]]
+
+*** Ethernet Frame Structure
+
+#+ATTR_LATEX: :width 380px
+[[./lecture-ethernet-frame-structure.png]]
+
+- _Payload_: typically IP datagram. Min 46 bytes (for collision detection), max 1500 bytes (MTU)
+- _Preamble_: 7 bytes with pattern $10101010$ followed by 1 byte with pattern $10101011$, used to synchronize sender and receiver clock rates (so receiver can figure out width of a bit)
+- _Dest address_: if NIC receives frame with its dest address or broadcast address, extract data in frame; otherwise, discard
+- _Type_: indicates higher level protocol (typically IP)
+- _CRC_: detect corruption
+
+#+ATTR_LATEX: :width 350px
+[[./lecture-ethernet-preamble.png]]
+
+*** Ethernet Data Delivery
+
+- Connectionless and unreliable: no handshaking, no ACKs or NAKs
+- Multiple Access Protocol: CSMA/CD with binary (exponential) backoff
+
+*** Ethernet CSMA/CD
+
+_Sender_
+- Create frame
+- If sense channel idle, start frame transmission; if busy, wait till channel idle
+- If transmit entire frame without collision, done; else abort and send /jam signal/
+- After aborting, enter /binary back-off/
+
+_Binary/exponential back-off_
+- After $m^{th}$ collision, choose $K$ at random from $\{0, 1, 2 \ldots, 2^{m}-1 \}$
+- Wait for $K \times 512$ bit times
+
+** Link Layer Switches
+
+*** Ethernet Switch
+
+- Stores and forwards Ethernet frames
+- Buffers frames and is full duplex
+- Examines incoming MAC address, and selectively forwards it to one or more outgoing links
+- /Transparent/ to hosts: no IP address, hosts unaware of presence of switches
+
+#+ATTR_LATEX: :width 150px
+[[./lecture-ethernet-switch.png]]
+
+*** Switch Forwarding Table
+
+| MAC address | Interface | TTL |
+|-------------+-----------+-----|
+| A           |         1 |  60 |
+| B           |         2 | 120 |
+| ...         |           |     |
+
+- _Format_: ~<MAC address of host, interface of host, TTL>~
+- _Self-learning_: switch learns which hosts can be reached through which interfaces
+  - When receiving frame from $A$, store location of $A$ in switch table
+  - If $B$ is found in table, forward frame to that link
+  - If $B$ is not found in table, broadcast frame to all outgoing links
+
+*** Interconnected Switches
+
+Switches can be interconnected in hierarchy, and form a /spanning tree/
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-interconnected-switches.png]]
+
+*** Router vs. Switch
+
+| Router                                       | Switch                                        |
+|----------------------------------------------+-----------------------------------------------|
+| /Network/ layer                                | /Link/ layer                                    |
+| Check /IP address/                             | Check /MAC address/                             |
+| Store-and-forwards /datagrams/                 | Store-and-forward /frames/                      |
+| Computes routes to destination               | Simply forwards to outgoing link or broadcast |
+| More complex, usually needs to be configured | Simpler, plug-and-play, self-learning         |
+
+* Multimedia Networking
+
+How do we deliver multimedia over the internet (OTT), when networking applications don't by themselves make latency/real-time guarantees?
+
+3 types of multimedia networking applications
+- Streaming stored content (video/audio): e.g. YouTube, Netflix
+- Conversational/two-way live voice/video over IP, e.g. Skype, Zoom
+- Streaming/one-way-live audio/video
+
+** Multimedia: Audio
+
+_Audio_: sequence of signal amplitudes across time
+
+_Sampling_
+- Sample an analog audio signal at a certain rate (e.g. 8,000 samples/s for telephone, 44,100 samples/s for CDs)
+- Then /quantize/ each sample to an integer value (e.g. 2^8, or 2^16 values for CDs)
+
+#+ATTR_LATEX: :width 220px
+[[./lecture-audio-sampling.png]]
+
+** Multimedia: Video
+
+_Video_: sequence of images displayed at a constant rate (e.g. 30/s)
+
+_Encoding_: use /redundancy/---within and between images to decrease #bits required to encode image
+- Spatial: within an image
+- Temporal: from one image to the next---can send only the difference from one frame to another
+
+_Compressions_
+- Constant bit rate: encoding rate fixed
+- Variable bit rate: encoding rate changes as amount of spatial, temporal encoding changes (allows for better quality when there's more to encode)
+
+** Streaming Stored Content
+
+_Continuous playout constraint_: once client playout begins, playback must match original timing
+- Client-side buffer: helps to deal with variable network delays
+- Client playout delay: only start playing back some time after we receive packets, buffer is semi-full
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-streaming-stored-video.png]]
+
+_Playout buffering_: average fill rate $\bar{x}$, playout rate $r$
+- If $\bar{x} < r$, buffer eventually empties, will eventually freeze
+- If $\bar{x} > r$, buffer will not empty if initial playout delay is large enough
+  - Initial playout delay: if too large, buffer starvation less likely, but larger delay until content starts playing
+  - Avoid full buffer: just don't take from TCP buffer (so rely on TCP congestion mechanism), OR application layer sends message down
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-streaming-stored-buffering.png]]
+
+_Using UDP (push-based streaming)_
+- Server just sends at appropriate rate, without congestion control
+- Error control at application level
+
+_Using HTTP (pull-based streaming)_
+- Client retrieves data by HTTP GET, sent at maximum possible rate under TCP
+- Fill rate fluctuates due to TCP congestion control, and in-order delivery
+
+** Voice-over-IP (VoIP)
+
+_Latency (end-end-delay) requirement_: delays need to be small, <400ms!
+
+Speaker's audio: alternating talk spurts and silent periods
+- Only generate packets and transmit during talk spurts
+- 64kbps encoding, partitioned into 20ms chunks and sent at 8Kbytes/s (same), 160bytes of data/chunk
+
+_Loss_
+- Network loss: packet lost in network (e.g. buffer overflow)
+- Delay loss: packet arrives too late for playout
+- Loss tolerance: between 1% and 10%
+
+*** Playout Delay
+
+_Fixed playout delay $q$_
+- Large $q$: less packet loss
+- Small $q$: better interactive experience
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-voip-fixed-playout-delay.png]]
+
+_Adaptive playout delay_
+- Estimate packet delay $d_i$ using exponentially weighted moving average
+- Estimate average deviation $v_i$ of delay---use about $K=3$ or $K=4$ standard deviations
+- Playout time = $t_i + d_i + Kv_i$
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-adaptive-playout-delay.png]]
+ 
+*** Recovery from Loss
+
+_Redundant chunk every N chunks_
+- Redundant chunk is simply XOR of N original chunks
+- Reconstruct at most 1 lost chunk every N+1 chunks (with playout delay)
+
+\newpage
+
+_"Piggyback lower quality stream"_
+- Send high resolution stream + low resolution stream for previous one
+- It's a form of Forward Error Correction (FEC): send enough bits to allow for recovery
+
+#+ATTR_LATEX: :width 250px
+[[./lecture-voip-piggyback.png]]
+
+_Conceal loss by interleaving_
+- Packet contains units from different chunks \rightarrow if loss, still have most of each chunk
+- No redundancy, but increases playout delay
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-voip-interleave.png]]
+
+** Protocols: for Real-Time Conversational Applications
+
+*** Real-Time Protocol (RTP)
+
+Suite of protocols: RTP, RTCP (control), RTSP (streaming: done over TCP)
+- Each uses a different port number
+- Runs in end systems over UDP
+
+#+ATTR_LATEX: :width 250px
+[[./lecture-rtp-suite.png]]
+
+\newpage
+
+_RTP header_
+- Payload type (7 bits): type of encoding
+- Sequence number (16 bits): increment by 1 for each packet sent
+- Timestamp (32 bits)
+- Synchronisation Source ID (SSRC) (32 bits): identifies source of RTP stream
+
+#+ATTR_LATEX: :width 300px
+[[./lecture-rtp-header.png]]
+
+** Dynamic Adaptive Streaming over HTTP (DASH)
+
+Stream media over HTTP protocol, by dividing it into streamlets of different quality
+- MPD (Media Presentation Description) file: gives client information on available videos and qualities
+- Client runs adaptive bitrate algorithm (ABR) to determine which segment of what quality to download next
+
+Advantages and disadvantages
+- (+) Simple server, just a regular web server
+- (+) No firewall problems, port 80 HTTP
+- (+) Standard caching works
+- (--) Longer media segments
+- (--) High latency: several seconds
+
+** Summary of Multimedia Applications
+
+VoD (e.g. YouTube, Netflix)
+- One-way, stored, long latency okay \rightarrow DASH
+
+Live-streaming (e.g. Twitch)
+- One-way, live source, not too long latency \rightarrow DASH
+
+VoIP (e.g. Skype, Zoom)
+- Two-way, must have low latency \rightarrow RTP
+
+* Protocol Summary
+
+| Layer       | Protocol | Underlying Protocol | Information                                 |
+|-------------+----------+---------------------+---------------------------------------------|
+| Application | HTTP     | TCP 80              |                                             |
+|             | DNS      | UDP 53              | Find IP address for domain name             |
+|             | DHCP     | UDP 67/68           | For host to obtain IP address/other info    |
+|             | RIP      | UDP 520             | Distance vector routing algorithm           |
+|             | RTP      | UDP                 |                                             |
+|-------------+----------+---------------------+---------------------------------------------|
+| Transport   | TCP      | IP                  |                                             |
+|             | UDP      | IP                  |                                             |
+|-------------+----------+---------------------+---------------------------------------------|
+| Network     | IP       | (Link layer)        |                                             |
+|             | ICMP     | IP                  | Communicate network-level information       |
+|-------------+----------+---------------------+---------------------------------------------|
+| Link        | Ethernet | (uses CSMA/CD)      |                                             |
+|             | Wi-Fi    | (uses CSMA/CA)      |                                             |
+|             | ARP      |                     | Discovers and translates IP and MAC address |
+|-------------+----------+---------------------+---------------------------------------------|
+|             |          |                     |                                             |
+
+| Access control protocol type | Protocol        |
+|------------------------------+-----------------|
+| Channel partitioning         | TDMA            |
+|                              | FDMA            |
+|------------------------------+-----------------|
+| Taking turns                 | Polling         |
+|                              | Token passing   |
+|------------------------------+-----------------|
+| Random access                | (Slotted) ALOHA |
+|                              | CSMA/CD         |
+|                              | CSMA/CA         |
