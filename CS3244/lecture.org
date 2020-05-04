@@ -1,0 +1,1109 @@
+#+TITLE: CS3244 Notes
+#+DATE: [2020-01-23]
+#+LATEX_HEADER: \usepackage{indentfirst}
+#+LATEX_HEADER: \usepackage{parskip}  \setlength{\parindent}{15pt}
+#+LATEX_HEADER: \usepackage{sectsty}  \setcounter{secnumdepth}{3}
+#+LATEX_HEADER: \usepackage{titlesec} \newcommand{\sectionbreak}{\clearpage}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+#+LATEX_HEADER: \usepackage[outputdir=Output]{minted}
+#+LATEX_HEADER: \usepackage{algorithm}
+#+LATEX_HEADER: \usepackage[noend]{algpseudocode}
+#+LATEX_HEADER: \DeclareMathOperator*{\argmax}{arg\,max} \DeclareMathOperator*{\argmin}{arg\,min}
+#+OPTIONS: toc:2 author:nil
+
+* Concept Learning
+
+** Concept Learning
+
+_Concept learning_: a form of supervised learning, infer a concept from training examples
+
+_Concept $c$_: a boolean-valued function over a set of input instances
+
+_Input instances $X$_: each instance $x\in{}X$ is represented by a conjunction of input attributes
+
+*** Hypothesis
+
+_Hypothesis space $H$_: each hypothesis $h\in{}H$ ($h : X \rightarrow \{0,1\}$) is represented by a conjunction of /constraints/ on input attributes
+- Constraint can be a specific value, don't care, or no value allowed
+
+Trade-off between /expressive power/ and /smaller hypothesis space/ (larger space \rightarrow usually more data needed)
+- $ax+b$ is less expressive, smaller hypothesis space ($a \times b$)
+- $ax^2+bx+c$ is more expressive, larger hypothesis space ($a \times b \times c$)
+
+*** Consistency and Satisfiability
+
+_Consistency_: a hypothesis $h$ is /consistent/ with a set of training examples $D$
+\Leftrightarrow $h(x)=c(x) \ \forall{}\langle{}x, c(x)\rangle{}\in{}D$
+
+_Satisfiability_: an input instance $x\in{}X$ /satisfies/ a hypothesis $h\in{}H$ \Leftrightarrow $h(x)=1$
+
+Note: /consistent/ \ne /satisfy/! One is $h(x) = c(x)$, one is $h(x) = 1$
+
+*** Example of ~EnjoySport~
+
+| Example | Sky   | AirTemp | ... | EnjoySport |
+|---------+-------+---------+-----+------------|
+|       1 | Sunny | Warm    |     |          1 |
+|       2 | Sunny | Cold    |     |          1 |
+|       3 | Rainy | Warm    |     |          0 |
+|       4 | Sunny | Warm    |     |          1 |
+
+- Input instances: ~Sky~ (Sunny, Cloudy, Rainy), ~AirTemp~ (Warm, Cold), ~Humidity~ (Normal, High), ~Wind~ (Strong, Weak), ~Water~ (Warm, Cool), ~Forecast~ (Same, Change)
+- Target concept: ~EnjoySport~ (boolean valued)
+- Example of hypothesis: $\langle{}Sky=Sunny, AirTemp=?, Wind=Strong, ...\rangle{}$
+
+*** Concept Learning
+
+Goal: given these, search for a hypothesis $h\in{}H$ that is /consistent/ with $D$.
+Concept learning is search!
+- _Target concept/function_ $c : X \rightarrow \{0,1\}$ (unknown)
+- _Noise-free training examples_ $D$
+
+_Inductive Learning Assumption_: a hypothesis that approximates target function well over sufficiently large set of /training/ examples ALSO approximates target function well over /unobserved/ examples
+- More data \rightarrow more confidence
+
+Example: hypothesis space $H$ for ~EnjoySport~
+- 5x4x4x4x4x4 synthetically distinct hypotheses
+- 4x3x3x3x3x3+1 semantically distinct hypotheses (a hypothesis with 1+ $\phi$ symbols is semantically the same, classifies everything as a negative example)
+
+*** Exploit Structure in Concept Learning
+
+$h_j$ is _more general than/equal to_ $h_k$ ($h_j \ge_{g} h_k$) \Leftrightarrow any input instance $x$ that satisfies $h_k$ also satisfies $h_j$
+- $\forall{}x\in{}X \ (h_k(x)=1) \rightarrow (h_j(x)=1)$
+- $\exists{}x\in{}X \ (h_k(x)=1) \wedge (h_j(x)=0)$ --- the /negation/
+- $\ge_{g}$ relation defines a _partial order_ (reflexive, anti-symmetric, transitive) over $H$, but NOT a total order
+- (Anti-symmetric: $x\ge{}y \wedge y\ge{}x \rightarrow x=y$)
+
+** \textsc{FIND-S} algorithm
+
+Start with most specific hypothesis. Whenever it wrongly classifies +ve training example as --ve, "minimally" generalize to satisfy it.
+
+*** Algorithm
+
+1. Initialize $h$ to most specific hypothesis in $H$
+2. For each +ve training instance $x$:
+   - For each attribute constraint $a_i$ in $h$:
+   - If $x$ does not satisfiy constraint $a_i$, replace $a_i$ in $h$ by next more general constraint satisfied by $x$
+3. Output hypothesis $h$
+
+#+ATTR_LATEX: :width 400px
+[[./find-s.png]]
+
+_Proposition 1_: $h$ is consistent with $D$ \Leftrightarrow every +ve training instance satisfies $h$, and every --ve training instance does not satisfy $h$.
+
+*** Limitations
+
+- Can't tell whether \textsc{Find-S} has learned target concept
+- Can't tell when training examples are inconsistent (errors or noise)
+- Picks a maximally specific $h$ --- but depending on $H$, there may be several (or none)!
+
+** Version Spaces
+
+_Version space $VS_{H,D}$_ (wrt hypothesis space $H$ and training examples $D$): subset of hypotheses from $H$ that are consistent with $D$
+- $VS_{H,D} = \{h\in{}H \ | \ h \text{ is consistent with } D\}$
+
+*** General and Specific Boundaries
+
+_General boundary $G$_ of $VS_{H,D}$: set of /maximally general/ members of $H$ consistent with $D$
+- $G = \{ g \in{} H \ | \ g \text{ consistent with } D \wedge (\not{}\exists{}g'\in{}H \ \ g'>_{g}g \ \wedge{} \ g' \text{ consistent with } D \}$
+- "Summary" of --ve training examples
+
+_Specific boundary $S$_ of $VS_{H,D}$: set of /maximally specific/ members of $H$ consistent with $D$
+- $S = \{ s \in{} H \ | \ s \text{ consistent with } D \wedge (\not{}\exists{}s'\in{}H \ \ s>_{g}s' \ \wedge{} \ s' \text{ consistent with } D \}$
+- "Summary" of +ve training examples
+
+#+ATTR_LATEX: :width 300px
+[[./version-space-enjoysport.png]]
+
+_Version Space Representation Theorem (VSRT)_: all hypotheses in the version space lie in some path from $G$ to $S$
+- $VS_{H,D} = \{ h\in{}H \ | \ \exists{}s\in{}S,g\in{}G \ \ g\ge_{g}h\ge_{g}s \}$
+- Proof omitted, see pg 21 of =2-ConceptLearning Part 1.pdf=
+
+** \textsc{List-Then-Eliminate} algorithm
+
+_Idea_: List all possible hypotheses in $H$. Eliminate any hypothesis found inconsistent with any training example.
+
+*** Algorithm
+
+- /VersionSpace/ \leftarrow{} list of all hypotheses in $H$
+- For each training example $\langle{}x, c(x)\rangle{}$:
+  - Remove from /VersionSpace/ any hypothesis $h$ for which $h(x)\ne{}c(x)$ (inconsistent).
+
+*** Limitation
+
+Prohibitively expensive to exhaustively enumerate all hypotheses
+
+** \textsc{Candidate-Elimination} algorithm
+
+_Idea_: Start with most general and specific hypotheses. Each training example "minimally" generalizes $S$ and specializes $G$ to remove inconsistent hypotheses from version space.
+- +ve training examples "bring down" $S$ to be more general
+- --ve training examples "raise up" $G$ to be more specific
+
+*** Algorithm
+
+- $G$ \leftarrow{} maximally general hypotheses in $H$
+- $S$ \leftarrow{} maximally specific hypotheses in $H$
+- For each +ve training example $d$:
+  - Remove from $G$ any hypothesis inconsistent with $d$
+  - For each $s\in{}S$ not consistent with $d$:
+    - Remove $s$ from $S$
+    - Add all minimal generalizations $h$ of $s$, such that $h$ is consistent with $d$, and some member of $G$ is more general than $h$
+    - Finally, remove from $S$ any hypothesis that is more general than another hypothesis in $S$ (restore boundary property)
+- For each --ve training example $d$:
+  - Remove from $S$ any hypothesis inconsistent with $d$
+  - For each $g\in{}G$ not consistent with $d$:
+    - Remove $g$ from $G$
+    - Add all minimal specializations $h$ of $s$, such that $h$ is consistent with $d$, and some member of $S$ is more specific than $h$
+    - Finally, remove from $G$ any hypothesis that is more specific than another hypothesis in $G$ (restore boundary property)
+
+\newpage
+
+_--ve example (specialises $G$)_
+#+ATTR_LATEX: :width 300px
+[[./candidate-elimination-2.png]]
+
+_+ve example (generalises $S$, but also eliminates one from $G$)_
+#+ATTR_LATEX: :width 300px
+[[./candidate-elimination-3.png]]
+
+*** Properties
+
+- Cannot handle error/noise in training data
+- Hypothesis space may be /biased/, if hypothesis representation is not expressive enough (such that target concept $c\notin{}H$), we can have no consistent hypotheses
+- (For example: our current hypothesis representation cannot support multiple values---e.g. for /Sky/ attribute, /{Sunny, Cloudy}/ but excluding /Rainy/)
+
+_Active learner_: if it can choose an input instance that satisfies exactly $\frac{1}{2}$ of the hypotheses in version space, then version space HALVES with each training example \rightarrow{} $\log_2$ training examples to find target concept $c$ (fewer training examples needed!)
+
+*** Classifying unobserved input instances
+
+Can do so if we don't have an exact target concept, using the version space
+
+_Classifying with 100% confidence_
+- Proposition 3: an input instance $x$ satisfies every member of $S$ \Leftrightarrow $x$ satisfies every hypothesis in version space (surely +ve)
+- Proposition 4: an input instance $x$ satisfies none of the members of $G$ \Leftrightarrow $x$ satisfies none of the hypotheses in version space (surely --ve)
+
+_Classifying with some confidence_
+- Take a majority vote of hypotheses in version space (assuming all are equally probable)
+
+** Unbiased Learner
+
+Remember: our hypothesis space may be _biased_
+
+Choose $H$ that can express every teachable concept, i.e. $H = \mathcal{P}(X)$,
+so $\vert{}H\vert{}=2^{\vert{}X\vert{}}$. Basically, consider every input instance individually.
+
+_Example_: $\langle{}x_1, 1\rangle{}, \langle{}x_2, 1\rangle{}, \langle{}x_3, 1\rangle{}, \langle{}x_4, 0\rangle{}, \langle{}x_5, 0\rangle{}$
+- $S \gets \{ (x_1 \vee x_2 \vee x_3) \}$
+- $G \gets \{ \neg{}(x_4 \vee x_5) \}$
+
+_Limitation_: Cannot classify new unobserved instances!
+
+** Inductive Bias
+
+_Inductive bias_: inductive bias of a concept learning algorithm $L$ is any
+minimal set of assertions $B$ such that for any target concept $c$ and
+corresponding noise-free training examples $D_c$,
+
+$\forall{}x\in{}X \ (B \wedge D_c \wedge x) \models c(x) = L(x, D_c)$
+
+Intuitively, it's the set of assumptions that allow you to generalise from
+training examples to the entire input instance space.
+
+_Inductive bias of $\textsc{Candidate-Elimination}$_: $B = \{c\in{}H\}$
+- Assumption: $\textsc{Candidate-Elimination}$ outputs a classification $L(x,
+  D_c)$ for input instance $x$ if vote among hypotheses in $VS_{H,D_c}$ is
+  unanimously +ve or --ve, does not output a classification otherwise
+- If $c\in{}H$, then $c\in{}VS_{H,D_c}$ since $c$ is consistent with $D_c$ (by definition of
+  version space)
+- ?
+
+_Inductive vs. deductive inference_
+
+_Comparing learners with different inductive biases_ (weak \rightarrow strong generalization
+power)
+- $\textsc{Rote-Learner}$: store all examples, classify if it matches example
+- $\textsc{Candidate-Elimination}$: $c\in{}H$
+- $\textsc{Find-S}$: $c\in{}H$ and all instances are --ve unless training examples
+  tell you otherwise
+
+** Summary
+
+Concept learning is a search through our hypothesis space $H$. We can order $H$
+with a general-to-specific ordering, where boundaries $G$ and $S$ characterize
+the learner's uncertainty.
+
+We've learned the $\textsc{Find-S}$ and $\textsc{Candidate-Elimination}$
+algorithms.
+
+Active learners can generative informative queries. (What should I learn next?)
+
+Inductive biases, when stronger, can classify a greater proportion of unobserved
+input instances.
+
+* Decision Tree Learning
+
+** Decision Trees
+
+#+ATTR_LATEX: :width 350
+[[./chapt3-decisiontree.png]]
+
+*** Decision Tree Learning vs. Concept Learning
+
+|                   | Concept Learning             | Decision Tree Learning                            |
+|-------------------+------------------------------+---------------------------------------------------|
+| Target concept    | Binary outputs               | Discrete outputs                                  |
+| Training data     | Noise-free                   | Robust to noise                                   |
+| Hypothesis space  | Restricted (hard bias)       | Complete and expressive                           |
+| Search strategy   | Complete: version space      | Incomplete: prefers shorter tree (soft bias)      |
+|                   | Refine search per example    | Refine search using all examples. No backtracking |
+| Exploit structure | General-to-specific ordering | Simple-to-complex ordering                        |
+
+*** Expressive Power
+
+_Expressive power_: decision tree learning can express /any/ function of the input attributes!
+- But we also want to find a /compact/ decision tree
+- To express a boolean decision tree, convert to disjunctive normal form, i.e.
+  $C = Path_1 \vee Path_2 \vee \ldots$, where each path is a conjunction of attributes e.g. $(\neg{}A \wedge B \wedge \neg{}C \wedge ...)$
+
+*** Hypothesis/Search Space
+
+Number of distinct binary DTs with $m$ boolean attributes
+
+= number of boolean-valued functions
+
+= number of distinct truth tables with $2^m$ rows
+
+= $2^{2^{m}}$
+
+** $\textsc{Decision-Tree-Learning}$ algorithm
+
+_Goal_: find a small tree consistent with training examples
+
+_Idea_: greedily choose "most important" attribute as root of subtree
+
+\begin{algorithm}
+\begin{algorithmic}
+\Procedure{Decision-Tree-Learning}{$examples, attributes, parent\_examples$}
+\If{examples is empty}
+  \State \Return $\textsc{Plurality-Value}(parent\_examples)$
+\ElsIf{all examples have the same classification}
+  \State \Return $\text{the classification}$
+\ElsIf{attributes is empty}
+  \State \Return $\textsc{Plurality-Value}(examples)$
+\Else
+  \State $A \gets \text{argmax}_{a\in{}attributes} \ \textsc{Importance}(a, examples)$
+  \State $tree \gets \text{a new decision tree with root test } A$
+  \For{$\text{each value} \ v_{k} \ of A$}
+    \State $exs \gets \{e : e \in{} examples \text{ and } e.A = v_{k}\}$
+    \State $subtree \gets \textsc{Decision-Tree-Learning}(exs, attributes - A, examples)$
+    \State $\text{add a branch to } tree \text{ with label } (A = v_{k}) \text{ and subtree } subtree$
+  \EndFor
+\EndIf
+\State \Return $tree$
+\end{algorithmic}
+\end{algorithm}
+
+*** $\textsc{Plurality-Value}$
+
+Plurality-value is just a majority vote. Allows you to still classify, even when:
+- Data is noisy or wrong
+- Domain is non-deterministic
+- Not all attributes are accounted for
+
+*** $\textsc{Importance}$: how to choose the most important attribute?
+
+_Idea_: attribute should split the examples into subsets that are ideally all +ve,
+or all --ve
+- Select attribute that /maximises information gain/, by reducing the most entropy (uncertainty)
+
+#+ATTR_LATEX: :width 450
+[[./chapt3-mostimptattr.png]]
+
+- $Gain(Wait, Patrons) = B(\frac{6}{12}) - [\frac{2}{12}B(\frac{0}{2}) + \frac{4}{12}B(\frac{4}{4}) + \frac{6}{12}B(\frac{2}{6})] = 0.459 = 0.0541 \ \text{bits} \ (??)$
+- $Gain(Wait, Type) = B(\frac{6}{12}) - [\frac{2}{12}B(\frac{1}{2}) +
+  \frac{2}{12}B(\frac{1}{2}) + \frac{4}{12}B(\frac{1}{2}) + \frac{4}{12}B(\frac{1}{2}) = 0 \ \text{bits}$
+
+_Information gain_: $Gain(C,A)$ of target concept $C$ from attribute test on $A$ is the expected reduction in entropy
+- Chosen attribute $A$ divides training set $E$ into subsets $E_{1}\ldots{}E_{d}$ corresponding to the $d$ distinct values of $A$. Each subset $E_{i}$ has $p_{i}$ +ve and $n_{i}$ --ve examples
+\begin{equation*}
+\begin{align}
+Gain(C, A)
+&= H(C) - H(C|A) \\
+&= B(\frac{p}{p+n}) + \sum_{i=1}^{d}\frac{p_{i}+n_{i}}{p+n}B(\frac{p_{i}}{p_{i}+n_{i}}) \ \text{(i.e. weighted average of the entropies of child nodes)}
+\end{align}
+\end{equation*}
+
+_Entropy_: measures the /uncertainty of classification/
+- $H(C) = -\sum_{i=1}^{k} P(c_i) \log_{2}P(C_i) = B(\frac{p}{p+n})$ where $p$ is #+ve examples, $n$ is #--ve examples
+- $B(q) = -(q \log_{2} q + (1-q) \log_{2} (1-q))$ is entropy of boolean r.v. true with probability $q$
+
+_Entropy curve_: idea is that $B(\frac{p}{p+n})$ is 0 when $\frac{p}{p+n} = 0 / 1$, is 1 when $\frac{p}{p+n} = 0.5$
+
+#+ATTR_LATEX: :width 180
+[[./chapt3-entropycurve.png]]
+
+
+*** Hypothesis Space Search
+
+$\textsc{Decision-Tree-Learning}$ is guided by the /information gain/ heuristic (from the $\textsc{Importance}$ function)
+- It's a heuristic, so no guarantee that tree will actually be shortest
+
+*** Inductive Bias
+
+Inductive bias of $\textsc{Decision-Tree-Learning}$
+1. Shorter trees are preferred
+2. Trees that place /high information gain attributes close to the root/ are preferred
+
+If we only consider (1), then it is the /exact/ inductive bias of BFS for the shortest consistent decision tree---prohibitively expensive
+
+Note: bias is a /preference/ for some hypotheses, not a /restriction/ of the hypothesis space.
+
+*** Occam's Razor
+
+_Occam's razor_: prefer the shortest/simplest hypothesis that fits the data
+- Simple hypothesis that fits data is unlikely to be a coincidence
+- Complex hypothesis that fits data could be coincidence---could be overfitting
+- (BUT) it could be wrong
+
+** Overfitting
+
+_Overfitting_: hypothesis $h$ /overfits/ the set of training examples $D$ \Leftrightarrow $\exists{}h'\in{}H\backslash{}\{h\} \ (error_{D}(h) < error_{D}(h')) \wedge (error_{D_{X}}(h) > error_{D_{X}}(h'))$
+- $error_{D}(h)$ and $error_{D_{X}}(h)$ --- errors of $h$ over $D$ and set $D_{X}$ of examples corresponding to instance space $X$ respectively
+- i.e. overfitting occurs when there's another hypothesis that's worse on the training examples, but better on the instance space in general
+
+Why does overfitting occur?
+- Training examples are noisy or wrong
+- Data is limited, but the target concept is complex
+
+*** Avoiding overfitting
+
+_Approaches_
+- Stop growing DT when expanding a node is not statistically significant in improving performance over entire instance space---use hypothesis testing/chi-squared tests
+- $(\star)$ Allow DT to grow and overfit the data, then _post-prune_ it
+
+_Partition training data_ into /training/ dataset, and /validation/ dataset ($\sim \frac{2}{3} / \frac{1}{3}$) --- measure performance over both
+
+_Minimum description length, MDL_: minimize $size(tree)$ and $size(misclassifications(tree))$
+
+*** Reduced-Error Pruning
+
+_Idea_: keep pruning (convert entire subtree under it to a leaf node), until further pruning is harmful
+- Greedily prune the node that most improves /validation/ set accuracy
+
+*** Rule Post-Pruning
+
+Convert DT into an equivalent set of /rules/, by creating one rule for each path from root \rightarrow leaf
+- e.g. $\text{IF} \ (Patrons = Full) \wedge (Hungry = Yes) \wedge (Type = Thai) \ \text{THEN} \ (Wait = No)$
+
+Prune (generalize) each rule by removing any precondition/conjunct that improves its estimated accuracy
+
+Sort pruned rules by estimated accuracy into desired sequence used to classify unobserved input instances
+
+** Different Attribute Types
+
+*** Continuous-Valued Attributes
+
+_Solution_: make it /discrete/! Define a /discrete/-valued input attribute to /partition/ the values into set of intervals for testing
+- e.g. $WaitEstimate\text{:} \ 0-10, 10-30, 30-60, >60$
+
+*** Attributes with Many Values
+
+_Problem_: $Gain$ has a preference for attributes with many values, e.g. $Date$ has 365 values \rightarrow each value might have only 1 training example \rightarrow not helpful in classifying
+
+_Solution_: $Gain$ \rightarrow $GainRatio(C,A) = \frac{Gain(C,A)}{SplitInformation(C,A)}$, i.e. normalize gain by split information
+- $SplitInformation(C,A) = -\sum_{i=1}^{d} \frac{\vert{}E_{i}\vert{}}{\vert{}E\vert{}} \log_{2} \frac{\vert{}E_{i}\vert{}}{\vert{}E\vert{}}$
+- i.e. split information measures how distributed the training set subsets $E_i$ are
+
+*** Attributes with Differing Costs
+
+_Problem_: suppose each attribute test comes with a given cost---how to learn a DT
+that has low expected cost?
+
+_Solution_: $Gain$ \rightarrow $\frac{Gain^{2}(C,A)}{Cost(A)}$ or $\frac{2^{Gain(C,A)}-1}{(Cost(A)+1)^{w}}$, where $w\in{}[0,1]$ determines importance of cost
+
+*** Missing Attribute Values
+
+_Problem_: what if some training examples are missing values for $A$?
+
+_Solution_: use training example anyway and sort through DT
+- If node $n$ tests $A$, assign the /most common value/ of $A$ among other
+  examples sorted to node $n$
+- Assign most common value of $A$ among other examples sorted to node $n$ with
+  /same value of output/target concept/
+- Assign /probability/ $p_{i}$ to each possible value of $A$, then assign /fraction/ $p_{i}$ of example to each descendant in DT
+
+Classify new unobserved input instances with missing attribute values in same manner
+
+** Summary
+
+- Decision tree learning uses /information gain/
+- Overfitting comes from having noisy/limited training data, can be avoided with post-pruning
+- Extensions to \textsc{Decision-Tree-Learning}: attributes with continuous/missing/many values, and differing costs
+
+* Neural Networks
+
+** Neural Nets
+
+|                        | *Decision Tree Learning*                      | *Neural Nets*                                       |
+|------------------------+---------------------------------------------+---------------------------------------------------|
+| Target function/output | Discrete                                    | Discrete/real vector                              |
+| Input instance         | Discrete                                    | Discrete/real, high-dimensional                   |
+| Training data          | Robust to noise                             | Robust to noise                                   |
+| Hypothesis space       | Complete, expressive                        | Restricted (#hidden units--hard bias), expressive |
+| Search strategy        | Incomplete: prefer shorter tree (soft bias) | Incomplete: prefer smaller weights (soft bias)    |
+|                        | Refine search using all examples            | Gradient descent/ascent                           |
+|                        | No backtracking                             | Batch mode/stochastic                             |
+| Training time          | Short                                       | Long                                              |
+| Prediction time        | Fast                                        | Fast                                              |
+| Interpretability       | White-box                                   | Black-box                                         |
+
+** Perceptron
+
+[[./chapter4-perceptron-unit.png]]
+
+\begin{equation*}
+o(\mathbf{x}) = sgn(\mathbf{w} \cdot \mathbf{x}) = \begin{cases}
+1 & \text{if} \ \mathbf{w} \cdot \mathbf{x} > 0 \\
+-1 & \text{otherwise}
+\end{cases}
+\end{equation*}
+
+Perceptron calculates a linear combination of a vector of real-valued inputs, and runs through step function
+- _Inputs_: $\mathbf{x} = (x_0, \ldots, x_n)^{T}$ ($x_0$ is bias input)
+- _Weights_: $\mathbf{w} = (w_0, \ldots, w_n)^{T}$ ($w_0$ is bias weight)
+- _Linear sum_: $\mathbf{w} \cdot \mathbf{x} = \sum_{i=0}^{n} w_{i}x_{i}$
+- _Activation function_: step function (1 if +ve, --1 if --ve)
+- _Hypothesis space_: $H = \{ \mathbf{w} \ \vert \ \mathbf{w} \in{} \mathbb{R}^{n+1} \}$
+
+*** Decision Surface of Perceptron
+
+- _Input vector_: $\mathbf{x} = (1, x_1, x_2)^{T}$
+- _Weight vector_: $\mathbf{w} = (w_0, w_1, w_2)^{T}$
+- _Decision surface/line_: hyperplane represented by $\mathbf{w} \cdot \mathbf{x} = 0$ \Rightarrow $x_2 = -\frac{w_1}{w_2}x_1 - \frac{w_0}{w_2}$
+
+#+ATTR_LATEX: :width 150px
+[[./chapter4-decision-surface.png]]
+
+_Orthogonal vector_
+- (\star) Always points to the +ve examples
+- Sign of $w_n$: if it points in same direction as $x_n$ axis, it's +ve, else it's --ve
+- Sign of $w_0$: depends on slope of line, and whether it's above/below 0 (check from equation)
+
+_What if function is not linearly separable?_
+- E.g. $XOR(x_1, x_2)$
+- Note: every boolean function can be represented with neural network with 2 layers (only 1 hidden layer)
+
+** Perceptron Training Rule
+
+_Idea_: initialize /randomly/. Iterate through every training example, and apply the training rule to each training example until $\mathbf{w}$ is consistent:
+
+$$w_i \gets w_i + \Delta{}w_i, \ \ \ \Delta{}w_i = \eta{}(t-o)x_i$$
+
+- $t = c(\mathbf{x})$: target output for training example $\langle{}\mathbf{x}, c(\mathbf{x})\rangle{}$
+- $o = o(\mathbf{x})$: perceptron output
+- $\eta$ is /learning rate/: small +ve constant (usually decays over time)
+- Intuitively, $(t-o)$ measures the misclassification
+
+*** Why does the training rule work?
+
+Assume all $x_i$ are +ve.
+- If $t$ is +ve and $o$ is --ve, then $t-o$ is +ve \Rightarrow $\Delta{}w_i$ is +ve \Rightarrow $w_i$ \uparrow \Rightarrow $\mathbf{w} \cdot \mathbf{x}$ \uparrow \Rightarrow makes $o$ more +ve
+- If $t$ is --ve and $o$ is +ve, then $t-o$ is --ve \Rightarrow $\Delta{}w_i$ is --ve \Rightarrow $w_i$ \downarrow \Rightarrow $\mathbf{w} \cdot \mathbf{x}$ \downarrow \Rightarrow makes $o$ more --ve
+
+(\star) Guaranteed to converge if training examples are /linearly separable/ and \eta is /sufficiently small/!
+
+_Problem_: if training examples are not linearly separable, can fail to converge!
+
+** Linear Unit Training Rule
+
+_Idea_: Search $H$ to find weight vector that converges to best-fit approximation for the training examples, even if they're linearly non-separable: we learn $\mathbf{w}$ that minimizes the loss function $L_{D}$
+
+_Linear unit_: $o = \mathbf{w} \cdot \mathbf{x}$ (let's consider an /unthresholded/ perceptron here)
+
+_Loss function (s.s.e)_: $L_{D}(\mathbf{w}) = \frac{1}{2}\sum_{d\in{}D}(t_{d}-o_{d})^2$
+- $D$: set of training examples
+- $t_d$ and $o_d$: target output and output of linear unit for training example $d$
+
+*** Gradient Descent
+
+_Idea_: Find $\mathbf{w}$ that minimizes $L$ by repeatedly updating it in the direction of steepest descent
+
+_Gradient_: $\nabla{}L_{D}(\mathbf{w}) = [\frac{\partial{}L_{D}}{\partial{}w_0}, \frac{\partial{}L_{D}}{\partial{}w_1}, \ldots, \frac{\partial{}L_{D}}{\partial{}w_n}]$
+
+_Training rule_: $w_i \gets w_i + \Delta{}w_i, \ \ \ \Delta{}w_i = -\eta{}\frac{\partial{}L_{D}}{\partial{}w_{i}}$ \hspace{0.3cm} \equiv \hspace{0.3cm} $\mathbf{w} \gets \mathbf{w} + \Delta{}\mathbf{w}, \ \ \ \Delta{}\mathbf{w} = -\eta{}\nabla{}L_{D}(\mathbf{w})$
+
+#+ATTR_LATEX: :width 250px
+#+ATTR_ORG: :width 250px
+[[./chapter4-loss-function.png]]
+
+$$\frac{\partial{}L_{D}}{\partial{}w_{i}} = -\sum_{d\in{}D}(t_d - o_d)x_{id} \hspace{0.3cm} \equiv \hspace{0.3cm} \nabla{}L_{D}(\mathbf{w}) = -\sum_{d\in{}D}(t_d - o_d)\mathbf{x}_d$$
+
+$$\Delta{}w_i = -\eta{}\frac{\partial{}L_{D}}{\partial{}w_{i}} = \eta{}\sum_{d\in{}D}(t_d - o_d)x_{id} \hspace{0.3cm} \equiv \hspace{0.3cm} \Delta{}\mathbf{w} = -\eta{}\nabla{}L_{D}(\mathbf{w}) = \eta{}\sum_{d\in{}D}(t_d - o_d)\mathbf{x}_{d}$$
+
+\centering
+
+_Derivation_
+
+\flushleft
+
+\begin{align*}
+\frac{\partial{}L_{D}}{\partial{}w_{i}} &= \frac{\partial}{\partial{}w_{i}} \frac{1}{2} \sum_{d\in{}D} (t_d - o_d)^2 \\
+&= \sum_{d\in{}D} (t_d - o_d) \frac{\partial{}}{\partial{}w_i}(t_d - \mathbf{w}\cdot{}\mathbf{x}_{d}) \\
+&= -\sum_{d\in{}D} (t_d - o_d)x_{id} \\
+\nabla{}L_{D}(\mathbf{w}) &= -\sum_{d\in{}D}(t_d - o_d)\mathbf{x}_{d}
+\end{align*}
+
+\newpage
+
+*** Gradient Descent Algorithm
+
+$\textsc{Gradient-Descent}(D, \eta)$
+- Initialise $\mathbf{w}$ randomly
+- Repeatedly apply linear unit training rule until satisfied:
+  - Initialise $\Delta\mathbf{w} \gets 0$
+  - For each $d \in D$:
+    1. Input instance $\mathbf{x}_{d}$ to linear unit and compute output $o$
+    2. Compute $\Delta{}\mathbf{w} \gets \Delta\mathbf{w} + \eta(t-o)\mathbf{x}_{d}$
+  - Compute $\mathbf{w} \gets \mathbf{w} + \Delta\mathbf{w}$
+
+*** Stochastic Gradient Descent
+
+_Batch gradient descent_: loss defined over ALL training examples. Do until satisfied:
+- Compute gradient $\nabla{}L_{D}(\mathbf{w}) = -\sum_{d\in{}D}(t_d - o_d) \mathbf{x}_{d}$
+- $\mathbf{w} \gets \mathbf{w} - \eta\nabla{}L_{D}(\mathbf{w})$ where $L_{D}(\mathbf{w}) = \frac{1}{2}\sum_{d\in{}D}(t_d - o_d)^2$
+
+_Stochastic gradient descent_: loss defined over EACH training example. Do until satisfied, for each $d$:
+- Compute gradient $\nabla{}L_{d}(\mathbf{w}) = -(t_d - o_d) \mathbf{x}_{d}$
+- $\mathbf{w} \gets \mathbf{w} - \eta\nabla{}L_{d}(\mathbf{w})$ where $L_{d}(\mathbf{w}) = \frac{1}{2}(t_d - o_d)^2$
+
+SGD will approximate batch GD arbitrarily closely if \eta is sufficiently small!
+- Stochastic gradient is an unbiased estimator of the true gradient: $E[\nabla{}L_{d}(\mathbf{w})] = \nabla{}L_{D}(\mathbf{w})$
+
+Why is SGD useful?
+- Lower computational cost: does not use ALL training examples at once
+- "Anytime" performance: can stop the computation at any time and still get some performance
+- Economic cost: buying data in small batches
+- Helps to escape /local minima/
+
+** Sigmoid Unit
+
+[[./chapter4-sigmoid-unit.png]]
+
+- _Linear sum_: $net = \sum_{i=0}^{n}w_i \cdot x_i = \mathbf{w} \cdot \mathbf{x}$
+- _Sigmoid function_: $o = \sigma(net) = \frac{1}{1+e^{-net}}$
+- $\frac{\text{d}\sigma(net)}{\text{d}net} = \sigma(net)(1-\sigma(net)) = o(1-o)$
+
+*** Gradient Descent Rules
+
+$$\frac{\partial{}L_{D}}{\partial{}w_{i}} = -\sum_{d\in{}D}(t_d - o_d) o_d (1-o_d) x_{id} \hspace{0.3cm} \equiv \hspace{0.3cm} \nabla{}L_{D}(\mathbf{w}) = -\sum_{d\in{}D}(t_d - o_d)o_{d}(1-o_d)\mathbf{x}_d$$
+
+$$\Delta{}w_{i} = -\eta{}\frac{\partial{}L_{D}}{\partial{}w_{i}} \hspace{0.3cm} \equiv \hspace{0.3cm} \Delta{}\mathbf{w} = -\eta{}\nabla{}L_{D}(\mathbf{w})$$
+
+\centering
+
+_Derivation_
+
+\flushleft
+
+\begin{align*}
+\frac{\partial{}L_{D}}{\partial{w_i}} &= \frac{\partial}{\partial{}w_i} ( \frac{1}{2} \sum_{d\in{}D}(t_d - o_d)^2 ) \\
+&= \sum_{d\in{}D} (t_d - o_d) \frac{\partial}{\partial{}w_i} (t_d - o_d) \\
+&= \sum_{d\in{}D} (t_d - o_d) (-\frac{\partial{}o_d}{\partial{}w_i}) \\
+&= -\sum_{d\in{}D} (t_d - o_d) \frac{\partial{}o_d}{\partial{}net_d} \frac{\partial{}net_d}{\partial{}w_i} \\
+&= -\sum_{d\in{}D}(t_d - o_d) o_d (1-o_d) x_{id}
+\end{align*}
+
+\begin{align*}
+\frac{\partial{}o_d}{\partial{}net_d} &= \frac{\partial{}\sigma(net_d)}{\partial{}net_d} = o_d(1-o_d) \\
+\frac{\partial{}net_d}{\partial{}w_i} &= \frac{\partial{}(\mathbf{w} \cdot \mathbf{x}_d)}{\partial{}w_i} = x_{id} \\
+\end{align*}
+
+** Multilayer Networks
+
+_2 layers with multiple outputs_: Input layer (NO neurons) \rightarrow Hidden layer (sigmoid) \rightarrow Output layer (sigmoid)
+
+#+ATTR_LATEX: :width 120px
+[[./chapter4-multilayer-network.png]]
+
+$$L_{D}(\mathbf{w}) = \frac{1}{2}\sum_{d\in{}D}\sum_{k\in{}K}(t_{kd}-o_{kd})^2 \text{ where } K \text{ is the set of output units}$$
+
+*** Backpropagation Algorithm
+
+$\textsc{Backpropagation}(D, \eta)$
+- Initialise $\mathbf{w}$ randomly
+- Repeatedly do until satisfied:
+  - For each $d \in D$:
+    1. Input instance $\mathbf{w}_{d}$ into the network and compute every hidden output $o_h$ and output $o_k$
+    2. For each output unit $k$, compute error $\delta_k \gets o_{k}(1-o_k)(t_k - o_k)$
+    3. For each hidden unit $h$, compute error $\delta_h \gets o_{h}(1-o_h)\sum_{k\in{}K}w_{hk}\delta_k$
+    4. Update each weight $w_{hk} \gets w_{hk} + \Delta{}w_{hk}$ where $\Delta{}w_{hk} = \eta{}\delta{}_{k}o_{h}$
+    5. Update each weight $w_{ih} \gets w_{ih} + \Delta{}w_{ih}$ where $\Delta{}w_{ih} = \eta{}\delta{}_{k}x_{i}$
+
+*** Derivation of Backpropagation
+
+We want to find $\Delta{}w_{hk}$ and $\Delta{}w_{ih}$.
+
+\begin{align*}
+\frac{\partial{}L_{d}}{\partial{}w_{hk}} &= \frac{\partial{}L_{d}}{\partial{}o_{k}} \frac{\partial{}o_{k}}{\partial{}net_{k}} \frac{\partial{}net_{k}}{\partial{}w_{hk}} \ \text{ where } net_{k} = \sum_{h'\in{}H}w_{h'k}o_{h'} \\
+\frac{\partial{}L_{d}}{\partial{}o_{k}} &= \frac{\partial{}}{\partial{}o_k} \frac{1}{2}\sum_{k'\in{}K}(t_{k'}-o_{k'})^2 = -(t_k - o_k) \\
+\frac{\partial{}o_{k}}{\partial{}net_{k}} &= \frac{\partial{}\sigma{}(net_k)}{\partial{}net_k} = o_{k}(1-o_k) \\
+\frac{\partial{}net_{k}}{\partial{}w_{hk}} &= o_k \\
+\therefore \Delta{}w_{hk} &= -\eta{}\frac{\partial{}L_{d}}{\partial{}w_{hk}} = \eta{}\delta{}_{k}o_h \ \text{ where } \delta{}_{k} = (t_k - o_k)o_k(1 - o_k)
+\end{align*}
+
+*** Remarks on Backpropagation
+
+- _Multiple local minima_ for $L_{D}$, so GD does not necessarily converge to global minimum. In practice, GD often performs well, especially after multiple random initialisations of $\mathbf{w}$
+- _Weight momentum $\alpha{}\in{}[0,1]$_ often included: $\Delta{}w_{hk} \gets \eta{}\delta{}_{k}o_{h} + \alpha{}\Delta{}w_{hk}$, \hspace{0.2cm} $\Delta{}w_{ih} \gets \eta{}\delta{}_{h}x_{i} + \alpha{}\Delta{}w_{ih}$
+- _Generalisable to networks of arbitrary depth_
+  - Step 3: Let $K$ be all units in /next/ layer, whose inputs include output of $h$
+  - Step 5: Let $x_i$ be output of unit $i$ in /previous/ layer, that is an input to $h$
+- _Expressive hypothesis space_
+  - Every /boolean/ function can be represented by a network with 1 hidden layer! (But could take exponential number of hidden units, in number of inputs)
+  - Every /bounded continuous/ function can be approximated by network with 1 hidden layer
+  - /Any/ function can be approximated by network with 2 hidden layers
+- _Approximate inductive bias_: smooth interpolation between data points
+
+** Alternative Loss/Error Functions
+
+- _Penalize large weights_:
+  $$L_{D}(\mathbf{w}) = \frac{1}{2}\sum_{d\in{}D}\sum_{k\in{}K}(t_{kd} - o_{kd})^2 + \gamma \sum_{j,l}w_{jl}^2$$
+- _Train on target values as well as slopes_:
+  $$L_{D}(\mathbf{w}) = \frac{1}{2}\sum_{d\in{}D}\sum_{k\in{}K} \left[ (t_{kd} - o_{kd})^2 + \mu \sum_{i=1}^{n} (\frac{\partial{}t_{kd}}{\partial{}x_{id}} - \frac{\partial{}o_{kd}}{\partial{}x_{id}})^2 \right]$$
+- _Tie together weights_
+
+* Bayesian Inference
+
+** Why Bayesian Inference?
+
+*** Bayesian Inference
+
+- Allows /prior/ knowledge to be combined with /observed data/ to give a /probabilistic prediction/
+- Allows new input instance to be classified by /combining predictions of multiple hypotheses/ weighted by their beliefs
+- /Incrementally updates belief/ of hypothesis with each training example
+- Useful /conceptual framework/: provides "gold standard" to evaluate other learning algorithms
+
+*** Importance of Bayesian Learning Algorithms
+
+- They calculate explicit probabilities for hypotheses (e.g. naive Bayes classifier), and are practical and effective for some problems
+- They provide a useful perspective for understanding many learning algorithms that do not explicitly manipulate probabilities
+  - Analyse the conditions under which \textsc{Find-S} and \textsc{Candidate-Elimination} output the most probable hypothesis given training data
+  - Neural networks: choosing to minimise SSE when searching space of neural networks, but choosing cross-entropy when learning target functions that predict probabilities
+  - Decision trees: analyse inductive bias that favour short trees
+
+** Bayes' Theorem
+
+$$P(h\vert{}D) = \frac{P(D\vert{}h)P(h)}{P(D)}$$
+
+_Idea_: update /prior/ belief to /posterior/ belief, given data $D$
+- $P(h)$: /prior/ belief of hypothesis $h$
+- $P(D\vert{}h)$: likelihood of data $D$ given $h$
+- $P(D) = \sum_{h\in{}H}P(D\vert{}h)P(h)$: marginal likelihood/evidence of $D$
+- $P(h\vert{}D)$: /posterior/ belief of $h$ given $D$
+
+*** Limitations of Bayes' Theorem
+
+Requires specifying probabilities and underlying distributions
+- Some priors never occur (e.g. uniform prior, where all hypotheses have equal probability---could be incorrect)
+- Likelihood function could be chosen wrongly. Conjugate priors
+- Not enough data to substantiate a prior---how do we know which prior to assume?
+
+Often prohibitively expensive to compute evidence
+- How to get $P(D)$ easily, especially when hypothesis space is large?
+- Solutions: approximate inference, variational inference
+
+*** Maximum /a posteriori/ (MAP) hypothesis
+
+_MAP_: the most probable hypothesis given the training data, i.e. gives the highest unnormalized posterior
+$$h_{MAP} = \argmax_{h\in{}H}P(h\vert{}D) = \argmax_{h\in{}H}P(D\vert{}h)P(h)$$
+- Unnormalized posterior: $P(D\vert{}h)P(h)$
+
+*** Maximum likelihood (ML) hypothesis
+
+_ML_: similar to MAP, but assume all hypotheses have equal probability
+$$h_{ML} = \argmax_{h\in{}H} P(D\vert{}h)$$
+- Likelihood (of the data given $h$): $P(D\vert{}h)$
+
+** Example: Medical Diagnosis
+
+Medical test for cancer
+- $P(+\vert{}cancer) = 0.98$
+- $P(-\vert{}\neg{}cancer) = 0.97$
+- $P(cancer) = 0.008$
+
+Unnormalised posteriors
+- $P(+\vert{}cancer)P(cancer) = 0.98 \times 0.008 = 0.00784$
+- $P(+\vert{}\neg{}cancer)P(\neg{}cancer) = 0.03 \times 0.992 = 0.02976$
+- $\therefore h_{MAP} = \neg{}cancer$
+- $P(cancer\vert{}+) = \frac{0.00784}{0.00784+0.02976} = 0.20851$
+
+** Basic Probability Formulas
+
+*** Chain Rule for Probability
+
+Joint probability of a conjunction of events $A_1$ to $A_i$ is the product:
+
+$$P(A_1, \ldots, A_n) = \prod_{i=1}^{n}P(A_i \vert{} A_1, \ldots, A_{i-1})$$
+
+*** Inclusion-Exclusion Principle
+
+Probability of a union of events can be expressed as sums of joint probabilities
+
+$$P(\cup_{i=1}^{n}A_i) = \sum_{1\le{}i\le{}n} P(A_i) - \sum_{1\le{}i<j\le{}n} P(A_i, A_j) + ... + (-1)^{n-1} P(A_1, \ldots, A_n)$$
+
+*** Marginalization
+
+If $A_1, \ldots, A_n$ are mutually exclusive and form a partition, then $P(B) = \sum_{i=1}^{n} P(B\vert{}A_i)P(A_i)$
+
+** Brute-Force MAP Hypothesis Learning Algorithm
+
+1. For each hypothesis $h\in{}H$, calculate the posterior probability
+   $$P(h\vert{}D) = \frac{P(D\vert{}h)P(h)}{P(D)}$$
+2. Output the hypothesis $h_{MAP}$ with highest posterior probability
+   $$h_{MAP} = \argmax_{h\in{}H} P(h\vert{}D)$$
+
+*** Requirements
+
+We need to choose:
+- $P(D\vert{}h)$
+- $P(h)$
+
+...and that will be sufficient to determine $P(D)$.
+
+** Bayesian Inference: Concept Learning
+
+Let's now relate the the brute-force MAP learning algorithm to concept learning. We choose:
+- $P(D\vert{}h)$: deterministic likelihood (0 or 1), depending on whether $h$ is consistent with $D$
+- $P(h)$: uniform distribution
+
+\begin{equation*}
+\begin{align}
+P(D\vert{}h) &=
+\begin{cases}
+1 & \text{if } h \text{ is consistent with D, i.e.} \ c(\mathbf{x}_d) = h(\mathbf{x}_d) \ \forall{}d\in{}D \\
+0 & \text{otherwise}
+\end{cases} \\
+P(h) &= \frac{1}{\vert{}H\vert{}} \\
+\therefore{} P(h\vert{}D) &=
+\begin{cases}
+\frac{1}{\vert{}VS_{H,D}\vert{}} & \text{if } h \text{ is consistent with D} \\
+0 & \text{otherwise}
+\end{cases}
+\end{align}
+\end{equation*}
+
+(\star) Every consistent hypothesis is a MAP hypothesis! Since all consistent hypotheses are equally likely.
+
+[[./chapter5-belief-update.png]]
+
+** Bayesian Inference: Learning a Continuous-Valued Function
+
+(\star) Under certain assumptions, a learning algorithm trying to learn a continuous-valued target function that /minimizes SSE/ (between hypothesis predictions and training data) will give the ML hypothesis.
+
+*** Setup
+
+- Target function $f$ is continuous
+- Training examples $D = \{ \langle{} \mathbf{x}_d, t_d \rangle{} \}$ are fixed
+- Output $t_d$ is noisy, where errors are normally distributed
+
+$$\text{Let} \ t_d = f(\mathbf{x}_d) + \epsilon_{d} \text{, where} \ \epsilon_{d} \sim N(0, \sigma^{2})$$
+$$\text{Then} \ h_{ML} = \argmin_{h\in{}H} \frac{1}{2} \sum_{h\in{}D}(t_d - h(\mathbf{x}_d))^2$$
+
+*** Derivation
+
+\begin{equation*}
+\begin{align}
+h_{ML} &= \argmax_{h\in{}H} p(D\vert{}h) \\
+&= \argmax_{h\in{}H} \prod_{d\in{}D} p(t_{d}\vert{}h, \mathbf{x}_{d}) \ \text{(assuming training examples are mutually independent)} \\
+&= \argmax_{h\in{}H} \prod_{d\in{}D} \frac{1}{\sqrt{2\pi}\sigma} \ exp(-\frac{(t_d - h(\mathbf{x}_d))^2}{2\sigma{}^2}) \\
+&= \argmax_{h\in{}H} \sum_{d\in{}D} \ln \frac{1}{\sqrt{2\pi}\sigma{}} - \frac{(t_d - h(\mathbf{x}_d))^2}{2\sigma{}^2} \\
+&= \argmax_{h\in{}H} \sum_{d\in{}D} - \frac{(t_d - h(\mathbf{x}_d))^2}{2\sigma{}^2} \\
+&= \argmax_{h\in{}H} \frac{1}{2} \sum_{d\in{}D} - (t_d - h(\mathbf{x}_d))^2 \\
+&= \argmin_{h\in{}H} \frac{1}{2} \sum_{d\in{}D} (t_d - h(\mathbf{x}_d))^2 \\
+\end{align}
+\end{equation*}
+
+** Bayesian Inference: Learning to Predict Probabilities
+
+(\star) Under certain assumptions, a learning algorithm trying to predict probabilities that /minimizes cross-entropy/ will give the ML hypothesis.
+
+*** Setup
+
+- Non-deterministic concept $c$, giving $0$ or $1$ with some probability
+- Target function $f$ is the /probability/ that $c(x)=1$, i.e. $f(x) = P(c(x)=1)$
+- Training examples $D = \{ \langle{}\mathbf{x}_{d}, t_{d} \rangle{}\}$ where $t_d = c(\mathbf{x}_d)$
+
+_Example 1_: $\mathbf{x}$ refers to patient's symptoms; $c(\mathbf{x}_d) = 1$ if patient survives, $0$ if patient dies
+
+_Example 2_: $\mathbf{x}$ refers to loan applicant's history; $c(\mathbf{x}_d) = 1$ if loan repaid, $0$ if loan not repaid
+
+\begin{equation*}
+\text{Let} \ t_d = c(\mathbf{x}_d) \text{, where} \ c(\mathbf{x}_d) =
+\begin{cases}
+1 & \text{with probability} \ p \\
+0 & \text{with probability} \ 1-p
+\end{cases} \ \text{and} \ f(\mathbf{x}_d) = P(c(\mathbf{x}_d) = 1)
+\ \text{i.e.} \ P(t_d = 1 \vert{} \mathbf{x}_d)
+\end{equation*}
+
+$$\text{Then} \ h_{ML} = \argmax_{h\in{}H} \sum_{d\in{}D} t_d \ln h(\mathbf{x}_d) + (1-t_d) \ln (1-h(\mathbf{x}_d))$$
+
+*** Derivation
+
+(Note: $\mathbf{x}_d$ is no longer fixed, it is unknown and now a random variable --- we assume it's independent of $h$. We could make the simplifying assumption that training examples are fixed, but the final outcome is still the same.)
+
+\begin{equation*}
+\begin{align}
+P(D\vert{}h) &= \prod_{d\in{}D} P(\mathbf{x}_d, t_d \vert{} h) \\
+&= \prod_{d\in{}D} P(t_d \vert{} h, \mathbf{x}_d) P(\mathbf{x}_d) \\
+P(t_d \vert{} h, \mathbf{x}_d) &=
+\begin{cases}
+h(\mathbf{x}_d) & \text{ if } t_d = 1\\
+1 - h(\mathbf{x}_d) & \text{ if } t_d = 0
+\end{cases} \\
+&= h(\mathbf{x}_d)^{t_d} (1-h(\mathbf{x}_d))^{1-t_d} \\
+h_{ML} &= \argmax_{h\in{}H} P(D\vert{}h) \\
+&= \argmax_{h\in{}H} \prod_{d\in{}D} h(\mathbf{x}_d)^{t_d} (1-h(\mathbf{x}_d))^{1-t_d} P(\mathbf{x}_d) \\
+&= \argmax_{h\in{}H} \prod_{d\in{}D} h(\mathbf{x}_d)^{t_d} (1-h(\mathbf{x}_d))^{1-t_d} \\
+&= \argmax_{h\in{}H} \sum_{d\in{}D} t_d \ln h(\mathbf{x}_d) + (1-t_d) \ln (1-h(\mathbf{x}_d))
+\end{align}
+\end{equation*}
+
+\newpage
+
+*** Gradient /Ascent/ to Maximize Likelihood in a Sigmoid Unit
+
+- $U_D(h)$ refers to that thing previously for a given hypothesis $h$.
+- Gradient ascent because we want to maximize, not minimize
+
+\begin{equation*}
+\begin{align}
+U_{D} &= \sum_{d\in{}D} t_d \ln h(\mathbf{x}_d) + (1-t_d) \ln (1-h(\mathbf{x}_d))  \ \text{(cross-entropy, but not negative)} \\
+\frac{\partial{}U_{D}}{\partial{}w_i} &= \sum_{d\in{}D} \frac{\partial{}U_D}{\partial{}h(\mathbf{x}_d)} \frac{\partial{}h(\mathbf{x}_d)}{\partial{}w_i} \\
+&= \sum_{d\in{}D} \frac{\partial{} t_d \ln h(\mathbf{x}_d) + (1-t_d) \ln (1-h(\mathbf{x}_d))}{\partial{}h(\mathbf{x}_d)} \frac{\partial{}h(\mathbf{x}_d)}{\partial{}w_i} \\
+&= \sum_{d\in{}D} \frac{t_d - h(\mathbf{x}_d)}{h(\mathbf{x}_d)(1-h(\mathbf{x}_d))} h(\mathbf{x}_d)(1-h(\mathbf{x}_d))x_{id} \\
+&= \sum_{d\in{}D} (t_d - h(\mathbf{x}_d)) x_{id} \\
+w_i &\gets{} w_i + \Delta{}w_i \ \text{where} \ \Delta{}w_i = \eta \frac{\partial{}U_D}{\partial{}w_i}
+\end{align}
+\end{equation*}
+
+(Note: even if the model outputs a high probability, it doesn't mean that the model is confident in its prediction!)
+
+** Minimum Description Length (MDL) Principle
+
+_Occam's Razor_: choose the shortest explanation for the observed data
+
+\begin{equation*}
+\begin{align}
+h_{MAP} &= \argmax_{h\in{}H} P(D\vert{}h) P(h) \\
+&= \argmax_{h\in{}H} \log_{2} P(D\vert{}h) + \log_2 P(h) \\
+&= \argmin_{h\in{}H} -\log_{2} P(D\vert{}h) - \log_2 P(h)
+\end{align}
+\end{equation*}
+
+Information theory: optimal (shortest expected description length) code for message with probability $p$ is $-\log_2 p$ bits
+- $-\log_2 P(h)$: description length of $h$ under optimal code
+- $-\log_2 P(D\vert{}h)$ : description length of $D$ given $h$ under optimal code
+
+*** Minimum Description Length (MDL)
+
+$$h_{MDL} = \argmin_{h\in{}H} L_{C_1}(h) + L_{C_2}(D\vert{}h)$$
+
+where $L_{C}(x)$ is description length of $x$ under encoding scheme $C$
+
+_Example_: $H$ = decision trees
+- $L_{C_1}(h)$ is #bits to describe tree $h$
+- $L_{C_2}(D\vert{}h)$ is #bits to describe $D$ given $h$
+  - $L_{C_2}(D\vert{}h) = 0$ if examples classified perfectly by $h$
+  - Otherwise, only misclassifications need to be described
+- _Idea_: minimize /length(tree)/ and /length(misclassifications(tree))/
+  - $h_{MDL}$ trades off tree size for training errors, to mitigate overfitting
+
+** Most Probable Classification of New Instances
+
+Given new instance $\mathbf{x}$, what is its /most probable classification/ given the new training data $D$?
+- $h_{MAP}$ is the most probable hypothesis, but not the most probable classification!
+- We need to find $t$ that maximises $P(t\vert{}D)$, not $h$ that maximises $P(h\vert{}D)$!
+
+_Example_
+- Consider 3 possible hypotheses: $h_1$, $h_2$, $h_3$; let classifications $T = \{+, -\}$
+- $P(h_1 \vert{} D) = 0.4$, $P(h_2 \vert{} D) = 0.3$, $P(h_3 \vert{} D) = 0.3$
+- $h_1(\mathbf{x}) = +$, $h_2(\mathbf{x}) = -$, $h_3(\mathbf{x}) = -$
+- Most probable hypothesis $h_{MAP} = h_1$, but most probable classification is $-$: $P(-\vert{}D) = 0.6 > P(+\vert{}D) = 0.4$!
+
+*** Bayes-Optimal Classifier
+
+$$
+\argmax_{t\in{}T} P(t\vert{}D) = \argmax_{t\in{}T} \sum_{h\in{}H} P(t\vert{}h) P(h\vert{}D)
+$$
+
+_Limitations_
+- /Computationally costly/ if $H$ is large
+
+*** Gibbs Classifier
+
+Sample a hypothesis $h$ from the posterior belief $P(h\vert{}D)$, then use $h$ to classify $\mathbf{x}$
+- Expected misclassification error is \le{}2\times that of Bayes-optimal classifier!
+
+*** Naive Bayes Classifier
+
+Let target concept $c : X \rightarrow T$, where each instance $\mathbf{x}\in{}X$ is represented by input attributes $\mathbf{x} = (x_1, \ldots, x_n)^{T}$.
+
+_Naive Bayes assumption_: $P(x_1, \ldots, x_n\vert{}t) = \prod_{i=1}^{n} P(x_i\vert{}t)$
+- (\star) Assumption: input attributes are /conditionally independent/ given classification
+
+Most probable classification of new instance $\mathbf{x}$:
+
+\begin{equation*}
+\begin{align}
+t_{MAP} &= \argmax_{t\in{}T} P(t\vert{}x_1, \ldots, x_n) \\
+&= \argmax_{t\in{}T} \frac{P(x_1, \ldots, x_n \vert{} t)P(t)}{P(x_1, \ldots, x_n)} \\
+&= \argmax_{t\in{}T} P(x_1, \ldots, x_n \vert{} t)P(t) \\
+t_{NB} &= \argmax_{t\in{}T} P(t) \prod_{i=1}^{n}P(x_i\vert{}t)
+\end{align}
+\end{equation*}
+
+_Space analysis_: $2n$ in number of input attributes, instead of $2\times(2^n-1)$!
+
+_Data analysis_: frequency counting $2n\times{}2$, instead of $2\times2^n$!
+
+_Limitation_: needs moderate to large amounts of training data
+
+*** Naive Bayes Algorithm
+
+$\textsc{Naive-Bayes-Learn}(D)$
+- For each value of target output $t\in{}T$:
+  - $\widehat{P}(t)$ \gets estimate $P(t)$ using $D$
+  - For each value of attribute $x_i$:
+    - $\widehat{P}(x_i\vert{}t)$ \gets estimate $P(x_i\vert{}t)$ using $D$
+
+$\textsc{Classify-New-Instance}(\mathbf{x})$
+- $t_{NB} = \argmax_{t\in{}T} \widehat{P}(t) \prod_{i=1}^{n}\widehat{P}(x_i\vert{}t)$
+
+*** Example of Naive Bayes
+
+#+ATTR_LATEX: :width 300px
+[[./chapter5-naive-bayes-playtennis.png]]
+
+Predict the target concept /PlayTennis/ for new instance $\langle{}Outlook=Sunny, Temperature=Cool, Humidity=High, Wind=Strong\rangle{}$
+- $P(Yes)P(Sunny\vert{}Yes)P(Cool\vert{}Yes)P(High\vert{}Yes)P(Strong\vert{}Yes)=\frac{9}{14}\cdot\frac{2}{9}\cdot\ldots = 0.005291$
+- $P(No)P(Sunny\vert{}No)P(Cool\vert{}No)P(High\vert{}No)P(Strong\vert{}No)=\frac{5}{14}\cdot\frac{3}{5}\cdot\ldots = 0.02057$
+- $P(No\vert{}Sunny,Cool,High,Strong)=\frac{0.02057}{0.02057+0.005291}=0.7954$
+
+*** Properties of Naive Bayes
+
+_Problem_: What if for some attribute value $x_i$, none of the training instances have target output $t$?
+$$\widehat{P}(x_i\vert{}t) = 0 \ \Rightarrow \ \widehat{P}(t)\prod_{i=1}^{n}\widehat{P}(x_i\vert{}t) = 0$$
+- Biased underestimate of true likelihood
+- As long as one probability is 0, the entire probability is 0
+- Possible if we have little data!
+
+_Solution_: Use Bayesian estimate:
+$$\widehat{P}(x_i\vert{}t) = \frac{\vert{}D_{tx_i}\vert{} + mp}{\vert{}D_t\vert{} + m}$$
+- $\vert{}D_t\vert{}$: #training examples with target output value $t$ across all attribute values
+- $\vert{}D_{tx_i}\vert{}$: #training examples with target output value $t$ and attribute value $x_i$
+- $p$: prior estimate for $\widehat{P}(x_i\vert{}t)$ (if don't know, use uniform prior)
+- $m$: weight given to prior $p$ (number of "virtual" examples)
+
+** Expectation Maximisation (EM)
+
+Helps us to find maximum likelihood parameters of a model, involving variables that /can't be observed directly/
+
+_When to use EM?_
+- Data is only partially observable (hidden/latent variables)
+- Unsupervised learning (target output unobservable)
+- Supervised learning (some input attributes unobservable)
+
+_Applications_
+- Training Bayesian belief networks
+- Unsupervised clustering
+- Learning hidden Markov models
+- Inverse reinforcement learning
+
+*** EM for Estimating $M$ means
+
+_Generating data from mixture of $M$ Gaussians_
+- Instances $\mathbf{x}_d$ from $X$, each generated by a Gaussian distribution selected with equal probability from a mixture of $M$ Gaussians, all with the same known variance $\sigma^2$
+- Unknown means $\langle{}\mu_1,\ldots,\mu_M\rangle$
+- Don't know which instance is generated by which Gaussian
+
+Determine /maximum likelihood/ (ML) estimates of $\langle{}\mu_1,\ldots,\mu_M\rangle$
+
+Consider full description of each instance as $d = \langle{}x_d, z_{d1}, \ldots, z_{dm}\rangle$
+- $x_d$ is observable
+- $z_{dm}$ is unobservable indicator variable: 1 if it's generated from $m^{th}$ Gaussian, 0 otherwise
+- (\star) Realise that $\mathbb{E}[z_{dm}]$ is the probability that $m^{th}$ Gaussian is selected given that $x_d$ is generated
+
+_Example: 2 Gaussians_
+
+#+ATTR_LATEX: :width 400px
+[[./chapt5-mixture-gaussians.png]]
+
+*** EM Algorithm for 2 Gaussians
+
+Pick random initial $h = \langle\mu_1, \mu_2\rangle{}$
+- _E step_: Calculate the expected value $\mathbb{E}[z_{dm}]$ of each hidden variable $z_{dm}$, assuming the current hypothesis $h=\langle{}\mu_1,\mu_2\rangle$ holds.
+
+$$\mathbb{E}[z_{dm}] = \frac{p(x_d\vert{}\mu_m)}{\sum_{l}p(x_d\vert{}\mu_l)} = \frac{\exp(-\frac{1}{2\sigma^2}(x_d - \mu_m)^2)}{\sum_{l}\exp{-\frac{1}{2\sigma^2}(x_d-\mu_l)^2}}$$
+
+- _M step_: Calculate a new ML hypothesis $$h'=\langle\mu'_1, \mu'_2\rangle$$, assuming the value taken on by each $z_{dm}_{}$ is its expected value $\mathbb{E}[z_{dm}]$ computed above. Replace $h$ by $h'$.
+
+$$\mu_{m}' \gets \frac{\sum_{d\in{}D}\mathbb{E}[z_{dm}]x_d}{\sum_{d\in{}D}\mathbb{E}[z_{dm}]}$$
+
+(Intuitively, input instance is weighted by the probability that it's generated by the $m^th$ Gaussian)
+
+*** EM Algorithm
+
+Converges to /local/ ML hypothesis $h'$ and provides estimates of hidden/latent variables $z_{dm}$
+
+Local maximum in $\mathbb{E}[\ln p(D\vert{}h')]$: expected log likelihood
+- $D$ is complete data (observable $x_d$ plus unobservable $z_{dm}$ variables)
+- Expectation is w.r.t unobserved variables in $D$
+
+*** General EM Problem
+
+Given
+- Observed data $\{\mathbf{x}_d\}$
+- Unobserved data $\{\mathbf{z}_d\}$ where $\mathbf{z}_d = \langle{}z_{d1}, \ldots, z_{dM}\rangle{}$
+- Parameterized probability distribution $p(D\vert{}h)$ where
+  - $D = \{d\}$ is the complete data where $d = \langle{}\mathbf{x}_d, \mathbf{z}_d\rangle{}$
+  - $h$ comprises the parameters
+
+Determine ML hypothesis $h'$ that (locally) maximizes $\mathbb{E}[\ln p(D\vert{}h')]$
+
+*** General EM Algorithm
+
+Define $Q(h\vert{}h') = \mathbb{E}[\ln p(D\vert{}h') \vert{} h, \{\mathbf{x}_d\}_{d\in{}D}]$ given current hypothesis $h$ and observed data $\{\mathbf{x}_d\}_{d\in{}D}$ to estimate the latent variables $\{\mathbf{z}\}_{d\in{}D}$
+
+_EM Algorithm_: Pick a random initial $h$. Then iterate:
+- _E step_: Calculate $Q(h\vert{}h') = \mathbb{E}[\ln p(D\vert{}h')\vert{}h, \{\mathbf{x}_d\}_{d\in{}D}$ using $h$ and observed data $\{\mathbf{x}_d\}_{d\in{}D}$ to estimate latent variables $\{\mathbf{z}_d\}_{d\in{}D}$
+- _M step_: Replace $h$ by $h'$ that maximises this $Q$ function: $h \gets \argmax_{h'}Q(h'\vert{}h)$
+
+*** Applying EM to Estimate $M$ Means
+
+_E step_
+
+\begin{equation*}
+\begin{align}
+p(d\vert{}h') &= p(x_d, z_{d1}, \ldots, z_{dM}\vert{}h') \ \text{(where} \ h' = \langle{}\mu_1', \ldots, \mu_M'\rangle{} \text{)} \\
+  &= \frac{1}{\sqrt{2\pi}\sigma}\exp\left(-\frac{1}{2\sigma^2} \sum_{m=1}^{M} z_{dm}(x_d - \mu_{m}')^2\right) \ \text{(take only the selected Gaussian)} \\
+\ln p(D\vert{}h') &= \ln \prod_{d\in{}D}p(d\vert{}h') = \sum_{d\in{}D}\ln p(d\vert{}h') \\
+  &= \sum_{d\in{}D}\left(\ln \frac{1}{\sqrt{2\pi}\sigma} - \frac{1}{2\sigma^2} \sum_{m=1}^{M }z_{dm}(x_d - \mu_{m}')^2\right) \\
+Q(h'\vert{}h) &= \mathbb{E}[\ln p(D\vert{}h')] \\
+  &= \mathbb{E}\left[ \sum_{d\in{}D}\left(\ln \frac{1}{\sqrt{2\pi}\sigma} - \frac{1}{2\sigma^2} \sum_{m=1}^{M }z_{dm}(x_d - \mu_{m}')^2\right) \right] \\
+  &= \sum_{d\in{}D}\left(\ln \frac{1}{\sqrt{2\pi}\sigma} - \frac{1}{2\sigma^2} \sum_{m=1}^{M }\mathbb{E}[z_{dm}](x_d - \mu_{m}')^2\right) \\
+\text{where} \ \mathbb{E}[z_{dm}] &= \frac{\exp(-\frac{1}{2\sigma^2}(x_d - \mu_m)^2)}{\sum_{l=1}^{M}\exp(-\frac{1}{2\sigma^2}(x_d-\mu_l)^2)}
+\end{align}
+\end{equation*}
+
+_M step_
+
+\begin{equation*}
+\begin{align}
+&\argmax_{h'} Q(h\vert{}h') \\
+&= \argmax_{h'} \sum_{d\in{}D}\left(\ln \frac{1}{\sqrt{2\pi}\sigma} - \frac{1}{2\sigma^2} \sum_{m=1}^{M }\mathbb{E}[z_{dm}](x_d - \mu_{m}')^2\right) \\
+&= \argmax_{h'} \sum_{d\in{}D} - \sum_{m=1}^{M} \mathbb{E}[z_{dm}](x_d - \mu_{m}')^2 \\
+&= \argmin_{h'} \sum_{d\in{}D} \sum_{m=1}^{M} \mathbb{E}[z_{dm}](x_d - \mu_{m}')^2 \\
+& \mu_{m}' \gets \frac{\sum_{d\in{}D} \mathbb{E}[z_{dm}] x_d}{\sum_{d\in{}D} \mathbb{E}[z_{dm}]}
+\end{align}
+\end{equation*}
