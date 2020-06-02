@@ -37,7 +37,7 @@ _Forwarding_: moving packets from a router's input to output
 
 ** Internet Structure
 
-[[./lecture-ISPs.png]]
+[[./img/lecture-ISPs.png]]
 
 - _Access ISPs_: connected to hosts
 - _Regional ISPs_: connect access nets to one another
@@ -79,7 +79,7 @@ _Internet Protocol Stack_
 | Physical      |              |
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-protocol-stack.png]]
+[[./img/lecture-protocol-stack.png]]
 
 * Application Layer
 
@@ -104,7 +104,7 @@ _Non-persistent_: 1 object sent per TCP connection. Default for HTTP 1.0
 - HTTP response time: 2\times{}RTT + file transmission time
 
 #+ATTR_LATEX: :width 350px
-[[./lecture-non-persistent.png]]
+[[./img/lecture-non-persistent.png]]
 
 _Persistent_: multiple objects can be sent per TCP connection. Default for HTTP 1.1
 - As little as 1 RTT per referenced object
@@ -116,7 +116,7 @@ In ASCII. Each line ends with ~\r\n~
 _Method types_: ~GET~, ~POST~, ~HEAD~, ~PUT~ (1.1), ~DELETE~ (1.1)
 
 #+ATTR_LATEX: :width 400px
-[[./lecture-http-request-format.png]]
+[[./img/lecture-http-request-format.png]]
 
 #+BEGIN_SRC http
 GET /somedir/page.html HTTP/1.1\r\n   # request line
@@ -133,7 +133,7 @@ Accept-language: fr\r\n               # ...
 _Status codes_: ~200 OK~, ~301 Moved Permanently~, ~400 Bad Request~, ~404 Not Found~, ~505 HTTP Version Not Supported~, ...
 
 #+ATTR_LATEX: :width 400px
-[[./lecture-http-response-format.png]]
+[[./img/lecture-http-response-format.png]]
 
 #+BEGIN_SRC http
 HTTP/1.1 200 OK\r\n                                # status line
@@ -158,7 +158,7 @@ _Components to cookies_
 4. Server website has backend database to store cookie entries
 
 #+ATTR_LATEX: :width 400px
-[[./lecture-cookies.png]]
+[[./img/lecture-cookies.png]]
 
 *** Web Caches/Proxy Server
 
@@ -168,7 +168,7 @@ _Web cache/proxy server_: satisfies HTTP requests on behalf of an origin web ser
 
 #+ATTR_LATEX: :width 300px
 #+ATTR_ORG: :width 300px
-[[./lecture-web-cache.png]]
+[[./img/lecture-web-cache.png]]
 
 _Conditional GET_
 - Problem: what if origin server updates their copy of an object? Then cache's object might be stale
@@ -209,7 +209,7 @@ Mapping is cached by DNS server when it learns it
 
 #+ATTR_LATEX: :width 300px
 #+ATTR_ORG: :width 300px
-[[./lecture-dns-iterative-query.png]]
+[[./img/lecture-dns-iterative-query.png]]
 
 - Iterative: contacted DNS server replies with the name of a lower-level server to contact next
 - Recursive: contacted DNS server handles all the work on behalf of client, and returns actual mapping
@@ -352,7 +352,7 @@ Header size: 64 bits (8 bytes)
 
 #+ATTR_LATEX: :width 300px
 #+ATTR_ORG: :width 300px
-[[./lecture-udp-segment.png]]
+[[./img/lecture-udp-segment.png]]
 
 * Principles of Reliable Data Transfer
 
@@ -437,7 +437,7 @@ Sliding window of size $N$ consecutive un-ACKed packets
 
 #+ATTR_LATEX: :width 320px
 #+ATTR_ORG: :width 320px
-[[./lecture-tcp-send-receive-buffers.png]]
+[[./img/lecture-tcp-send-receive-buffers.png]]
 
 (\star) Send and receive buffers are created after handshaking on *BOTH* sides! \rightarrow bi-directional data transfer
 
@@ -455,7 +455,7 @@ Header: typically 20 bytes (can be more)
 
 #+ATTR_LATEX: :width 280px
 #+ATTR_ORG: :width 280px
-[[./lecture-tcp-segment.png]]
+[[./img/lecture-tcp-segment.png]]
 
 *** Sequence/Acknowledgement Number
 
@@ -474,7 +474,7 @@ _Receive Window (rwnd)_: number of bytes receiver is willing to accept
 
 #+ATTR_LATEX: :width 300px
 #+ATTR_ORG: :width 300px
-[[./lecture-receive-window.png]]
+[[./img/lecture-receive-window.png]]
 
 *** Other components
 
@@ -505,7 +505,7 @@ States
 
 #+ATTR_LATEX: :width 300px
 #+ATTR_ORG: :width 300px
-[[./lecture-tcp-handshake.png]]
+[[./img/lecture-tcp-handshake.png]]
 
 *Note: can send data in the final ~ACK~!
 
@@ -524,7 +524,7 @@ States
 
 #+ATTR_LATEX: :width 300px
 #+ATTR_ORG: :width 300px
-[[./lecture-tcp-close-connection.png]]
+[[./img/lecture-tcp-close-connection.png]]
 
 ** TCP Reliable Data Transfer
 
@@ -582,7 +582,7 @@ _Idea_: sender can detect packet loss before timeout, using duplicate ACKs, so c
 
 #+ATTR_ORG: :width 400px
 #+ATTR_LATEX: :width 400px
-[[./lecture-routing-forwarding-control-data-plane.png]]
+[[./img/lecture-routing-forwarding-control-data-plane.png]]
 
 * IP (Internet Protocol)
 
@@ -603,7 +603,7 @@ _Interface_: the connection between host/router and physical link
 
 #+ATTR_ORG: :width 300px
 #+ATTR_LATEX: :width 300px
-[[./lecture-subnet.png]]
+[[./img/lecture-subnet.png]]
 
 _Subnet_: a network formed by a group of "directly interconnected" hosts
 - Directly interconnected: hosts in the same subnet can physically connect with each other without any intervening router; connect to the outside world with a router
@@ -644,7 +644,7 @@ Hierarchical: each tier is responsible for receiving packets for all its smaller
 
 #+ATTR_ORG: :width 350px
 #+ATTR_LATEX: :width 350px
-[[./lecture-hierarchical-addressing.png]]
+[[./img/lecture-hierarchical-addressing.png]]
 
 More specific routes: when an organisation changes ISP, the ISP can simply add and advertise another entry to neighbouring routers
 - _Longest prefix matching_ (match as much as possible) to deconflict
@@ -660,7 +660,7 @@ Getting IP addresses
 
 #+ATTR_ORG: :width 350px
 #+ATTR_LATEX: :width 350px
-[[./lecture-ip-address-allocation.png]]
+[[./img/lecture-ip-address-allocation.png]]
 
 ** DHCP (Dynamic Host Configuration Protocol)
 
@@ -676,7 +676,7 @@ DHCP runs over /UDP/
 
 #+ATTR_ORG: :width 450px
 #+ATTR_LATEX: :width 450px
-[[./lecture-dhcp.png]]
+[[./img/lecture-dhcp.png]]
 
 DHCP process: [client uses src 0.0.0.0, dest is always 255.255.255.255]
 - DHCP discover \rightarrow
@@ -690,7 +690,7 @@ DHCP process: [client uses src 0.0.0.0, dest is always 255.255.255.255]
 
 #+ATTR_LATEX: :width 450px
 #+ATTR_ORG: :width 450px
-[[./lecture-ipv4-datagram-format.png]]
+[[./img/lecture-ipv4-datagram-format.png]]
 
 Length refers to total length (e.g. 500 bytes), not data length (e.g. 480 bytes)
 
@@ -702,7 +702,7 @@ Why need to fragment and reassemble?
 
 #+ATTR_LATEX: :width 400px
 #+ATTR_ORG: :width 400px
-[[./lecture-ip-fragmentation.png]]
+[[./img/lecture-ip-fragmentation.png]]
 
 _Flag (frag flag)_:
 - 1 if there is next fragment from same segment
@@ -730,7 +730,7 @@ _LAN_: local network --- use private IP addresses
 
 #+ATTR_LATEX: :width 400px
 #+ATTR_ORG: :width 400px
-[[./lecture-ip-nat.png]]
+[[./img/lecture-ip-nat.png]]
 
 _NAT translation table_: implemented by NAT routers
 - Store mapping from WAN to LAN: (NAT IP address, new port #) \leftrightarrow (source IP address, port #)
@@ -791,7 +791,7 @@ $$\text{Bellman-Ford equation:} \ \ d_{x}(y) = \min_{v} \{ \ c(x,v) + d_{v}(y) \
 
 #+ATTR_LATEX: :width 250px
 #+ATTR_ORG: :width 250px
-[[./lecture-bellman-ford-equation.png]]
+[[./img/lecture-bellman-ford-equation.png]]
 
 \newpage
 
@@ -848,7 +848,7 @@ _Link layer_: sends datagram between adjacent nodes over a single link
 - _Framing_: encapsulates datagram in a frame, adding /header/ and /trailer/
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-link-layer-framing.png]]
+[[./img/lecture-link-layer-framing.png]]
 
 - _Link access control_: when multiple nodes /share/ a single link, need to coordinate which nodes can send frames at a certain point of time (sort of like scheduling)
 
@@ -878,13 +878,13 @@ _Single bit parity_: can detect single bit errors in data
 - Odd parity: total #1s is odd \rightarrow 0, otherwise 1
 
 #+ATTR_LATEX: :width 200px
-[[./lecture-one-bit-parity.png]]
+[[./img/lecture-one-bit-parity.png]]
 
 _Two-dimensional bit parity_: can detect and correct single bit errors in data
 - Use the 2D matrix to find row and column of flipped bit
 
 #+ATTR_LATEX: :width 250px
-[[./lecture-2d-bit-parity.png]]
+[[./img/lecture-2d-bit-parity.png]]
 
 *** Cyclic Redundancy Check (CRC)
 
@@ -902,7 +902,7 @@ _Example_:
 - Sender sends $101110\vert{}011$
 
 #+ATTR_LATEX: :width 150px
-[[./lecture-crc-division.png]]
+[[./img/lecture-crc-division.png]]
 
 \newpage
 
@@ -914,7 +914,7 @@ _Point-to-point link_: sender and receiver connected by a dedicated link
 - Example protocols: Point-to-Point Protocol (PPP), Serial Line Internet Protocol (SLIP)
 
 #+ATTR_LATEX: :width 250px
-[[./lecture-point-to-point-link.png]]
+[[./img/lecture-point-to-point-link.png]]
 
 _Broadcast link_ (shared medium): multiple nodes connected to a shared broadcast channel
 - When node transmits a frame, channel broadcasts the frame and every other node receives a copy
@@ -922,7 +922,7 @@ _Broadcast link_ (shared medium): multiple nodes connected to a shared broadcast
 - Solution: /multiple access protocols/ (channel partitioning/taking turns/random access)
 
 #+ATTR_LATEX: :width 250px
-[[./lecture-broadcast-link.png]]
+[[./img/lecture-broadcast-link.png]]
 
 *** Channel Partitioning Protocols
 
@@ -933,14 +933,14 @@ _TDMA (Time Division Multiple Access)_
 - Unused slots go idle
 
 #+ATTR_LATEX: :width 250px
-[[./lecture-tdma.png]]
+[[./img/lecture-tdma.png]]
 
 _FDMA (Frequency Division Multiple Access)_
 - Channel spectrum divided into frequency bands, where each node gets a fixed frequency band
 - Unused transmission time in frequency bands go idle
 
 #+ATTR_LATEX: :width 250px
-[[./lecture-fdma.png]]
+[[./img/lecture-fdma.png]]
 
 *** Taking Turns Protocols
 
@@ -949,14 +949,14 @@ _Polling_
 - Concerns: polling overhead (minor), single point of failure on master node
 
 #+ATTR_LATEX: :width 130px
-[[./lecture-polling.png]]
+[[./img/lecture-polling.png]]
 
 _Token Passing_
 - Control token passed from one node to the next sequentially
 - Concerns: token overhead (minor), single point of failure on token
 
 #+ATTR_LATEX: :width 130px
-[[./lecture-token-passing.png]]
+[[./img/lecture-token-passing.png]]
 
 *** Random Access Protocols
 
@@ -967,7 +967,7 @@ _Slotted ALOHA_
 - If collision happens, node retransmits frame in every subsequent slot with probability $p$ until success
 
 #+ATTR_LATEX: :width 450px
-[[./lecture-slotted-aloha.png]]
+[[./img/lecture-slotted-aloha.png]]
 
 _Pure (unslotted) ALOHA_
 - Time not divided into slots, no synchronisation
@@ -975,7 +975,7 @@ _Pure (unslotted) ALOHA_
 - Chance of collision increases: frame sent at $t_0$ collides with other frames sent in $(t_0-1, t_0+1)$ \rightarrow utilisation is /worse/ than slotted ALOHA (about half)
 
 #+ATTR_LATEX: :width 350px
-[[./lecture-pure-aloha.png]]
+[[./img/lecture-pure-aloha.png]]
 
 _CSMA (Carrier Sense Multiple Access)_
 - Sense the channel before transmission
@@ -984,7 +984,7 @@ _CSMA (Carrier Sense Multiple Access)_
 - Collisions may still happen: both nodes sense idle at same time, and start transmission after (because of /propagation delay/, nodes don't hear each others' transmission immediately)
 
 #+ATTR_LATEX: :width 220px
-[[./lecture-csma-collisions.png]]
+[[./img/lecture-csma-collisions.png]]
 
 _CSMA/CD (Collision Detection)_
 - CSMA, where you /abort transmission/ when collision is detected \rightarrow reduce channel wastage
@@ -992,12 +992,12 @@ _CSMA/CD (Collision Detection)_
 - (Used in early Ethernet)
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-csma-cd.png]]
+[[./img/lecture-csma-cd.png]]
 
 (\star) /Minimum frame size/ in CSMA: if frame size too small, collision may not be detected \rightarrow no retransmission
 
 #+ATTR_LATEX: :width 200px
-[[./lecture-csma-minimum-frame-size.png]]
+[[./img/lecture-csma-minimum-frame-size.png]]
 
 _CSMA/CA (Collision Avoidance)_
 - Difficult to detect collisions in some systems (hidden node problem)
@@ -1005,7 +1005,7 @@ _CSMA/CA (Collision Avoidance)_
 - (Used in wireless LANs)
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-csma-ca-hidden-node.png]]
+[[./img/lecture-csma-ca-hidden-node.png]]
 
 ** Switched Local Area Networks
 
@@ -1042,7 +1042,7 @@ _Sending frame in /different/ subnet_
 - $R$ will create a new frame with $B$'s MAC address
 
 #+ATTR_LATEX: :width 420px
-[[./lecture-mac-send-another-subnet.png]]
+[[./img/lecture-mac-send-another-subnet.png]]
 
 ** Ethernet
 
@@ -1060,12 +1060,12 @@ _Local Area Network (LAN)_: network that interconnects computers in a geographic
 - _Star topology_: /switch/ in center, nodes do not collide (point-to-point connection)
 
 #+ATTR_LATEX: :width 280px
-[[./lecture-bus-star-topology.png]]
+[[./img/lecture-bus-star-topology.png]]
 
 *** Ethernet Frame Structure
 
 #+ATTR_LATEX: :width 380px
-[[./lecture-ethernet-frame-structure.png]]
+[[./img/lecture-ethernet-frame-structure.png]]
 
 - _Payload_: typically IP datagram. Min 46 bytes (for collision detection), max 1500 bytes (MTU)
 - _Preamble_: 7 bytes with pattern $10101010$ followed by 1 byte with pattern $10101011$, used to synchronize sender and receiver clock rates (so receiver can figure out width of a bit)
@@ -1074,7 +1074,7 @@ _Local Area Network (LAN)_: network that interconnects computers in a geographic
 - _CRC_: detect corruption
 
 #+ATTR_LATEX: :width 350px
-[[./lecture-ethernet-preamble.png]]
+[[./img/lecture-ethernet-preamble.png]]
 
 *** Ethernet Data Delivery
 
@@ -1103,7 +1103,7 @@ _Binary/exponential back-off_
 - /Transparent/ to hosts: no IP address, hosts unaware of presence of switches
 
 #+ATTR_LATEX: :width 150px
-[[./lecture-ethernet-switch.png]]
+[[./img/lecture-ethernet-switch.png]]
 
 *** Switch Forwarding Table
 
@@ -1124,7 +1124,7 @@ _Binary/exponential back-off_
 Switches can be interconnected in hierarchy, and form a /spanning tree/
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-interconnected-switches.png]]
+[[./img/lecture-interconnected-switches.png]]
 
 *** Router vs. Switch
 
@@ -1154,7 +1154,7 @@ _Sampling_
 - Then /quantize/ each sample to an integer value (e.g. 2^8, or 2^16 values for CDs)
 
 #+ATTR_LATEX: :width 220px
-[[./lecture-audio-sampling.png]]
+[[./img/lecture-audio-sampling.png]]
 
 ** Multimedia: Video
 
@@ -1175,7 +1175,7 @@ _Continuous playout constraint_: once client playout begins, playback must match
 - Client playout delay: only start playing back some time after we receive packets, buffer is semi-full
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-streaming-stored-video.png]]
+[[./img/lecture-streaming-stored-video.png]]
 
 _Playout buffering_: average fill rate $\bar{x}$, playout rate $r$
 - If $\bar{x} < r$, buffer eventually empties, will eventually freeze
@@ -1184,7 +1184,7 @@ _Playout buffering_: average fill rate $\bar{x}$, playout rate $r$
   - Avoid full buffer: just don't take from TCP buffer (so rely on TCP congestion mechanism), OR application layer sends message down
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-streaming-stored-buffering.png]]
+[[./img/lecture-streaming-stored-buffering.png]]
 
 _Using UDP (push-based streaming)_
 - Server just sends at appropriate rate, without congestion control
@@ -1214,7 +1214,7 @@ _Fixed playout delay $q$_
 - Small $q$: better interactive experience
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-voip-fixed-playout-delay.png]]
+[[./img/lecture-voip-fixed-playout-delay.png]]
 
 _Adaptive playout delay_
 - Estimate packet delay $d_i$ using exponentially weighted moving average
@@ -1222,7 +1222,7 @@ _Adaptive playout delay_
 - Playout time = $t_i + d_i + Kv_i$
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-adaptive-playout-delay.png]]
+[[./img/lecture-adaptive-playout-delay.png]]
  
 *** Recovery from Loss
 
@@ -1237,14 +1237,14 @@ _"Piggyback lower quality stream"_
 - It's a form of Forward Error Correction (FEC): send enough bits to allow for recovery
 
 #+ATTR_LATEX: :width 250px
-[[./lecture-voip-piggyback.png]]
+[[./img/lecture-voip-piggyback.png]]
 
 _Conceal loss by interleaving_
 - Packet contains units from different chunks \rightarrow if loss, still have most of each chunk
 - No redundancy, but increases playout delay
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-voip-interleave.png]]
+[[./img/lecture-voip-interleave.png]]
 
 ** Protocols: for Real-Time Conversational Applications
 
@@ -1255,7 +1255,7 @@ Suite of protocols: RTP, RTCP (control), RTSP (streaming: done over TCP)
 - Runs in end systems over UDP
 
 #+ATTR_LATEX: :width 250px
-[[./lecture-rtp-suite.png]]
+[[./img/lecture-rtp-suite.png]]
 
 \newpage
 
@@ -1266,7 +1266,7 @@ _RTP header_
 - Synchronisation Source ID (SSRC) (32 bits): identifies source of RTP stream
 
 #+ATTR_LATEX: :width 300px
-[[./lecture-rtp-header.png]]
+[[./img/lecture-rtp-header.png]]
 
 ** Dynamic Adaptive Streaming over HTTP (DASH)
 
