@@ -87,7 +87,7 @@ Start with most specific hypothesis. Whenever it wrongly classifies +ve training
 3. Output hypothesis $h$
 
 #+ATTR_LATEX: :width 400px
-[[./find-s.png]]
+[[./img/find-s.png]]
 
 _Proposition 1_: $h$ is consistent with $D$ \Leftrightarrow every +ve training instance satisfies $h$, and every --ve training instance does not satisfy $h$.
 
@@ -113,7 +113,7 @@ _Specific boundary $S$_ of $VS_{H,D}$: set of /maximally specific/ members of $H
 - "Summary" of +ve training examples
 
 #+ATTR_LATEX: :width 300px
-[[./version-space-enjoysport.png]]
+[[./img/version-space-enjoysport.png]]
 
 _Version Space Representation Theorem (VSRT)_: all hypotheses in the version space lie in some path from $G$ to $S$
 - $VS_{H,D} = \{ h\in{}H \ | \ \exists{}s\in{}S,g\in{}G \ \ g\ge_{g}h\ge_{g}s \}$
@@ -160,11 +160,11 @@ _Idea_: Start with most general and specific hypotheses. Each training example "
 
 _--ve example (specialises $G$)_
 #+ATTR_LATEX: :width 300px
-[[./candidate-elimination-2.png]]
+[[./img/candidate-elimination-2.png]]
 
 _+ve example (generalises $S$, but also eliminates one from $G$)_
 #+ATTR_LATEX: :width 300px
-[[./candidate-elimination-3.png]]
+[[./img/candidate-elimination-3.png]]
 
 *** Properties
 
@@ -245,7 +245,7 @@ input instances.
 ** Decision Trees
 
 #+ATTR_LATEX: :width 350
-[[./chapt3-decisiontree.png]]
+[[./img/chapt3-decisiontree.png]]
 
 *** Decision Tree Learning vs. Concept Learning
 
@@ -317,7 +317,7 @@ or all --ve
 - Select attribute that /maximises information gain/, by reducing the most entropy (uncertainty)
 
 #+ATTR_LATEX: :width 450
-[[./chapt3-mostimptattr.png]]
+[[./img/chapt3-mostimptattr.png]]
 
 - $Gain(Wait, Patrons) = B(\frac{6}{12}) - [\frac{2}{12}B(\frac{0}{2}) + \frac{4}{12}B(\frac{4}{4}) + \frac{6}{12}B(\frac{2}{6})] = 0.459 = 0.0541 \ \text{bits} \ (??)$
 - $Gain(Wait, Type) = B(\frac{6}{12}) - [\frac{2}{12}B(\frac{1}{2}) +
@@ -340,7 +340,7 @@ _Entropy_: measures the /uncertainty of classification/
 _Entropy curve_: idea is that $B(\frac{p}{p+n})$ is 0 when $\frac{p}{p+n} = 0 / 1$, is 1 when $\frac{p}{p+n} = 0.5$
 
 #+ATTR_LATEX: :width 180
-[[./chapt3-entropycurve.png]]
+[[./img/chapt3-entropycurve.png]]
 
 
 *** Hypothesis Space Search
@@ -459,7 +459,7 @@ Classify new unobserved input instances with missing attribute values in same ma
 
 ** Perceptron
 
-[[./chapter4-perceptron-unit.png]]
+[[./img/chapter4-perceptron-unit.png]]
 
 \begin{equation*}
 o(\mathbf{x}) = sgn(\mathbf{w} \cdot \mathbf{x}) = \begin{cases}
@@ -482,7 +482,7 @@ Perceptron calculates a linear combination of a vector of real-valued inputs, an
 - _Decision surface/line_: hyperplane represented by $\mathbf{w} \cdot \mathbf{x} = 0$ \Rightarrow $x_2 = -\frac{w_1}{w_2}x_1 - \frac{w_0}{w_2}$
 
 #+ATTR_LATEX: :width 150px
-[[./chapter4-decision-surface.png]]
+[[./img/chapter4-decision-surface.png]]
 
 _Orthogonal vector_
 - (\star) Always points to the +ve examples
@@ -534,7 +534,7 @@ _Training rule_: $w_i \gets w_i + \Delta{}w_i, \ \ \ \Delta{}w_i = -\eta{}\frac{
 
 #+ATTR_LATEX: :width 250px
 #+ATTR_ORG: :width 250px
-[[./chapter4-loss-function.png]]
+[[./img/chapter4-loss-function.png]]
 
 $$\frac{\partial{}L_{D}}{\partial{}w_{i}} = -\sum_{d\in{}D}(t_d - o_d)x_{id} \hspace{0.3cm} \equiv \hspace{0.3cm} \nabla{}L_{D}(\mathbf{w}) = -\sum_{d\in{}D}(t_d - o_d)\mathbf{x}_d$$
 
@@ -587,7 +587,7 @@ Why is SGD useful?
 
 ** Sigmoid Unit
 
-[[./chapter4-sigmoid-unit.png]]
+[[./img/chapter4-sigmoid-unit.png]]
 
 - _Linear sum_: $net = \sum_{i=0}^{n}w_i \cdot x_i = \mathbf{w} \cdot \mathbf{x}$
 - _Sigmoid function_: $o = \sigma(net) = \frac{1}{1+e^{-net}}$
@@ -623,7 +623,7 @@ _Derivation_
 _2 layers with multiple outputs_: Input layer (NO neurons) \rightarrow Hidden layer (sigmoid) \rightarrow Output layer (sigmoid)
 
 #+ATTR_LATEX: :width 120px
-[[./chapter4-multilayer-network.png]]
+[[./img/chapter4-multilayer-network.png]]
 
 $$L_{D}(\mathbf{w}) = \frac{1}{2}\sum_{d\in{}D}\sum_{k\in{}K}(t_{kd}-o_{kd})^2 \text{ where } K \text{ is the set of output units}$$
 
@@ -794,7 +794,7 @@ P(h) &= \frac{1}{\vert{}H\vert{}} \\
 
 (\star) Every consistent hypothesis is a MAP hypothesis! Since all consistent hypotheses are equally likely.
 
-[[./chapter5-belief-update.png]]
+[[./img/chapter5-belief-update.png]]
 
 ** Bayesian Inference: Learning a Continuous-Valued Function
 
@@ -983,7 +983,7 @@ $\textsc{Classify-New-Instance}(\mathbf{x})$
 *** Example of Naive Bayes
 
 #+ATTR_LATEX: :width 300px
-[[./chapter5-naive-bayes-playtennis.png]]
+[[./img/chapter5-naive-bayes-playtennis.png]]
 
 Predict the target concept /PlayTennis/ for new instance $\langle{}Outlook=Sunny, Temperature=Cool, Humidity=High, Wind=Strong\rangle{}$
 - $P(Yes)P(Sunny\vert{}Yes)P(Cool\vert{}Yes)P(High\vert{}Yes)P(Strong\vert{}Yes)=\frac{9}{14}\cdot\frac{2}{9}\cdot\ldots = 0.005291$
@@ -1037,7 +1037,7 @@ Consider full description of each instance as $d = \langle{}x_d, z_{d1}, \ldots,
 _Example: 2 Gaussians_
 
 #+ATTR_LATEX: :width 400px
-[[./chapt5-mixture-gaussians.png]]
+[[./img/chapt5-mixture-gaussians.png]]
 
 *** EM Algorithm for 2 Gaussians
 
