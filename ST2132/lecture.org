@@ -1,0 +1,2363 @@
+#+TITLE: Lecture Notes
+#+DATE: [2020-08-12]
+#+LATEX_HEADER: \usepackage{indentfirst}
+#+LATEX_HEADER: \usepackage{parskip}  \setlength{\parindent}{15pt}
+#+LATEX_HEADER: \usepackage{sectsty}  \setcounter{secnumdepth}{2}
+#+LATEX_HEADER: \usepackage{titlesec} \newcommand{\sectionbreak}{\clearpage}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+#+LATEX_HEADER: \usepackage[outputdir=Output]{minted}
+#+OPTIONS: toc:2 author:nil
+
+* Assessment
+
+| Final Exam       | 70% |
+| Assignments (x4) | 30% |
+
+* Introduction and Recap
+
+** Independence
+
+_Independence_: $X_1$ and $X_2$ are independent if for any 2 events $A_1$ and $A_2$,
+- $P(X_1 \in A_1, X_2 \in A_2) = P(X_1 \in A_1) \cdot P(X_2 \in A_2)$
+- $P(A_1 \cap A_2) = P(A_1) \cdot P(A_2)$
+
+** Expectation and Variance
+
+_Expectation_: $E(X) = \int x \cdot f_{X}(x) \ dx$
+- $E(g(X)) = \int g(x) \cdot f_{X}(x) \ dx$
+- $E(aX + bY) = aE(X) + bE(Y)$
+
+_Variance_: $Var(X) = E[X - E(X)^2] = E(X^2) - E(X)^2$
+- $Var(aX + bY) = a^2 Var(X) + b^2 Var(Y) + 2ab \ Cov(X, Y)$
+
+_Standard deviation_: $SD(X) = \sqrt{Var(X)}$
+
+_Covariance_: $Cov(X, Y) = E[(X-E(X))(Y-E(Y))] = E(XY) - E(X)E(Y)$
+- $Cov(aX, bY) = ab \ Cov(X, Y)$
+- $Cov(X+a, Y+b) = Cov(X, Y)$
+
+_Correlation_: $p_{X,Y} = \frac{Cov(X, Y)}{SD(X) SD(Y)}$
+
+** Centred Random Variables
+
+_Centred_: zero expectation
+
+We can centre RV $X$ by letting $Y = X - E(X)$
+- $E(Y) = 0$
+- $Var(Y) = Var(X)$
+
+Model of measurement: Let $\mu$ be a constant (what we're interested in) and $\epsilon$ be centred RV (random measurement errors), define $X = \mu + \epsilon$ (measurements)
+- $E(X) = \mu$
+- $Var(X) = Var(\epsilon)$
+- $Cov(X, \epsilon) = Cov(c+\epsilon, \epsilon) = Cov(\epsilon, \epsilon) = Var(\epsilon)$
+
+** Law of Large Numbers
+
+_Law of large numbers_: Let $X_i$ be IIDs with expectation $\mu$ and variance $\sigma^2$, and mean $\bar{X}_n = \frac{1}{n} \sum_{i=1}^{n} X_i$. Then as $n \rightarrow \infty$, $\bar{X}_n \rightarrow \mu$.
+- Implication: Let $x_i$ be realisations of $X_i$, and so $\bar{x}_n$ is a realisation of $\bar{X}_n$. Then as $n \rightarrow \infty$, $\bar{x}_n \rightarrow \mu$; variance of $x_i$ converges to $\sigma^2$.
+- Empirical distribution converges to the common distribution
+
+** Central Limit Theorem
+
+Let $X_1, \ldots, X_n$ be IID (any distribution!) with expectation $\mu$ and SD $\sigma$. Let $S_n = \sum_{i} X_i$.
+
+(\star) As $n\rightarrow\infty$, distribution of $\frac{S_n-n\mu}{\sqrt{n}\sigma}$ converges to standard normal distribution, then $S_n \sim N(n\mu, n\sigma^2)$
+
+*** Example: 100 tosses of fair coin, find P(between 40 and 60 heads)
+
+- $S_n \sim Bin(100, \frac{1}{2}) \sim> N(50, 25)$
+- $P(40 \le S_n \le 60) \approx P(\frac{40-50}{5} < Z < \frac{60-50}{5}) \approx 95\%$ (ignoring continuity correction)
+
+* Normal Distribution and Related Distributions
+
+Let $X \sim{} N(\mu, \sigma^2)$
+- $f(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$
+- $E(X) = \mu$
+- If $\mu=0$, then $E(X^{2i+1}) = 0$
+
+** Standardisation
+
+Let $Z = \frac{X - \mu}{\sigma}$, then $Z$ is standard normal
+- $Z$ has pdf $\phi$ and cdf $\Phi$
+
+** $\chi^2$ Distribution
+
+*** $\chi_1^2$ Distribution
+
+Let $U=Z^2$. Then $U \sim{} \chi_{1}^2$
+- $F_{U}(u) = \Phi(\sqrt{u}) - \Phi(-\sqrt{u})$
+- $f_{U}(u) = \frac{1}{\sqrt{2\pi}}u^{-\frac{1}{2}}e^{-\frac{u}{2}}$
+- $E(U) = 1$
+- $Var(U) = 2$
+
+$\chi_{1}^{2}$ is Gamma with $\alpha = \frac{1}{2}, \lambda = \frac{1}{2}$
+
+*** (Proof) Find CDF of $U$, $F_{U}(u)$
+
+\begin{align*}
+F_{U}(u) = P(U \le u) &= P(Z^2 \le u) \\
+&= P(-\sqrt{u} \le Z \le \sqrt{u}) \\
+&= P(Z \le \sqrt{u}) - P(Z \le -\sqrt{u}) \\
+&= \Phi(\sqrt{u}) - \Phi(-\sqrt{u})
+\end{align*}
+
+\begin{align*}
+f_{U}(u) &= \frac{d}{du} F_{U}(u) \\
+&= \phi(\sqrt{u})\frac{1}{2}u^{-\frac{1}{2}} - \phi(-\sqrt{u})(-\frac{1}{2}u^{-\frac{1}{2}}) \\
+&= \phi(\sqrt{u})\frac{1}{2}u^{-\frac{1}{2}} + \phi(\sqrt{u})(\frac{1}{2}u^{-\frac{1}{2}}) \\
+&= \phi(\sqrt{u})u^{-\frac{1}{2}} \\
+&= \frac{1}{\sqrt{2\pi}} u^{-\frac{1}{2}} e^{-\frac{u}{2}}
+\end{align*}
+
+*** $\chi_{n}^2$ Distribution
+
+Let $V = \sum_{i=1}^{n} U_i$, where $U_1, \ldots, U_n$ are IID $\chi_{1}^{2}$. Then $V \sim{} \chi_{n}^{2}$
+- $\chi_{n}^{2}$ is Gamma with $\alpha=\frac{n}{2}$, $\lambda=\frac{1}{2}$
+- $E(V) = n$
+- $Var(V) = 2n$
+- As $n\rightarrow\infty{}$, $V$ is approximately normal by CLT
+
+If $X \sim{} \chi_{m}^2$ and $Y \sim{} \chi_{n}^2$ are independent, then $X+Y \sim{} \chi_{m+n}^2$
+
+** $\Gamma$ Distribution
+
+$g(t) = \frac{\lambda^\alpha}{\Gamma(\alpha)} t^{\alpha-1} e^{-\lambda{}t}$, for $t\ge{}0$
+- $\alpha$ is the /shape/ parameter
+- $\lambda$ is the /rate/ parameter --- how fast it 'dies out'
+- If we have independent Gamma distributions with the same rate parameter, we can simply sum the shape paremeters!
+
+** Moment Generating Functions
+
+$M_{V}(t) = E(e^{tV})$
+- From $M(t)$, you can get all the moments of $V$, e.g. $E(V)$, $E(V^2)$!
+- $E(V^k) = M^{(k)}(0)$, so $E(V) = M'(0)$, $E(V^2) = M''(0)$
+
+(\star) MGF uniquely describes the distribution. If two variables have the same MGF, they have the same distribution.
+
+(\star) If $X$ and $Y$ are independent, then $M_{X+Y}(t) = M_{X}(t) \cdot M_{Y}(t)$
+
+*** MGF of $\Gamma$ and $\chi_{n}^{2}$ distributions
+
+- For $\Gamma$ distribution, $M(t) = (\frac{\lambda}{\lambda-t})^{\alpha}$
+- For $\chi_{n}^2$ distribution, $M(t) = (1-2t)^{-\frac{n}{2}}$
+
+*** Expectation and Variance of $\chi_{n}^2$ distribution
+
+\begin{align*}
+M(t) &= (1-2t)^{-\frac{n}{2}} \\
+M'(t) &= n(1-2t)^{-\frac{n}{2}-1} \\
+M''(t) &= n(n+2)(1-2t)^{-\frac{n}{2}-2} \\ \\
+E(V) &= M'(0) = n \\
+E(V^2) &= M''(0) = n(n+2) \\
+Var(V) &= E(V^2) - E(V)^2 = 2n
+\end{align*}
+
+*** Proving that Sum of Chi-Squares gives Chi-Square with $n+m$ Degrees of Freedom
+
+Since $X$ and $Y$ are independent,
+
+\begin{align*}
+M_{X+Y}(t) &= M_{X}(t) M_{Y}(t) \ \text{(since $X$ and $Y$ are independent)} \\
+&= (1-2t)^{-\frac{m}{2}} (1-2t)^{-\frac{n}{2}} \\
+&= (1-2t)^{-\frac{m+n}{2}} \\ \\
+\therefore X+Y &\sim{} \chi_{m+n}^{2}
+\end{align*}
+
+** $t$ Distribution
+
+$t_n = \frac{Z}{\sqrt{V_n / n}}$, where $V_n \sim{} \chi_{n}^2$
+- $t_n$ has a $t$ distribution with $n$ degrees of freedom
+- $f(t) = \frac{\Gamma((n+1)/2)}{\sqrt{n\pi}\Gamma(n/2)} (1+\frac{t^2}{n})^{-(n+1)/2}$
+
+$t_n$ distribution
+- Symmetric about 0
+- Converges to $Z$ as $n\rightarrow{}\infty$
+  - $V_n/n$: by law of large numbers, as $n\rightarrow{}\infty$, $V_n/n$ converges to its mean $1$, so $t_n$ converges to $Z$
+
+#+ATTR_LATEX: :width 400px
+[[./img/t-distribution.png]]
+
+*** Deriving PDF of $t$ Distribution
+
+(Not important)
+
+\begin{align*}
+X &= \sqrt{\frac{V_n}{n}} \\
+\\
+P(X \le x) &= P(\sqrt{\frac{V_n}{n}} \le x) \\
+&= P(V_n \le nx^2) \\
+f_{X}(x) &= f_{V_n}(nx^2) \cdot (2nx) \\
+&= \frac{(\frac{1}{2})^\frac{n}{2}}{\Gamma(\frac{n}{2})} (nx^2)^{\frac{n}{2}-1} e^{-\frac{1}{2}nx^2} (2nx) \\
+&= \frac{1}{\Gamma(\frac{n}{2})} (\frac{1}{2})^{\frac{n}{2}-1} n^{\frac{n}{2}} x^{n-1} e^{-\frac{1}{2}nx^2} \\
+&= K x^{n-1} e^{-\frac{1}{2}nx^2} \\
+\end{align*}
+
+\begin{align*}
+\text{Theorem:} \ f_{Z}(z) &= \int_{-\infty}^{\infty} |x| f_{X}(x) f_{Y}(xz) \ dx \ \text{when $Z=\frac{Y}{X}$} \\
+\text{So:} \ f_{t}(t) &= \int_{-\infty}^{\infty} |x| f_{X}(x) \psi(xt) \ dx \ \text{since $t=\frac{Z}{X}$} \\
+&= \int_{0}^{\infty} x K x^{n-1} e^{-\frac{1}{2}nx^2} \frac{1}{\sqrt{2\pi}} e^{-\frac{1}{2}x^2 t^2} \ dx \\
+&= \frac{K}{\sqrt{2\pi}} \int_{0}^{\infty} x^n e^{-\frac{1}{2}x^2(n+t^2)} \ dx \\
+&= \frac{K}{\sqrt{2\pi}} \int_{0}^{\infty} \frac{1}{2} y^{\frac{n-1}{2}} e^{-\frac{1}{2}y(n+t^2)} \ dy \ \text{(Let $y=x^2$, $\frac{dy}{dx}=2x$)} \\
+\text{Consider} & \ \text{Gamma density function with $\alpha=\frac{n+1}{2}$, $\lambda=\frac{n+t^2}{2}$} \\
+&= \frac{K}{\sqrt{2\pi}} \cdot \frac{1}{2} \cdot \frac{\Gamma(\alpha)}{\lambda^\alpha} \int_{0}^{\infty} \frac{\lambda^\alpha}{\Gamma(\alpha)} y^{\alpha-1} e^{-\lambda{}y} \ dy \ \text{(The integral is 1, because Gamma!)} \\
+&= \ldots = k \cdot (1+\frac{t^2}{n})^{-(n+1)/2}
+\end{align*}
+
+** $F$ Distribution
+
+$W = \frac{U/m}{V/n}$, where $U\sim{}\chi_{m}^2$ and $V\sim{}\chi_{n}^2$
+- $W$ has an $F$ distribution with $(m,n)$ degrees of freedom
+- Note: If $X\sim{}t_n$, then $X$ has distribution of $\frac{Z}{\sqrt{V_n/n}}$ and $X^2$ has distribution of $\frac{Z^2/1}{V_n/n}$ ($F$ distribution with $(1,n)$ degrees of freedom)
+- If $n\rightarrow\infty$, then $W \approx U/m$ since $\frac{V}{n} \rightarrow 1$
+- For $n>2$, $E(W)=\frac{n}{n-2}$
+
+** (\star) IID Normal Random Variables: Sample Mean $\bar{X}$ and "Sample Variance" $S^2$
+
+Let $X_1, \ldots, X_n$ be IID $N(\mu, \sigma^2)$.
+- _Sample mean_: $\bar{X} = \frac{1}{n}\sum_{i=1}^{n}X_i$
+- _"Sample variance"_: $S^2 = \frac{1}{n-1}\sum_{i=1}^{n}(X_i - \bar{X})^2$ --- NOTE the $(n-1)$!
+
+Facts about $\bar{X}$ and $S^2$:
+1. $\bar{X}$ and $S^2$ are independent
+2. $\bar{X} \sim{} N(\mu, \frac{\sigma^2}{n})$
+3. $\frac{(n-1)S^2}{\sigma^2} \sim{} \chi_{n-1}^2$
+4. $\frac{\bar{X}-\mu}{S/\sqrt{n}} \sim{} t_{n-1}$
+
+- $E(S^2) = \sigma^2$ --- since $E(\frac{(n-1)S^2}{\sigma^2}) = n-1$
+- $Var(S^2) = \frac{2\sigma^4}{n-1}$ --- since $Var(\frac{(n-1)S^2}{\sigma^2}) = 2(n-1)$
+
+*** Proof of Fact 1 ($\bar{X}$ and $S^2$ are Independent)
+
+- Theorem: If $X$ and $Y$ are independent, then $E(XY) = E(X)E(Y)$; if $(X,Y)$ is bivariate/multivariate normal, then the converse is also true
+- Idea: show that $E(\bar{X}Y) = E(\bar{X})E(Y)$, where $Y=X_1 - \bar{X}$; hence $\bar{X}$ and $X_1 - \bar{X}$ are independent (by theorem), and hence $\bar{X}$ and $S^2$ are independent
+
+\begin{align*}
+E(\bar{X}Y) = E(\bar{X}(X_1 - \bar{X})) &= E(X_1 (\frac{1}{n}(X_1 + \ldots + X_n))) - E(\bar{X}^2) \\
+&= \frac{1}{n} E(X_1^2 + X_1 X_2 + \ldots + X_1 X_n) - E(\bar{X}^2) \\
+&= \frac{1}{n} [E(X_1^2) + E(X_1)E(X_2) + \ldots + E(X_1)E(X_n)] - E(\bar{X}^2) \\
+&= \frac{1}{n} [(\sigma^2 + \mu^2) + (n-1)\mu^2] - E(\bar{X}^2) \\
+&= \frac{\sigma^2}{n} + \mu^2 - E(\bar{X}^2) \\
+&= \frac{\sigma^2}{n} + \mu^2 - [Var(\bar{X}) + E(\bar{X})^2] \\
+&= \frac{\sigma^2}{n} + \mu^2 - [\frac{\sigma^2}{n} + \mu^2] \\
+&= 0 \\
+\\
+E(\bar{X})E(Y) &= \mu \cdot E(X_1 - \bar{X}) = \mu \cdot 0 = 0
+\end{align*}
+
+*** Proof of Fact 2 (Distribution of $\bar{X}$)
+
+Obvious: linear combination of IID normal RVs is a normal RV
+
+*** Proof of Fact 3 (Distribution of $S^2$)
+
+Note that:
+
+$\frac{1}{\sigma^2} \sum_{i=1}^{n} (X_i - \mu)^2 &= \sum_{i=1}^{n} (\frac{X_i-\mu}{\sigma})^2 \sim{} \chi_{n}^{2}$
+
+Verify:
+
+$\frac{1}{\sigma^2} \sum_{i=1}^{n} (X_i - \mu)^2 &= \frac{1}{\sigma^2} \sum_{i=1}^{n}(X_i - \bar{X})^2 + (\frac{\bar{X}-\mu}{\sigma / \sqrt{n}})^2$
+
+\begin{align*}
+\sum_i (X_i - \mu)^2 &= \sum_i ((X_i - \bar{X}) + (\bar{X} - \mu))^2 \\
+&= \sum_i (X_i - \bar{X})^2 + \sum_i (\bar{X} - \mu)^2 \\
+\end{align*}
+
+Call these terms $U = V+W$.
+
+$U$ and $V$ are independent from Fact 1, so:
+
+$M_W(t) = \frac{M_W(t)}{M_V(t)} = \frac{(1-2t)^{-n/2}}{(1-2t)^{-n/2}} = (1-2t)^{-(n-1)/2}$
+
+and $U$ has a $\chi_{n-1}^2$ distribution
+
+*** Proof of Fact 4 ($t$ Distribution)
+
+\begin{align*}
+\frac{\bar{X}-\mu}{S/\sqrt{n}} = \frac{(\frac{\bar{X}-\mu}{\sigma/\sqrt{n}})}{(\frac{S/\sqrt{n}}{\sigma/\sqrt{n}})}
+\end{align*}
+
+_Numerator_:  $\frac{\bar{X}-\mu}{\sigma/\sqrt{n}} \sim{} N(0,1)$
+
+_Denominator_: $\frac{S}{\sigma} = \sqrt{\frac{S^2}{\sigma^2} \cdot \frac{(n-1)}{(n-1)}} = \sqrt{\frac{S^2(n-1)}{\sigma^2} / (n-1)}$
+- It has $\chi_{n-1}^2$ distribution divided by $(n-1)$, square rooted.
+
+_Conclusion_: $\frac{\bar{X}-\mu}{S/\sqrt{n}}$ has same distribution as $\frac{Z}{\sqrt{U_{n-1}/(n-1)}}$, which is $t_{n-1}$ distribution
+
+** (\star) IID General Random Variables: Sample Mean $\bar{X}$ and "Sample Variance" $S^2$
+
+Now /relax/ the normality assumption. Let $X_1, \ldots, X_n$ be IID with expectation $\mu$ and variance $\sigma^2$.
+
+As $n \rightarrow \infty$, $\frac{\bar{X}-\mu}{\sigma/\sqrt{n}} \sim{} N(0, 1)$ (by CLT), so for large $n$, $\bar{X} \sim{} N(\mu, \frac{\sigma^2}{n})$
+
+* Survey Sampling A: SRS, Estimation
+
+** Motivation
+
+Population is too large to study; so we choose a smaller sample, and use it to infer facts about the population
+- /Random/ samples: uses chance to gather sample, the best way to choose sample
+
+** Population
+
+Let population have size $N$, each member has fixed value $x_i$. Let $\mu$, $\tau$, $\sigma$ be mean, total, SD of the population respectively.
+- $\mu = \frac{1}{N} \sum_{i} x_i$
+- $\tau = \sum_{i} x_i$
+- $\sigma^2 = \frac{1}{N} \sum_{i} (x_i - \mu)^2 = \frac{1}{N} \sum_{i} x_i^2 - \mu^2$ (the $\frac{1}{N}$ is /out/)
+- $\sigma = \sqrt{\frac{1}{N} \sum_{i} (x_i - \mu)^2}$
+
+(\star) The mean and variance are now no longer defined based on /random variables/, but on /a list of numbers/! So they are not random at all, just a bunch of numbers.
+
+** Population of 0's and 1's
+
+Each member can take value only 0 or 1, let $p$ be the proportion of the population that take the value 1
+- $\mu = p$
+- $\sigma^2 = p(1-p)$
+- $\sigma = \sqrt{p(1-p)}$
+
+** Simple Random Sampling
+
+_Simple random sampling_: make $n$ random draws /without replacement/ from the population
+- Every subset of size $n$ has the same probability
+
+Represent the draws as $X_1, \ldots, X_n$
+- $X_i$'s have the same (marginal) distribution
+- $E(X_i) = \mu$, $Var(X_i) = \sigma^2$
+- $X_i$ and $X_j$ are dependent and negatively correlated, $Cov(X_i, X_j) = -\frac{\sigma^2}{N-1}$
+
+*** Proof of $E(X_i)$ and $Var(X_i)$ (Lemma A)
+
+Let the /values/ of the population members be $\xi_1, \ldots, \xi_m$, let the /number/ of each value $\xi_j$ be $n_j$.
+
+$P(X_i = \xi_j) = \frac{n_j}{N}$
+
+$E(X_i) = \sum_{j=1}^{m} \xi_j P(X_i = \xi_j) = \sum_{j=1}^{m} \xi_j \frac{n_j}{N} = \frac{1}{N} \sum_{j=1}^{m} n_j \xi_j = \mu$
+
+$Var(X_i) = \sum_{j=1}^{m} (\xi_j - \mu)^2 P(X_i = \xi_j) = \frac{1}{N} \sum_{j=1}^{m} n_j (\xi_j - \mu)^2 = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2 = \sigma^2$
+
+*** Proof of $Cov(X_i, X_j)$ (Lemma B)
+
+$Cov(X_i, X_j) = E(X_i X_j) - E(X_i)E(X_j)$
+
+\begin{align*}
+E(X_i X_j) &= \sum_{k=1}^{m} \sum_{l=1}^{m} \xi_k \xi_l P(X_i = \xi_k, X_j = \xi_l) \\
+&= \sum_{k=1}^{m} \xi_k P(X_i = k) \sum_{l=1}^{m} \xi_l P(X_j = \xi_l \ | \ X_i = \xi_k) \\
+&= \sum_{k=1}^{m} \xi_k \frac{n_k}{N} \left[ \sum_{l\ne{}k} \xi_l \frac{n_l}{N-1} + \xi_k \frac{n_l-1}{N-1} \right] \\
+&= \sum_{k=1}^{m} \xi_k \frac{n_k}{N} \left[ \sum_{l=1}^{m} \xi_l \frac{n_l}{N-1} - \xi_k \frac{1}{N-1} \right] \\
+&= \frac{1}{N(N-1)} \tau (\tau - \xi_k) \\
+&= \frac{\tau}{N(N-1)} - \frac{1}{N-1} \left( \frac{1}{N} \sum_{k=1}^{m} \xi_k^2 n_k \right) \\
+&= \frac{\tau}{N(N-1)} - \frac{1}{N-1} (\mu^2 + \sigma^2) \\
+&= \ldots \\
+&= \mu^2 - \frac{\sigma^2}{N-1}
+\end{align*}
+
+\begin{align*}
+P(X_j = \xi_l \ | \ X_i = \xi_k) = \begin{cases}
+\frac{n_l}{N-1}    & \text{if $k\ne{}l$} \\
+\frac{n_l-1}{N-1}  & \text{if $k=l$}
+\end{cases}
+\end{align*}
+
+\begin{align*}
+\frac{1}{N} \sum_{k=1}^{m} \xi_k n_k &= E(X_i) = \mu \\
+\frac{1}{N} \sum_{k=1}^{m} \xi_k^2 n_k &= E(X_i^2) = Var(X_i) + E(X_i)^2 = \mu^2 + \sigma^2 \\
+\end{align*}
+
+** Simple Random Sampling Facts
+
+Let $\bar{X}$ be the sample mean of $X_1, \ldots, X_n$, and let $T = N\bar{X}$
+1. $E(\bar{X}) = \mu$, $E(T) = \tau$
+2. $Var(\bar{X}) = \frac{\sigma^2}{n} \cdot \frac{N-n}{N-1}$
+3. $Var(T) = N^2 \cdot \frac{\sigma^2}{n} \cdot \frac{N-n}{N-1}$
+
+*** Proof of Fact 2
+
+\begin{align*}
+Var(\bar{X}) &= \frac{1}{n^2} \left[ \sum_{i=1}^{n} Var(X_i) + \sum_{i\ne{}j} Cov(X_i, X_j) \right] \\
+&= \frac{1}{n^2} \left[ n\sigma^2 + n(n-1) \cdot \frac{-\sigma^2}{N-1} \right] \\
+&= \frac{\sigma^2}{n} \left[ 1 - \frac{n-1}{N-1} \right] \\
+&= \frac{\sigma^2}{n} \cdot \frac{N-n}{N-1}
+\end{align*}
+
+** Finite Population Correction Factor
+
+_Finite population correction factor_: $\frac{N-n}{N-1} = 1 - \frac{n-1}{N-1}$
+- It's smaller than 1
+- So SD is smaller than for draws with replacement
+
+_Sampling fraction_: $\frac{n}{N}$
+- When sampling fraction is small, the finite population correction is close to 1
+
+** Special case: Proportion (0/1)
+
+Let $\bar{X} = \hat{p}$ be the sample mean, i.e. the proportion of 1s
+- $E(\hat{p}) = p$
+- $SD(\hat{p}) = \sqrt{\frac{p(1-p)}{n} \cdot (1 - \frac{n-1}{N-1})}$
+
+* Estimation Problem
+
+Suppose that population mean $\mu$ is unknown. Let $X_1, \ldots, X_n$ be random draws /with replacement/.
+- $\bar{X}$ is an /estimator/ of $\mu$
+- $\bar{x}$, an observed value of $\bar{X}$, an /estimate/ of $\mu$
+
+Conclusion
+- $\bar{x}$ is an unbiased estimate of $\mu$
+- $s^2$ is an unbiased estimate of $\sigma^2$
+
+** Standard Error (SE)
+
+$SE \ \text{(of} \ \bar{x} \text{)} = SD(\bar{X}) = \frac{\sigma}{\sqrt{n}}$
+- Error in a particular estimate $\bar{x}$ is unknown, but on average its size is SE
+- SE is independent of population size $N$, dependent on sample size $n$
+- SE is unknown since we don't know $\sigma$ or $\sigma^2$
+
+** $\hat{\sigma}^2$ (the Bootstrap) as a biased estimator of $\sigma^2$
+
+Let's try $\hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^{n} (X_i - \bar{X})^2$:
+- Since $\sigma^2 = E((X_i - \mu)^2) = \frac{1}{n} \sum_{i=1}^{n} (X_i - \mu)^2$ --- simply replace $\mu$ by $\bar{X}$
+- However, $\hat{\sigma}^2$ is a biased estimator: $E(\hat{\sigma}^2) = (\frac{n}{n-1}) \sigma^2$
+
+\begin{align*}
+E(\sum_{i} (X_i - \bar{X})^2) &= E(\sum_{i}X_i + n\bar{X}^2 - 2\bar{X}\sum_{i}X_i) \\
+&= E(\sum_{i} X_i^2 - n\bar{X}^2) \\
+&= \sum_{i} E(X_i^2)  - n E(\bar{X}^2) \\
+&= \sum_{i} \left( Var(X_i) + E(X_i)^2 \right) - n (Var(\bar{X}) + E(\bar{X})^2) \\
+&= n \left( \sigma^2 + \mu^2 \right) - n (\frac{\sigma^2}{n} + \mu^2) \\
+&= \frac{n}{n-1} \sigma^2
+\end{align*}
+
+** $S^2$ as an unbiased estimator of $\sigma^2$, and $s^2$ as an unbiased estimate
+
+$S^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{X})^2$
+- $E(S^2) = \sigma^2$
+
+$s^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2$, where $s^2$ is an estimate of $S^2$
+
+** Special Case: Proportion of 0/1
+
+Let's say we have $\hat{p}$. Then $\hat{\sigma}^2 = \hat{p}(1-\hat{p})$, $s^2 = \frac{n}{n-1}\hat{\sigma}^2$
+
+So approximate SE of $\hat{p}$ is $\sqrt{\frac{\hat{p}(1-\hat{p})}{n-1}}$
+
+| Parameter | Estimate  | SE                        | Estimated SE                           |
+|-----------+-----------+---------------------------+----------------------------------------|
+| $\mu$     | $\bar{x}$ | $\frac{\sigma}{\sqrt{n}}$ | $\frac{s}{\sqrt{n}}$                   |
+| $p$       | $\hat{p}$ | $\sqrt{\frac{p(1-p)}{n}}$ | $\sqrt{\frac{\hat{p}(1-\hat{p})}{n-1}$ |
+
+
+** Simple Random Sampling (Without Replacement)
+
+Without replacement, we have to re-introduce the finite population correction factor: multiply the SE by $\sqrt{1 - \frac{n-1}{N-1}}$
+
+$S^2$ is biased for $\sigma^2$, so $E\left( \frac{N-1}{N} S^2 \right) = \sigma^2$
+
+But practically, we don't do this correction: the correction factor has a negligible effect when $N$ is large compared to $n$
+
+* Survey Sampling B: Confidence Intervals, Measurement Model
+
+** Normal Approximation for $\bar{X}$
+
+$\frac{\bar{X} - \mu}{\sigma / \sqrt{n}}$ is approximately $N(0,1)$, by CLT.
+
+** Confidence Intervals
+
+Let $x_1, \ldots, x_n$. Let $z_u$ be such that $P(Z > z_u) = u$.
+- E.g. $z_{0.025} = 1.96$, because $P(Z > 1.96) = 0.025$
+
+Let $\alpha$ be the significance level. Let the $(1 - \alpha)$-CI for $\mu$ be:
+
+$(\bar{x} - z_{\alpha/2} \frac{s}{\sqrt{n}}, \bar{x} + z_{\alpha/2} \frac{s}{\sqrt{n}})$
+
+which is a realisation of the random interval:
+
+$(\bar{X} - z_{\alpha/2} \frac{s}{\sqrt{n}}, \bar{X} + z_{\alpha/2} \frac{s}{\sqrt{n}})$
+
+whereby $1 - \alpha \approx P(\bar{X} - z_{\alpha/2} \frac{\sigma}{\sqrt{n}} \le \mu \le \bar{X} + z_{\alpha/2} \frac{\sigma}{\sqrt{n}})$.
+
+Hence the probability of a CI containing $\mu$ is $(1-\alpha)$.
+
+*** Example
+
+Say we take 100 samples from a population of 8000. $\bar{x} = 1.6$, $s = 0.8$. Construct a 95%-CI for $\mu$.
+- Approximate SE is $\frac{s}{\sqrt{n}} = \frac{0.8}{\sqrt{100}} = 0.08$
+- $\alpha = 0.05$, and $z_{\alpha/2} = 1.96$
+- So approximate 95%-CI for $\mu$ is $1.6 \pm 1.96 \cdot 0.08 \approx (1.4, 1.8)$
+
+*** Example
+
+Say 12% plans to sell house unit next year. Construct a 95%-CI for $p$.
+- Approximate SE is $\sqrt{\frac{0.12 \times 0.88}{99}} = 0.03$
+- So approximate 95%-CI for $p$ is $0.12 \pm 1.96 \times 0.03 = (0.06, 0.18)$
+
+** Summary on Estimation of Population Mean $\mu$
+
+- Simple Random Sampling (SRS): we can take it to be sampling with replacement (when $n$ is much smaller than $N$)
+- SE of estimate $\bar{x}$ is $SD(\bar{X}) = \sigma / \sqrt{n}$
+- If sample size $n$ is large, $S^2$ is similar to $\hat{\sigma}^2$
+- If sample size $n$ is large, then distribution of $\bar{X}$ is approximately normal; then interval (estimate \pm 1.96 SE) is a good 95%-CI for $\mu$
+  
+*** Exercise
+
+Say we have 2 populations, population I and population II
+- Population I: sample size $n_1$, population SD $\sigma_1$
+- Population II: sample size $n_2 = 2n_1$, population SD $\sigma_2 = 2\sigma_1$
+
+Which population has a larger confidence interval?
+- Width of CI $W = 2 z_{\alpha/2} \frac{s}{\sqrt{n}}$
+- $\frac{W_1}{W_2} = \frac{S_1 / \sqrt{n_1}}{S_2 / \sqrt{n_2}} \approx \frac{\sigma_1 / \sqrt{n_1}}{\sigma_2 / \sqrt{n_2}} = \frac{\sigma_1 / \sqrt{n_1}}{2\sigma_1 / \sqrt{2n_1}} = \frac{1}{\sqrt{2}}$
+
+*** Exercise
+
+Say we have population $p = 0.2$, take sample size $n=100$
+1. Find $\delta$ such that $P(|\hat{p}-p| \ge \delta) = 0.025$.
+2. If $\hat{p} = 0.25$, will the 95%-CI for $p$ contain the true value of $p$?
+
+- $\hat{p} \sim N(p, \frac{p(1-p)}{n}) = N(0.2, \frac{1}{25^2})$
+- $P(|\hat{p}-0.2| \ge \delta) = 0.025$
+- $P(|\frac{\hat{p}-0.2}{\frac{1}{25}}| \ge \frac{\delta}{\frac{1}{25}}) = 0.025$
+- $P(|Z| \ge 25\delta) = 0.025$
+- $25\delta = z_{0.0125} \Rightarrow \delta = \frac{1}{25} z_{0.0125}$
+
+Then:
+- $\hat{p} \pm z_{0.0125} \sqrt{\frac{\frac{1}{4}\frac{3}{4}}{99}} = 0.25 \pm 0.08$
+- So 95%-CI contains true value of $p = 0.2$
+
+** Measurement Error
+   
+Often, we can assume that $X_i = \mu + \epsilon_i$, where errors $\epsilon_i$ are IID with expectation 0 and unknown variance $\sigma^2$.
+- $E(\bar{X}) = \mu$
+- $Var(\bar{X}) = \frac{\sigma^2}{n}$
+
+Then $x_i = \mu + e_i$, where $e_i$ is a realisation of $\epsilon_i$
+- Similarly, $\bar{x}$ is an estimate of $\mu$, and its SE is $\frac{\sigma}{\sqrt{n}}$
+
+** Biased Measurements
+ 
+Let $X = \mu + \epsilon$, and we want to use $X$ to measure a constant $a \ne \mu$.
+
+Then $X = a + (\mu-a) + \epsilon$, where the bias is $\mu-a$.
+
+Mean square error $MSE = SE^2 + bias^2$
+- The MSE for $X$, $MSE = E[(X-a)^2] = E[((\mu-a)+\epsilon)^2] = E[(\mu-a)^2 + \epsilon^2 + 2\epsilon(\mu-a)] = \sigma^2 + (\mu-a)^2$
+- The MSE for $\bar{X}$, $MSE = E[(\bar{X}-a)^2] = \frac{\sigma^2}{n} + (\mu-a)^2$
+
+Implication of biased measurements
+- As you take more biased measurements, $SE^2$ will decrease, but $bias^2$ will remain the same
+- If $a = \mu$, $\sqrt{MSE} = SE$, so $SE$ indicates accuracy of $\bar{x}$
+- If $a \ne \mu$, $\sqrt{MSE} > SE$, so $SE$ only partly indicates accuracy of $\bar{x}$
+
+* Survey Sampling C: Estimation of a Ratio
+
+Setup: Population of $N$ members, record two characteristics from each member, $(x_1, y_1), \ldots, (x_N, y_N)$
+- $\mu_X = \frac{1}{N} \sum_{i} x_i$
+- $\mu_Y = \frac{1}{N} \sum_{i} y_i$
+
+_Ratio parameter_ $r = \frac{\mu_Y}{\mu_X}$
+  
+_Estimator of ratio parameter_ can be $R = \frac{\bar{Y}}{\bar{X}}$
+- Good estimator of $r$ when $n$ is large, because of law of large numbers for $\bar{X}$ and $\bar{Y}$
+- $E(R)$?
+- $Var(R)$? It should be small (see next section)
+
+** Approximating $Var(R)$ (via Taylor expansion)
+
+- Let $f(x, y) = \frac{y}{x}$, so $r = f(\mu_x, \mu_y)$ and $R = f(\bar{X}, \bar{Y})$
+- $\frac{\partial{}f}{\partial{}x}(x, y) = - \frac{y}{x^2}$
+- $\frac{\partial{}f}{\partial{}y}(x, y) = \frac{1}{x}$
+ 
+Assume that $\bar{X} \approx \mu_x$ and $\bar{Y} \approx \mu_y$ (when $n$ is large):
+
+Approximate up to first-order terms:
+
+\begin{align*}
+R &= f(\bar{X}, \bar{Y}) \\
+&= f(\mu_x, \mu_y) + \frac{\partial{}f}{\partial{}x}(\mu_x, \mu_y) (\bar{X}-\mu_x) + \frac{\partial{}f}{\partial{}y}(\mu_x, \mu_y) (\bar{Y}-\mu_y) + \ldots \ \text{(by Taylor expansion)} \\
+&= r + (\frac{-\mu_y}{\mu_x^2})(\bar{X}-\mu_x) + (\frac{1}{\mu_x})(\bar{Y}-\mu_y) + \ldots
+\end{align*}
+
+\begin{align*}
+Var(R) &= Var(...) \\
+&\approx \frac{\mu_y^2}{\mu_x^4} \sigma_{\bar{X}}^2 + \frac{1}{\mu_x^2} \sigma_{\bar{Y}}^2 - 2 \frac{\mu_y}{\mu_x^3} \sigma_{\bar{X}\bar{Y}} \\
+&= \frac{1}{\mu_x^2} (r^2 \sigma_{\bar{X}}^2 + \sigma_{\bar{Y}}^2 - 2r \sigma_{\bar{X}\bar{Y}})
+\end{align*}
+
+** Simple Random Sampling
+
+Same finite population correction factor for SRS.
+- $Var(\bar{X}) = \frac{\sigma_x^2}{n} (\frac{N-n}{N-1})$
+- $Var(\bar{Y}) = \frac{\sigma_y^2}{n} (\frac{N-n}{N-1})$
+- $Cov(\bar{X}, \bar{Y}) = \frac{\sigma_{xy}}{n} (\frac{N-n}{N-1})$
+- Where $\sigma_{xy} = \frac{1}{N} \sum_{i} (x_i - \mu_x) (y_i - \mu_y)$
+
+** Approximating $E(R)$ (via Taylor expansion)
+
+- $\frac{\partial{}f}{\partial{}x}(x, y) = - \frac{y}{x^2}$
+- $\frac{\partial{}f}{\partial{}y}(x, y) = \frac{1}{x}$
+- $\frac{\partial{}^{2}f}{\partial{}x^2}(x, y) = \frac{2y}{x^3}$
+- $\frac{\partial{}^{2}f}{\partial{}y^2}(x, y) = 0$
+- $\frac{\partial{}^{2}f}{\partial{}x\partial{}y}(x, y) = - \frac{1}{x^2}$
+  
+Approximate up to second-order terms:
+
+\begin{align*}
+R &= f(\bar{X}, \bar{Y}) \\
+&= f(\mu_x, \mu_y) + \frac{\partial{}f}{\partial{}x}(\mu_x, \mu_y) (\bar{X}-\mu_x) + \frac{\partial{}f}{\partial{}y}(\mu_x, \mu_y) (\bar{Y}-\mu_y) + \frac{1}{2}(\frac{2\mu_y}{\mu_x^3})(\bar{X}-\mu_x)^2 + \frac{1}{2}(0)(\bar{Y}-\mu_y)^2 + (-\frac{1}{\mu_x^2})(\bar{X}-\mu_x)(\bar{Y}-\mu_y) + \ldots \ \text{(by Taylor expansion)} \\
+&= r + (\frac{-\mu_y}{\mu_x^2})(\bar{X}-\mu_x) + (\frac{1}{\mu_x})(\bar{Y}-\mu_y) + \ldots
+\end{align*}
+
+\begin{align*}
+E(R) &= E(...) \\
+&= E(r) + 0 + 0 + \frac{\mu_y}{\mu_x^3} E[(\bar{X}-\mu_x)^2] + 0 - \frac{1}{\mu_x^2} E[(\bar{X}-\mu_x)(\bar{Y}-\mu_y)] + \ldots \\
+&= r + \frac{1}{\mu_x}(r\sigma_{\bar{X}}^2 - \sigma_{\bar{X}\bar{Y}}) + \ldots \\
+&\approx r + \frac{1}{n}(\frac{N-n}{N-1})\frac{1}{\mu_x}(r\sigma_x^2 - \rho\sigma_x \sigma_y) \ \text{(SRS)}
+\end{align*}
+
+** Population Correlation Coefficient
+   
+$\rho = \frac{\sigma_{xy}}{\sigma_x \sigma_y}$
+
+Unitless, takes values between -1 and 1
+- Close to -1 and 1: strong linear relationship between $x$ and $y$
+
+** Estimating $\sigma$
+
+Estimate $\sigma_x^2$ using $s_x^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2$
+
+Estimate $\sigma_{xy}$ using $s_{xy} = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})(Y_i - \bar{Y})$
+
+Estimate $\rho = \frac{\sigma_{xy}}{\sigma_x \sigma_y} \approx \frac{s_{xy}}{s_x s_y} = \frac{\sum_i (X_i-\bar{X})(Y_i-\bar{Y})}{\sqrt{\sum_i (X_i-\bar{X})^2} \sqrt{\sum_i (Y_i-\bar{Y})^2}}$ 
+
+** Confidence Interval
+
+How do we form a $(1-\alpha)$ confidence interval for $r$?
+- Previously, we used $\bar{x} \pm z_{\frac{\alpha}{2}} SE(\bar{x})$ as approximate $(1-\alpha)$ CI for $\mu$
+- Now we try using $R \pm z_{\frac{\alpha}{2}} SE(R)$ as approximate $(1-\alpha)$ CI for $r$ (here $R$ refers to the /estimate/, not the estimator, a bit of an abuse of notation)
+- This only works (using $z$) if $R$ is approximately normal, which is true (by Taylor expansion)
+  - $R$ is a linear combination of $\bar{X}$ and $\bar{Y}$, and they're roughly independent (unlike $X$ and $Y$ that might have covariance); so linear combination of jointly normal is approximately normal (technically multivariate CLT but don't need to know this)
+- $n$ must be large so that it's OK to ignore bias (the extra term in $E(R)$), and is approximately normal by CLT
+
+We estimate $R$ using the sample estimate for $R$, estimate $Var(R)$ using $S_R^2$ by plugging in sample estimates
+- $S_R^2 = \frac{1}{n} (\frac{N-n}{N-1}) \frac{1}{\bar{x}^2} (R^2 s_x^2 + s_y^2 - 2Rs_{xy})$ (with SRS finite population correction)
+- Then $R \pm z_{\frac{\alpha}{2}}S_R$ is approx $(1-\alpha)$ CI for $r$.
+
+** Some quick summary
+
+$\sigma_{\bar{X}}^2 = Var(\bar{X})$
+
+$SE(\bar{x}) = SD(\bar{X}) = \sigma_{\bar{X}} = \frac{\sigma_{x}}{\sqrt{n}} = \frac{s_x}{\sqrt{n-1}}$
+
+$SE(R) \ \text{(the estimate)} \ = SD(R) \ \text{(the estimator)} \ = \sigma_R \approx s_R$
+
+** Ratio Estimates
+
+Suppose we know $x_1, \ldots, x_N$ and we want to estimate $\mu_y$ --- take a random sample $Y_1, \ldots, Y_N$ (that we can match to $x$)
+
+_Ratio estimate_ of $\mu_y$, $\bar{Y}_R = \frac{\mu_x}{\bar{X}} \bar{Y} = \mu_x R$
+- Motivation: there might be correlation between $x$ and $y$, so we can adjust for that to give a better estimate
+
+$R$ estimates $r = \frac{\mu_y}{\mu_x}$ well when $n$ is large, so we expect $\bar{Y}_R$ to estimate $\mu_x r = \mu_y$ well too; is it 'better' than just using $\bar{Y}$?
+
+*** Expectation and Variance of Ratio Estimate
+
+$Var(\bar{Y}_R) \approx \frac{1}{n} (\frac{N-n}{N-1}) (r^2 \sigma_x^2 + \sigma_y^2 - 2r\rho \sigma_x \sigma_y)$
+
+$E(\bar{Y}_R) \approx \mu_y + \frac{1}{n} (\frac{N-n}{N-1}) \frac{1}{\mu_x} (r\sigma_x^2 - \rho \sigma_x \sigma_y)$
+
+Both $\bar{Y}_R$ and $\bar{Y}$ are roughly unbiased when $n$ is large.
+
+But $\bar{Y}_R$ can have a smaller variance, which makes for a better estimator. How do we show this?
+
+Let $C_x = \frac{\sigma_x}{\mu_x}$ and $C_y = \frac{\sigma_y}{\mu_y}$ (coefficient of variation).
+
+$\bar{Y}_R$ is a better estimator than $\bar{Y}$ of $\mu_y$ if $\rho > \frac{1}{2} (\frac{C_x}{C_y})$:
+
+\begin{align*}
+Var(\bar{Y}_R) &\approx \frac{1}{n} (\frac{N-n}{N-1}) (r^2 \sigma_x^2 + \sigma_y^2 - 2r\rho \sigma_x \sigma_y) \\
+&< \frac{1}{n} (\frac{N-n}{N-1}) (r^2 \sigma_x^2 + \sigma_y^2 - 2r(\frac{1}{2})(\frac{\sigma_x/\mu_x}{\sigma_y/\mu_y}) \sigma_x \sigma_y) \\
+&= \frac{1}{n} (\frac{N-n}{N-1}) (r^2 \sigma_x^2 + \sigma_y^2 - r^2 \sigma_x^2) \\
+&= \frac{1}{n} (\frac{N-n}{N-1}) \sigma_y^2 \\
+&= Var(\bar{Y}) \\
+\end{align*}
+
+(???) What about negative correlation? Won't that still give some useful information that makes $\bar{Y}_R$ a better estimator than $\bar{Y}$?
+
+*** Estimating Variance, Constructing CI for Ratio Estimate
+
+Estimating $Var(\bar{Y}_R)$: $s_{\bar{Y}_R}^2 = \frac{1}{n} (\frac{N-n}{N-1}) (R^2 s_x^2 + s_y^2 - 2Rs_{xy})$
+
+Approximate $(1-\alpha)$ CI for $\mu_y$: $\bar{Y}_R \pm z_{\frac{\alpha}{2}} s_{\bar{Y}_R}$
+
+* Parameter Estimation A: Introduction, Method of Moments
+
+How do we estimate parameters of a population distribution, more generally?
+
+** Example: Radioactive Emission
+
+Numbers of emissions are given to have Poisson distritubitions, which have the same rate and are independent.
+
+Data: $n=1207$ realisations of $X_1, \ldots, X_n$ where each is $Po(\lambda)$
+- Expected column for $n=k$ is computed from $1207 \times \frac{\lambda^k e^{-\lambda}}{k!}$, where $\lambda \approx 8.392$ (we got this estimate for $\lambda$ by survey sampling, see this later)
+
+|   n | Observed | Expected |
+|-----+----------+----------|
+| 0-2 |       18 |     12.2 |
+|   3 |       28 |     27.0 |
+|   4 |       56 |     56.5 |
+|   5 |      105 |     94.9 |
+|   6 |      126 |    132.7 |
+|   7 |      146 |    159.1 |
+|   8 |      164 |    166.9 |
+|   9 |      161 |    155.6 |
+|  10 |      123 |    130.6 |
+|  11 |      101 |     99.7 |
+|  12 |       74 |     69.7 |
+|  13 |       53 |     45.0 |
+|  14 |       23 |     27.0 |
+|  15 |       15 |     15.1 |
+|  16 |        9 |      7.9 |
+| 17+ |        5 |      7.1 |
+
+Goal: estimate $\lambda$ using experiment results
+
+Refresher on Poisson: $P(X=k) = \frac{\lambda^k e^{-\lambda}}{k!}$, $E(X) = Var(X) = \lambda$
+
+_Estimating $\lambda$_
+
+(Borrowing from survey sampling)
+- $\bar{x} = 8.392$ is an estimate of $\mu=\lambda$
+- $SE(\bar{x}) = \sqrt{\frac{\lambda}{n}}$, approx $SE = 0.08$
+
+** General Estimation Problem
+
+Let $X_1, \ldots, X_n$ be IID random variables with density $f(x|\theta)$, where $\theta\in{}\mathbb{R}^p$ is an unknown constant
+
+Realisations $x_1, \ldots, x_n$ used to get an estimate for $\theta$, which is a realisation of random variable estimator $\hat{\theta}$
+- $Bias = E(\hat{\theta}) - \theta$
+- $SE = SD(\hat{\theta})$
+
+*** Moments
+
+Let $\mu_k = E(X^k)$, the /k/-th moment of $X$
+- $Var(X) = \mu_2 - \mu_1^2$
+- For $Pois(\lambda)$, $\mu_1 = \lambda$, $\mu_2 = \lambda + \lambda^2$
+- For $N(\mu, \sigma^2)$, $\mu_1 = \mu$, $\mu_2 = \sigma^2 + \mu^2$
+
+*** Estimating Moments
+
+_/k/-th sample moment_ $\hat{\mu}_k = \frac{1}{n} \sum_{i=1}^{n} X_i^k$, which is an estimator of the /k/-th moment $\mu_k$
+- Realisation of $\hat{\mu}_k = \frac{1}{n} \sum_{i=1}^n x_i^k$
+
+** The Method of Moments (MOM)
+
+Express your estimator $\hat{\theta} = g(\hat{\mu}_1, \hat{\mu}_2, \ldots)$ (a function of the moments)
+
+*** Example of MOM: Poisson
+
+Let $X_i \sim Po(\lambda)$.
+
+MOM estimator for $\lambda$: $\hat{\lambda} = \hat{\mu}_1 = \bar{X}$
+- Then realisation of $\bar{X}$ is $\bar{x} = 8.392$
+- Then MOM estimate of $\lambda$ is 8.392, where approx SE is 0.08
+- $Bias = E(\bar{X}) - \mu = 0$, $SE = SD(\bar{X}) = \sqrt{\frac{\lambda}{n}} \approx \sqrt{\frac{\bar{x}}{n}}$
+
+Further, we can have normal approximation ($\bar{X}$ is approximately normal because of Poisson approximation):
+- Approximate 95%-CI for $\lambda$ is $8.932 \pm 1.96 \times 0.08 = (8.24, 8.55)$
+
+*** Example of MOM: Normal
+    
+Let $X_i \sim N(\mu, \sigma^2)$.
+
+$\theta = (\mu, \sigma^2)$ is an unknown vector.
+
+We know these things:
+- $\mu_1 = \mu$
+- $\mu_2 = \sigma^2 + \mu^2$
+
+So we can express MOM estimators $\hat{\mu}$ and $\hat{\sigma}^2$ in terms of $X$'s:
+- $\hat{\mu} = \hat{\mu}_1 = \bar{X}$
+- $\hat{\sigma}^2 = \hat{\mu}_2 - \hat{\mu}_1^2 = \frac{1}{n} \sum_{i=1}^{n} X_i^2 - (\bar{X})^2 = \frac{1}{n} \sum_{i=1}^n (X_i - \bar{X})^2$ (since $\sigma^2 = \mu_2 - \mu_1^2$)
+
+_Questions_
+
+Joint distribution of $(\hat{\mu}, \hat{\sigma}^2)$?
+- $\hat{\mu}$ and $\hat{\sigma}^2$ are independent, so we only need to look at marginal distributions; joint distribution is just product of marginal distributions
+- (\star) $\hat{\mu} \sim N(\mu, \frac{\sigma^2}{n})$ --- since $\hat{\mu}$ is $\bar{X}$
+- (\star) $\frac{n\hat{\sigma}^2}{\sigma^2} \sim \chi_{n-1}^2$ i.e. $\hat{\sigma}^2 = \frac{\sigma^2}{n} U_{n-1}$ where $U_{n-1} \sim \chi_{n-1}^2$ --- we proved this earlier in chapter 2
+
+Are the estimators biased?
+- $E(\hat{\mu}) = \mu$
+- $E(\hat{\sigma^2}) = \frac{n-1}{n} \sigma^2 = \sigma^2 - \frac{\sigma^2}{n}$ (biased)
+
+What are the SEs? How can they be estimated and interpreted?
+- $SE(\hat{\mu}) \ \text{(estimate)} \ = SD(\hat{\mu}) \ \text{(estimator)} \ = \frac{\sigma}{\sqrt{n}} \approx \frac{s}{\sqrt{n}} \ \text{or} \ \frac{\hat{\sigma}}{\sqrt{n}}$
+- $SE(\hat{\sigma}^2) \ \text{(estimate)} \ = SD(\hat{\sigma}^2) \ \text{(estimator)} \ = \sqrt{Var(\hat{\sigma}^2)} \ \text{(see below)}$
+- $Var(\hat{\sigma}^2) = \frac{\sigma^4}{n^2} (2(n-1)) = \frac{2}{n} (\frac{n-1}{n}) \sigma^4 \approx \frac{2}{n}(\frac{n-1}{n}) s^4 \ \text{(or replace with} \ \hat{\sigma}^4 \text{)}$
+
+*** Example of MOM: Gamma
+
+Gamma distribution with shape $\alpha$ and rate $\lambda$ has density function
+
+$f(x) = \frac{\lambda^\alpha}{\Gamma(\alpha)} x^{\alpha-1} e^{-\lambda{}x}$, $x>0$
+
+$\theta = (\lambda, \alpha)$ is an unknown vector.
+
+We know these things:
+- $\mu_1 = \frac{\alpha}{\lambda}$
+- $\mu_2 = \frac{\alpha(\alpha+1)}{\lambda^2}$
+
+So we can express MOM estimators $\hat{\lambda}$ and $\hat{\alpha}$ in terms of $X$'s:
+- $\hat{\lambda} &= \frac{\hat{\mu}_1}{\hat{\mu}_2 - \hat{\mu}_1^2} = \frac{\bar{X}}{\hat{\sigma}^2}$ (which can be estimated with $\frac{\bar{x}}{\hat{\sigma}^2}$)
+- $\hat{\alpha} &= \frac{\hat{\mu}_1^2}{\hat{\mu}_2 - \hat{\mu}_1^2} = \frac{\bar{X}^2}{\hat{\sigma}^2}$ (which can be estimated with $\frac{\bar{x}^2}{\hat{\sigma}^2}$)
+
+(Working)
+
+\begin{align*}
+\mu_2 &= \frac{\alpha^2}{\lambda^2} + \frac{\alpha}{\lambda}(\frac{1}{\lambda}) \\
+&= \mu_1^2 + \mu_1(\frac{1}{\lambda}) \\
+\mu_2 - \mu_1^2 &= \mu_1 (\frac{1}{\lambda}) \\
+\Rightarrow \ \lambda &= \frac{\mu_1}{\mu_2-\mu_1^2} \\
+\Rightarrow \ \alpha &= \lambda \mu_1 = \frac{\mu_1^2}{\mu_2 - \mu_1^2}
+\end{align*}
+
+Bias and SE?
+- Bias of $\hat{\lambda}$ estimate: $E_{\lambda,\alpha}(\hat{\lambda}) - \lambda = \ ???$
+- SE of $\hat{\lambda}$ estimate: $SD_{\lambda,\alpha}(\hat{\lambda}) = \ ???$
+- Same goes for bias and SE of $\hat{\alpha}$ estimate --- no nice analytical expression!
+
+_Rainfall example (Rice p.264)_
+
+Assume samples are realisations of IID Gamma RVs $X_1, \ldots, X_{227}$ with unknown shape $\alpha$ and rate $\lambda$
+
+$n = 227$, sample mean $\bar{x} = 0.224$, sample variance $\hat{\sigma}^2 = 0.1338$
+
+Then MOM estimates of $\lambda$ and $\alpha$ are:
+- $\hat{\lambda} \ \text{(estimate)} \ = \frac{0.224}{0.1338} \approx 1.67$
+- $\hat{\alpha} \ \text{(estimate)} \ = \frac{0.224^2}{0.1338} \approx 0.38$
+
+*** Example of MOM: Angular Distribution
+
+Let $X = \cos \theta$, where $\theta$ is random angle of electron emission
+
+$f(x) = \frac{1 + \alpha{}x}{2}$, $x\in{}[-1, 1]$ where $\alpha\in{}[-1,1]$ is an unknown constant
+
+Find the MOM estimator for $\alpha$, based on IID $X_1, \ldots, X_n$:
+- $E(X) = \int_{-1}^{1} x \cdot \frac{1 + \alpha{}x}{2} \ dx = \int_{-1}^{1} \frac{x}{2} + \frac{\alpha}{2}x^2 \ dx = [\frac{x^2}{4} + \frac{\alpha}{6}x^3]_{-1}^{1} = \frac{\alpha}{3}$
+- $\mu = \frac{\alpha}{3}$, so $\alpha = 3\mu$, hence $\hat{\alpha} = 3\hat{\mu}_1 = 3\bar{X}$
+
+*** Consistent Estimators
+
+Estimator $\hat{\theta}$ is consistent if as $n \rightarrow \infty$, $\hat{\theta} \rightarrow \theta$,
+i.e. it converges towards what it's trying to estimate as sample size increases
+
+MOM estimators are generally consistent (proof omitted).
+
+*** Summary of MOM
+
+- Method of moments: first, we express (population) moments in terms of parameters of interest; next, we express the parameters in terms of the moments. Then MOM estimator of the parameter is obtained by estimating moments with sample moments.
+- MOM estimators can be biased or unbiased, but are generally consistent (asymptotically unbiased, as $n \rightarrow \infty$ then the estimator converges to the parameter)
+
+* Parameter Estimation B: Bootstrap and Monte Carlo, Parametric Family of Distributions
+
+Combining bootstrap + monte carlo is powerful tool to estimate biases and SEs
+
+** Bootstrap
+
+_Bootstrap_: to approximate the error of our estimate, we use the estimate itself (plug in estimate in its estimate)
+- E.g. Poisson: the MOM estimate $\hat{\lambda} = \bar{x}$ has $SE(\bar{x}) = SD(\bar{X}) = \sqrt{\frac{\lambda}{n}} \approx \sqrt{\frac{\bar{x}}{n}}$
+
+Problem with bootstrap: sometimes, the quantities we want can't be simply expressed in terms of unknown parameters
+- E.g. Gamma: the MOM estimate $\hat{\lambda} = \frac{\bar{X}}{\hat{\sigma}^2}$ has expectation and variance that's difficult to compute, even if we know $\lambda$ and $\alpha$
+
+** Monte Carlo
+
+_Monte Carlo_: use a large sample to approximate an expectation
+- Justified by LLN
+- Useful to estimate expectations when there isn't a nice analytical form for it
+- Very powerful if we know the underlying true distribution, and so can repeat the simulation many times: then estimate will be very close to expectation
+
+*** Example: Gamma Distribution
+
+(For the previous problem with $\theta = (\lambda, \alpha)$)
+
+If we know $\theta=(\lambda, \alpha)$, then we can simulate 227 realisations from $Gamma(\lambda, \alpha)$ to obtain a realisation of MOM estimator $\hat{\lambda}$.
+Repeat this say 10,000 times to obtain 10,000 realisations of $\hat{\lambda}$.
+
+By LLN, expectation and SD of $\hat{\lambda}$ is approximately the average and SD of 10,000 realisations of $\hat{\lambda}$ --- so we just approximated its expectation and SD!
+
+** Combo: Bootstrap then Monte Carlo
+
+*** Example: Gamma Distribution
+
+Previously, we obtained estimate of $\hat{\lambda} = 1.67$, estimate of $\hat{\alpha} = 0.38$. How to find bias and SE of $\hat{\lambda}$ and $\hat{\alpha}$ estimates?
+
+_Bootstrap step_
+
+Key insight: my world with unknown $(\lambda, \alpha)$ behaves very similarly to a world where truth is the estimate $(1.67, 0.38)$, so bootstrap.
+- Suppose we conjure a different world where some data is generated from $Gamma(1.67, 0.38)$.
+- Suppose in that world, we don't know its $\lambda$ or $\alpha$ (which are actually 1.67 and 0.38), and want to estimate it by MOM; estimators are $\hat{1.67}$ and $\hat{0.38}$
+- Back in our world, since the sample size is large, $(1.67, 0.38)$ is likely close to $(\lambda, \alpha)$, so in distribution, $(\hat{\lambda} - \lambda, \hat{\alpha} - \alpha) \approx (\hat{1.67} - 1.67, \hat{0.38} - 0.38)$ --- this is the bootstrap
+- i.e. what we have ($\hat{\lambda}$ and $\hat{\alpha}$) is similar to the "ground truth"; our world is close to the other world by bootstrapping
+
+Hence for $\lambda$,
+- $bias(1.67) = E_{\lambda,\alpha}(\hat{\lambda}) - \lambda \approx E_{1.67,0.38}(\hat{1.67}) - 1.67$
+- $SE(1.67) = SD_{\lambda,\alpha}(\hat{\alpha}) \approx SD_{1.67,0.38}(\hat{1.67})$
+- and similarly for $\alpha$.
+
+_Monte Carlo step_
+- Generate 10,000 realisations for $\hat{1.67}$, each time using 227 samples from the $Gamma(1.67, 0.38)$ distribution
+- $E_{1.67,0.38}(\hat{1.67}) - 1.67 \approx 0.09$, $SD_{1.67,0.38}(\hat{1.67}) \approx 0.35$
+- $E_{1.67,0.38}(\hat{0.38}) - 0.38 \approx 0.02$, $SD_{1.67,0.38}(\hat{0.38}) \approx 0.06$
+
+Hence $bias(1.67) \approx 0.09$, $SE(1.67) \approx 0.35)$; $bias(0.38) \approx 0.02$, $SE(0.38) \approx 0.06$
+
+*** Summary
+
+First, we obtain a realisation of $\hat{\lambda}$, which is 1.67. Then we approximate:
+- $bias(1.67) = E_{\lambda,\alpha}(\hat{\lambda}) - \lambda \approx E_{1.67,0.38}(\hat{1.67}) - 1.67 \ \text{(by bootstrap)} \ \approx 0.09 \ \text{(by Monte Carlo)}$
+- $SE(1.67) = SD_{\lambda,\alpha}(\hat{\alpha}) \approx SD_{1.67,0.38}(\hat{0.38}) \ \text{(by bootstrap)} \ \approx 0.35 \ \text{(by Monte Carlo)}$
+
+Similarly for $\alpha$:
+- $bias(0.38) = \ldots \approx \ldots \approx 0.02$
+- $SE(0.38) = \ldots \approx \ldots \approx 0.06$
+
+Hence we estimate $\lambda$ to be $1.58 \pm 0.35$, and estimate $\alpha$ to be $0.36 \pm 0.06$.
+
+** Parametric Family of Distributions
+
+Idea: think of not a specific distribution, but a whole set of distributions
+- e.g. Poisson family of distributions: $\{Poisson(\lambda) \ | \ \lambda\in{}\mathbb{R}, \lambda > 0\}$
+
+Let $\{ f(x|\theta) \ | \ \theta\in{}\Theta \subset \mathbb{R}^p \}$ be a parametric family, where $\Theta$ is the parameter space.
+
+Let $x_1, \ldots, x_n$ be realisations of IID RVs $X_1, \ldots, X_n$ with density $f(x|\theta_0)$,
+where $\theta_0 \in \Theta$ is an unknown parameter we want to estimate from the data.
+- Poisson family: $\theta = \lambda$, $\Theta = (0, \infty)$, $f(x|\theta) = \frac{\lambda^x e^{-\lambda}}{x!}$, $x=0,1,\ldots$
+- Normal family: $\theta = (\mu, \sigma^2)$, $\Theta = (-\infty, \infty) \times (0, \infty)$, $f(x|\theta) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$, $-\infty<x<\infty$
+- Gamma family: $\theta = (\alpha, \lambda)$, $\Theta = (0, \infty)^2$, $f(x|\theta) = \frac{\lambda^\alpha}{\Gamma(\alpha)} x^{\alpha-1} e^{-\lambda{}x}$, $x>0$
+
+Assumption of /identifiability/: function $\theta \rightarrow f(\cdot|\theta)$ is one-one, i.e. there cannot be $\theta_1 \ne \theta_2$ such that they give the same distribution $f(\cdot | \theta_1) = f(\cdot | \theta_2)$
+- Each distribution can be mapped back to a unique $\theta$, a.k.a. no two different $\theta$'s lead to the same distribution
+
+** Mean Square Error
+
+\begin{align*}
+MSE &= E(\hat{\theta}-\theta)^2 \\
+&= E \left( (\hat{\theta} - E(\hat{\theta})) - (\theta - E(\hat{\theta})) \right)^2 \\
+&= E \left( \hat{\theta} - E(\hat{\theta}) \right)^2 + \left(\theta - E(\hat{\theta}) \right)^2 - 0 \\
+&= SE^2 + Bias^2
+\end{align*}
+
+* Parameter Estimation C: Maximum Likelihood
+
+ML, like MOM, yields consistent estimators.
+
+ML estimates are asymptotically the most efficient among consistent estimates, and has the smallest SE \Rightarrow better than MOM in a way
+
+(Summary)
+- Density function: $f(x|\theta)$
+- Logdensity function: $\log f(x|\theta)$
+- Likelihood function: $\prod_{i=1}^{n} f(x_i|\theta)$
+- Loglikelihood function: $\sum_{i=1}^{n} \log f(x_i|\theta)$
+- Random likelihood function: $L(\theta) = \prod_{i=1}^{n} f(X_i|\theta)$
+- Random loglikelihood function: $\ell(\theta) = \sum_{i=1}^{n} \log f(X_i|\theta)$
+
+** Likelihood Function
+
+Suppose data come from density specified by a general $\theta$. Then $P(X_1 = x_1, \ldots, X_n = x_n) = \prod_{i=1}^{n} f(x_i | \theta)$.
+
+Likelihood function is $\theta \rightarrow L(\theta) = \prod_{i=1}^{n} f(x_i | \theta)$.
+
+ML estimate of $\theta_0$ is the number that maximises the likelihood over $\Theta$.
+
+(Both functions are mathematically the same, but the intepretation is different.
+Density function is seen as function of outcomes; likelihood function is seen as function of parameters)
+
+** Maximum Likelihood Estimator
+
+_Random likelihood function_: $L(\theta) = \prod_{i=1}^{n} f(X_i|\theta)$
+
+_Maximum likelihood estimator $\hat{\theta}_0$_: find it by maximising the random likelihood function
+- $bias = E_{\theta_0}(\hat{\theta}_0) - \theta_0$
+- $SE = SD_{\theta_0}(\hat{\theta_0})$
+
+_Loglikelihood function_: apply logarithm on likelihood function
+
+** Example: Poisson distribution
+
+Let $x_1, \ldots, x_n$ be realisations from IID $Po(\lambda_0)$ RVs, where $\lambda_0>0$ is an unknown parameter
+
+Likelihood function is $L(\lambda) = \prod_{i=1}^{n} f(x_i|\lambda_0) = \prod_{i=1}^{n} \frac{\lambda^{x_i} e^{-\lambda}}{x_i!} = \frac{\lambda^{\sum_{i=1}^{n} x_i} e^{-n\lambda}}{\prod_{i=1}^{n} x_i!}$
+
+Loglikelihood function is $\ell(\lambda) = \sum_{i=1}^{n} x_i \log \lambda - n\lambda - \sum_{i=1}^{n} \log x_i!$
+- 1st derivative: $\ell'(\lambda) = \sum_{i=1}^{n} x_i (\frac{1}{\lambda}) - n$
+- 2nd derivative: $\ell''(\lambda) = \sum_{i=1}^{n} x_i (-\frac{1}{\lambda^2}) < 0$ since $x_i > 0$ in Poisson distribution
+- So max likelihood $\ell'(\hat{\lambda}_0) = 0$
+- So max likelihood when $\frac{1}{\hat{\lambda}_0} \sum_{i=1}^{n} x_i - n = 0$
+- So max likelihood when $\hat{\lambda}_0 = \bar{x}$
+
+ML estimate of $\lambda_0$ is $\bar{x}$, so ML estimator is $\hat{\lambda}_0$ is $\bar{X}$.
+
+** Example: Normal distribution
+
+Let $X_1, \ldots, X_n$ be IID $N(\mu, \sigma^2)$, where $\mu$ and $\sigma$ are unknown parameters
+- Note: symbols do not have subscript 0---either it means unknown parameter, or generic element of parameter set
+
+Logdensity of $N(\mu, \sigma^2)$ is $\log f(x|\mu, \sigma) = - \log \sigma - \frac{\log 2\pi}{2} - \frac{(x-\mu)^2}{2\sigma^2}$
+
+Random loglikelihood function is $\ell(\mu, \sigma) = \sum_{i=1}^{n} \log f(X_i | \mu, \sigma) = -n \log \sigma - \frac{n \log 2\pi}{2} - \frac{\sum_{i=1}^{n} (X_i - \mu)^2}{2\sigma^2}$
+
+\begin{align*}
+\frac{\partial{}l}{\partial{}\mu} &= -\frac{1}{\sigma^2} \sum_i (X_i - \mu)(-1) = \frac{1}{\sigma^2} (\sum_i X_i - n\mu) \\
+\frac{\partial{}l}{\partial{}\sigma} &= -\frac{n}{\sigma} + \frac{\sum_i(X_i-\mu)^2}{\sigma^3} = \frac{1}{\sigma} \left(\frac{\sum_i(X_i - \mu)}{\sigma^2} - n\right) \\
+\\
+\frac{\partial{}l}{\partial{}\mu}(\hat{\mu}, \hat{\sigma}) &= 0 \\
+\frac{1}{\hat{\sigma}^2}(\sum_i X_i - n\mu) &= 0 \\
+\Rightarrow \hat{\mu} &= \frac{1}{n} \sum_i X_i = \bar{X} \\
+\\
+\frac{\partial{}l}{\partial{}\sigma}(\hat{\mu}, \hat{\sigma}) &= 0 \\
+\frac{\sum_i (X_i - \hat{\mu})}{\hat{\sigma}^2} - n &= 0 \\
+\Rightarrow \hat{\sigma} &= \frac{1}{n} \sum_{i}(X_i - \bar{X})^2
+\end{align*}
+
+Note that the MLE of $\sigma^2$ is $\hat{\sigma}^2$, so in a way it's better than $s^2$ even though $\hat{\sigma}^2$ has some bias
+
+** Example: Gamma distribution
+
+Let $X_1, \ldots, X_n$ be IID $Gamma(\lambda, \alpha)$, where $\lambda$ and $\alpha$ are unknown parameters
+
+Logdensity of $Gamma(\lambda, \alpha)$ is $\alpha \log \lambda + (\alpha - 1)\log x - \lambda x - \log \Gamma(\alpha)$
+
+Random loglikelihood function is $\ell(\lambda, \alpha) = n\alpha \log \lambda + (\alpha - 1) \sum_{i=1}^{n} \log X_i - \lambda \sum_{i=1}^{n} X_i - n \log \Gamma(\alpha)$
+
+\begin{align*}
+\frac{\partial{}l}{\partial{}\lambda} &= \frac{n\alpha}{\lambda} - \sum_i X_i \\
+\frac{\partial{}l}{\partial{}\alpha} &= n \log \lambda + \sum_i \log X_i - n \frac{\Gamma'(\alpha)}{\Gamma(\alpha)}
+\end{align*}
+
+The ML estimator $\hat{\theta} = (\hat{\lambda}, \hat{\alpha})$ satisfies $\frac{\partial{}l}{\partial{}\lambda}(\hat{\mu}, \hat{\sigma}) &= 0$ and $\frac{\partial{}l}{\partial{}\alpha}(\hat{\mu}, \hat{\sigma}) &= 0$, so:
+
+\begin{align*}
+n \log \hat{\alpha} - n \log \bar{X} + \sum_{i=1}^{n} \log X_i - n\frac{\Gamma'(\alpha)}{\Gamma(\alpha)} = 0 \\
+\end{align*}
+\begin{align*}
+\hat{\lambda} = \frac{\hat{\alpha}}{\bar{X}}
+\end{align*}
+
+No closed analytical form, so we use numerical methods (e.g. Newton-Raphson) instead: find an $\hat{\alpha}$ that solves the equation to find MLE.
+
+Here, MOM \ne MLE!
+
+_Bias and SE of Gamma MLE_
+- Use Bootstrap + Monte Carlo on $Gamma(1.96, 0.44)$ again 
+- $Bias(1.96) = E_{\lambda,\alpha}(\hat{\lambda}) - \lambda \approx E_{1.96,0.44}(\hat{1.96}) - 1.96 \approx 0.04$
+- $SE(1.96) = SD_{\lambda,\alpha}(\hat{\lambda}) \approx SD_{1.96,0.44}(\hat{1.96}) \approx 0.26$
+- $Bias(0.44) = \ldots \approx 0.00$
+- $SE(0.44) = \ldots \approx 0.03$
+- So $\hat{\lambda} \approx 1.92 \pm 0.26$, $\hat{\alpha} \approx 0.44 \pm 0.03$
+
+** Example: Multinomial distribution
+
+Experiment has $r$ outcomes, with probabilites $\textbf{p} = (p_1, \ldots, p_r)$
+- Similar to $r$ sided die, each side with different probability, roll $n$ times
+
+Let $X_i$ be the number of times that outcome $i$ occurs in $n$ independent runs of the experiment.
+
+$(X_1, \ldots, X_r)$ has multinomial distribution, with density:
+
+$f(x_1, \ldots, x_r) = {n \choose x_1 \ldots x_r} \prod_{i=1}^{r} p_i^{x_i}$
+
+_Properties_
+- $E(X_i) = np_i$
+- $Var(X_i) = np_i(1-p_i)$
+- $Cov(X_i, X_j) = -np_i p_j$ for $i \ne j$
+
+_Estimating $\textbf{p}$ with ML_
+- Let $(x_1, \ldots, x_n)$ be a realisation of $(X_1, \ldots, X_r) \sim Multinomial(n, \textbf{p})$
+- Loglikelihood function $\ell(\textbf{p}) = \kappa + \sum_{i=1}^{r} x_i \log p_i$, where $\kappa = \log {n \choose x_1 \ldots x_r}$ does not depend on $\textbf{p}$
+- Note that since the total probability equals to 1 where $p_r = 1 - p_1 - \ldots - p_{r-1}$, there are only $r-1$ free variables
+
+\begin{align*}
+\frac{\partial{}\ell}{\partial{}p_i} &= 0 + \left(0 + \ldots + \frac{x_i}{p_i} + 0 + \ldots + \frac{x_r}{1 - p_1 - \ldots - p_{r-1}} (-1) \right) \\
+&= \frac{x_i}{p_i} - \frac{x_r}{1 - p_1 - \ldots - p_{r-1}} \\
+&= \frac{x_i}{p_i} - \frac{x_r}{p_r} \\ 
+\end{align*}
+
+Letting $\frac{\partial{}\ell}{\partial{}p_i} = 0$:
+
+\begin{align*}
+& \frac{x_i}{p_i} - \frac{x_r}{p_r} = 0 \\
+& p_r x_i = p_i x_r \\
+& \sum_{i=1}^{r} p_r x_i = \sum_{i=1}^{r} x_r p_i \\
+& p_r \sum_{i=1}^{r} x_i = x_r \sum_{i=1}^r p_i \\
+\\
+& p_r = \frac{x_r}{n} \\
+& \Rightarrow (\frac{x_r}{n}) x_i = x_r p_i \\
+& \Rightarrow p_i = \frac{x_i}{n}
+\end{align*}
+
+Hence ML estimate of $\hat{\textbf{p}}$:
+- ML estimator $\hat{p_i} = \frac{X_i}{n}$
+- ML estimate of $\hat{p_i} = \frac{x_i}{n}$
+
+Bias and variance of $\hat{\textbf{p}}_i$:
+- $E(\hat{p}_i) = \frac{E({X_i})}{n}$
+- $Var(\hat{p}_i) = \frac{np_i(1-p_i)}{n^2} = \frac{p_i(1-p_i)}{n}$
+- $Cov(\hat{p}_i, \hat{p}_j) = \frac{1}{n^2} Cov(X_i, X_j) = -\frac{p_i p_j}{n}$
+
+MOM estimate of $\textbf{p}$:
+- We know $E(X_i) = np_i$, so MOM $\hat{p}_i = \frac{X_i}{n}$
+
+** Example: HWE Trinomial (related to Multinomial)
+
+_Hardy-Weinberg equilibrium_
+- Suppose there are only 2 alleles $A$ and $a$, where proportion of $a$ in population is $\theta$
+- Assume that population is very large and mating is completely random
+- Then genotype proportions of the next generation are:
+  - $AA: (1-\theta)^2$
+  - $Aa: 2\theta(1-\theta)$
+  - $aa: \theta^2$
+
+Under HWE, number of $a$ alleles in child is the sum of two independent $Ber(\theta)$ random variables, i.e. $Bin(2, \theta)$
+- Hence the number of $a$ alleles in $n$ children is $Bin(2n, \theta)$
+
+_Setup of example problem_:
+- Suppose sample frequencies are as such: $AA: x_1 = 342$, $Aa: x_2 = 500$, $aa: x_3 = 187$ --- $n = 1029$
+- Frequencies are approximately realisations from $(X_1, X_2, X_3) \sim Multinomial(1029, \textbf{p})$ for some $\textbf{p}$
+- Assuming HWE holds, $\textbf{p} = ((1-\theta)^2, 2\theta(1-\theta), \theta^2)$, where $\theta$ is an unknown constant
+
+*** MOM estimators of $\theta$
+
+\begin{align*}
+E(X_1) &= np_1 = n(1-\theta)^2 \\
+\Rightarrow \theta &= 1 - \sqrt{\frac{E(X_1)}{n}} \\
+E(X_3) &= np_3 = n\theta^2 \\
+\Rightarrow \theta &= \sqrt{\frac{E(X_3)}{n}} \\
+\end{align*}
+
+Some possible MOM estimators of $\theta$:
+- MOM estimator 1 is $\hat{\theta} = 1 - \sqrt{\frac{X_1}{n}}$
+- MOM estimator 2 is ...
+- MOM estimator 3 is $\hat{\theta} = \sqrt{\frac{X_3}{n}}$
+- (Here, it's OK to use $X_1$ and $X_3$ instead of $\bar{X}_1$ and $\bar{X}_3$ because we have only 1 sample, $n=1$)
+
+*** ML estimator
+
+$L(\theta) = \frac{n!}{x_1!x_2!x_3!} p_1^{x_1}p_2^{x_2}p_3^{x_3} = \frac{n!}{x_1!x_2!x_3!} (1-\theta)^{2x_1 + x_2} \theta^{x_2+2x_3} 2^{x_2}$
+
+$\ell(\theta) = \kappa + (2x_1 + x_2) \log (1-\theta) + (x_2 + 2x_3) \log \theta$
+
+$\ell'(\theta) = -\frac{2x_1 + x_2}{1-\theta} + \frac{x_2 + 2x_3}{\theta}$
+
+$\ell''(\theta) = \ldots < 0$ (confirming that it's a maximum)
+
+$\ell'(\hat{\theta}) = 0 \Rightarrow - \frac{2x_1 + x_3}{1 - \hat{\theta}} + \frac{x_2 + 2x_3}{\hat{\theta}} = 0 \Rightarrow \ldots \Rightarrow \hat{\theta} = \frac{x_2 + 2x_3}{2n}$
+
+ML estimate is $\hat{\theta} = \frac{x_2 + 2x_3}{2n} = \frac{500 + 2 \times 187}{2 \times 1029} \approx 0.42$
+
+ML estimator is $\hat{\theta} = \frac{X_2 + 2X_3}{2n}$
+- We realise that $X_2 + 2X_3$ is the number of $a$ alleles, so $X_2 + 2X_3 \sim Bin(2n, \theta)$
+- So $E(\hat{\theta}) = \frac{1}{2n} E(X_2 + 2X_3) = \frac{1}{2n} 2n\theta = \theta$
+- So $Var(\hat{\theta}) = \frac{1}{4n^2} Var(X_2 + 2X_3) = \frac{1}{4n^2} 2n\theta(1-\theta) = \frac{\theta(1-\theta)}{2n}$
+- So $SE(0.42) = SD(\hat{\theta}) = \sqrt{0.42 \times 0.58}{2058} \approx 0.01$
+
+** Confidence Intervals based on MLE
+
+MLEs are asymptotically normal, and have the smallest SE within the class of consistent estimators
+
+Let $\theta \in \Theta$ be an unknown constant, with ML estimate $\hat{\theta}$
+- If sample size is large, we can construct approximate CI for $\theta$, relying on CLT
+
+ML estimator of $\mu$ is $\bar{X}$
+- We have $\frac{\bar{X} - \mu}{S - \sqrt{n}} \sim t_{n-1}$
+- $P(-t_{n-1, \alpha/2} \frac{s}{\sqrt{n}} \le \ldots \le t_{n-1, \alpha/2} \frac{s}{\sqrt{n}}) = 1 - \alpha$
+- Given realisations $\bar{x}$ and $s$, an exact $(1-\alpha)$ CI for $\mu$ is $(\bar{x} - t_{n-1, \alpha/2} \frac{s}{\sqrt{n}}, \bar{x} + t_{n-1, \alpha/2} \frac{s}{\sqrt{n}})$
+
+ML estimator of $\sigma^2$ is $\hat{\sigma}^2$
+- We have $\frac{n\hat{\sigma}^2}{\sigma^2} \sim \chi_{n-1}^2$
+- $P(\chi_{n-1, \alpha/2}^2 \le \ldots \le \chi_{n-1, 1-\alpha/2}^2) = 1 - \alpha$
+- Given realisation $\hat{\sigma}^2$, an exact $(1-\alpha)$ CI for $\sigma^2$ is $(\frac{n\hat{\sigma}^2}{\chi_{n-1, \alpha/2}^2}, \frac{n\hat{\sigma}^2}{\chi_{n-1, 1-\alpha/2}^2})$
+
+ML estimators, in general, are asymptotically normally distributed, so can be used to construct CIs
+
+* Fisher Information
+
+Recall the following things:
+- Let $\hat{\theta}_0$ be the ML estimator of unknown parameter $\theta_0$, based on $n$ IID RVs $X_1, \ldots, X_n$ with density $f(x|\theta_0)$
+- Bias of $\hat{\theta}_0$ is $E(\hat{\theta}_0) - \theta_0$
+- SE of $\hat{\theta}_0$ is $SD(\hat{\theta}_0)$
+- How to find approximate SD as $n \rightarrow \infty$? (Distribution of $\hat{\theta}_0$ becomes approximately normal)
+
+_Fisher information matrix_ at $\theta$ is a $p \times p$ matrix
+- Given a parametric family of densities $\{ f(x|\theta) \ | \ \theta \in \Theta \subset \mathbb{R}^p \}$
+- $I(\theta) = - \int_{-\infty}^{\infty} \left[ \frac{\partial^2}{\partial{}\theta^2} \{\log f(x|\theta) \} \right] f(x|\theta) \ dx$
+- i.e. $I_{ij}(\theta) = - \int_{-\infty}^{\infty} \left[ \frac{\partial^2}{\partial{}\theta_i \partial{}\theta_j} \{\log f(x|\theta) \} \right] f(x|\theta) \ dx$
+
+_Fisher information as /expectation/_
+- $I(\theta) = -E \left[ \frac{\partial^2}{\partial{}\theta^2} \log f(X|\theta) \right]$, where $X$ is a random varable with density $f(x|\theta)$
+- Negative expectation of the [second derivative of the random log likelihood]
+
+_Interpretation_: $I(\theta)$ indicates amount of information about $\theta$ in /one/ sample of $X \sim f(x|\theta)$
+- If you have $n$ independent samples, then the amount of information is just $nI(\theta)$ (by linearity of expectation)
+
+** Example: Poisson, $\theta=\lambda$
+
+Poisson density: $f(x|\lambda) = \frac{\lambda^x e^{-\lambda}}{x!}$, $x\ge0$
+
+Random log density: $\log f(X|\lambda) = X \log \lambda - \lambda - \log X!$
+- $\frac{\partial}{\partial\lambda} \log f(X|\lambda) = \frac{X}{\lambda} - 1$
+- $\frac{\partial^2}{\partial\lambda^2} \log f(X|\lambda) = -\frac{X}{\lambda^2}$
+- \therefore $I(\lambda) = \frac{E(X)}{\lambda^2} = \frac{1}{\lambda}$
+- Interpretation: Since $I(\lambda) = \frac{1}{\lambda}$, the larger $\lambda$ is, the smaller $I(\lambda)$ is, so one sample of $X$ gives less information on $\lambda$
+
+** Example: Bernoulli, $\theta=p$
+
+Bernoulli density: $f(x|p) = p^x (1-p)^{1-x}$
+
+Random log density: $\log f(X|p) = X \log p + (1-X) \log (1-p)$
+- $\frac{\partial}{\partial{}p} \ldots = \frac{X}{p} - \frac{1-X}{1-p}$
+- $\frac{\partial^2}{\partial{}p^2} \ldots = - \frac{X}{p^2} - \frac{1-X}{(1-p)^2}$
+- \therefore $I(p) = \frac{E(X)}{p^2} + {E(1-X)}{(1-p)^2} = \frac{1}{p} + \frac{1}{1-p} = \frac{1}{p(1-p)}$
+- Interpretation: more information is given when $p$ is close to 0 or 1; less information is given when $p$ is close to $\frac{1}{2}$
+
+** Example: Normal, $\theta=(\mu,\sigma)$
+
+Normal density: $f(x|\theta) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$
+
+Random log density: $\log f(X|\theta) = -\frac{\log 2\pi}{2} - \log \sigma - \frac{(X-\mu)^2}{2\sigma^2}$
+- $\frac{\partial}{\partial\theta} \ldots = \left( \frac{X-\mu}{\sigma^2}, -\frac{1}{\sigma} + \frac{(X-\mu)^2}{\sigma^3}  \right)$
+- $\frac{\partial^2}{\partial\theta^2} \ldots = \begin{bmatrix} -\sigma^{-2} & -2\sigma^{-3} (X-\mu) \\ -2\sigma^{-3}(X-\mu) & \sigma^{-2} - 3\sigma^{-4}(X-\mu)^2 \end{bmatrix}$ (this is also called Hessian matrix, a square matrix of second-order partial derivatives)
+- (NOTE) for $\frac{\partial^2}{\partial\theta_i \partial\theta_j}$, you can differentiate in either order and it'll give the same result!
+- \therefore $I(\theta) = \begin{bmatrix} \sigma^{-2} & 2\sigma^{-3}E(X-\mu) \\ 2\sigma^{-3}E(X-\mu) & -\sigma^{-2} + 3\sigma^{-4}E(X-\mu)^2  \end{bmatrix} = \begin{bmatrix} \frac{1}{\sigma^2} & 0 \\ 0 & \frac{2}{\sigma^2} \end{bmatrix}$
+- Interpretation: the larger the $\sigma$, the less information a sample gives us on both $\mu$ and $\sigma$
+
+** Example: Normal, $\theta = (\mu, v=\sigma^2)$
+
+Normal density: $f(x|\theta) = \frac{1}{\sqrt{2\pi{}v}} e^{-\frac{(x-\mu)^2}{2v}}$
+
+Random log density: $\log f(X|\theta) = -\frac{\log 2\pi}{2} - \frac{\log v}{2} - \frac{(X-\mu)^2}{2v}$
+- $\frac{\partial}{\partial\theta} \ldots = \left( \frac{X-\mu}{v}, -\frac{1}{2v} + \frac{(X-\mu)^2}{2v^2}  \right)$
+- $\frac{\partial^2}{\partial\theta^2} \ldots = \begin{bmatrix} -\frac{1}{v}^{} & -\frac{(X-\mu)}{v^2} \\ -\frac{(X-\mu)}{v^2} & \frac{1}{2v^2} - \frac{(X-\mu)^2}{v^3} \end{bmatrix}$
+- \therefore $I(\theta) = \begin{bmatrix} \frac{1}{v} & 0 \\ 0 & \frac{1}{2v^2}  \end{bmatrix} = \begin{bmatrix} \frac{1}{\sigma^2} & 0 \\ 0 & \frac{1}{2\sigma^4} \end{bmatrix}$
+- (NOTE) DIFFERENT from the one above, depending on the way we parameterise!
+
+** Example: Binomial, $\theta = p$
+
+Random log density: $f(x|p) = \log {n \choose X} + X \log p + (n-X) \log (1-p)$
+- $\frac{\partial}{\partial\theta} \ldots = 0 + \frac{X}{p} - \frac{n-X}{1-p}$
+- $\frac{\partial^2}{\partial\theta^2} \ldots = -\frac{X}{p^2} - \frac{n-X}{(1-p)^2}$
+- \therefore $I(\theta) = \frac{E(X)}{p^2} + \frac{n-E(X)}{(1-p)^2} = \ldots = \frac{n}{p(1-p)}$
+
+Question: what's the difference in Fisher information between Binomial and $n$ Bernoullis?
+- No real difference
+- Anyway, we see here that one sample from $Bin(n,p)$ is as informative as $n$ IID samples from $Ber(p)$
+
+** Example: HWE Trinomial Distribution, $\theta$
+
+Let $\textbf{X} = (X_1, X_2, X_3) \sim Multinomial(n, \textbf{p})$ where $\textbf{p} = ((1-\theta)^2, 2\theta(1-\theta), \theta^2)$
+- $E(X_1) = n(1-\theta)^2$, $E(X_2) = 2n\theta(1-\theta)$, $E(X_3) = \theta^2$
+
+Density function: $f(\textbf{x}|\theta) = \ldots$
+
+Random log density: $\log f(\textbf{X}|\theta) = \kappa + (2X_1 + X_2) \log (1-\theta) + (X_2 + 2X_3) \log \theta$
+- $\frac{\partial^2}{\partial\theta^2} \ldots = -\frac{2X_1+X_2}{(1-\theta)^2} - \frac{X_2 + 2X_3}{\theta^2}$
+- \therefore $I(\theta) = \frac{2E(X_1)+E(X_2)}{(1-\theta)^2} + \frac{E(X_2)+2E(X_3)}{\theta^2} = \ldots = \frac{2n}{\theta(1-\theta)}$
+
+** Example: General Trinomial Distribution, $\theta = (p_1, p_2)$
+
+Let $\textbf{X} = (X_1, X_2, X_3) \sim Multinomial(n, \textbf{p})$ where $p_3 = 1 - p_1 - p_2$
+
+Multinomial density: $f(\textbf{x}|\theta) = \frac{n!}{x_1! x_2! x_3!} p_1^{x_1} p_2^{x_2} p_3^{x_3}$
+- $E(X_i) = np_i$
+
+Random log density: $\log f(\textbf{X}|\theta) = \kappa + X_1 \log p_1 + X_2 \log p_2 + X_3 \log (1-p_1-p_2)$
+- $\frac{\partial}{\partial\theta}\ldots = ( \frac{X_1}{p_1} - \frac{X_3}{p_3}, \frac{X_2}{p_2} - \frac{X_3}{p_3} )$
+- $\frac{\partial^2}{\partial\theta^2}\ldots = \begin{bmatrix} -\frac{X_1}{p_1^2} - \frac{X_3}{p_3^2} & -\frac{X_3}{p_3^2} \\  -\frac{X_3}{p_3^2} & -\frac{X_2}{p_2^2} - \frac{X_3}{p_3^2}  \end{bmatrix}$
+- \therefore $I(\theta) = n \begin{bmatrix} \frac{1}{p_1} + \frac{1}{p_3} & \frac{1}{p_3} \\ \frac{1}{p_3} & \frac{1}{p_2} + \frac{1}{p_3}  \end{bmatrix}$
+
+*** Trinomial Distribution With Only One Trial
+
+Let $\textbf{Y} = (Y_1, Y_2, Y_3) \sim Multinomial(1, \textbf{p})$ where $p_3 = 1 - p_1 - p_2$
+
+Multinomial density: $f(\textbf{y}|\theta) = p_1^{y_1} p_2^{y_2} p_3^{y_3}$, where $\textbf{Y} = (y_1, y_2, y_3) \in \{(1,0,0),(0,1,0),(0,0,1)\}$
+
+** Variance and Fisher Information
+
+| Distribution       | Parameter  | MLE                           | Variance                                                                        |
+|--------------------+------------+-------------------------------+---------------------------------------------------------------------------------|
+| $Po(\lambda)$            | $\lambda$        | $X$                           | $\lambda$                                                                             |
+| $Ber(p)$           | $p$        | $X$                           | $p(1-p)$                                                                        |
+| $Bin(n,p)$         | $p$        | $\frac{X}{n}$                 | $\frac{p(1-p)}{n}$                                                              |
+| $HWE \ Trinom$     | $\theta$        | $\frac{X_2+2X_3}{2n}$           | $\frac{\theta(1-\theta)}{2n}$                                                             |
+| $General \ Trinom$ | $(p_1, p_2)$ | $(\frac{X_1}{n},\frac{X_2}{n})$ | $\frac{1}{n}\begin{bmatrix}p_1(1-p_1) & -p_1 p_2 \\ -p_1 p_2 & p_2(1-p_2)\end{bmatrix}$ |
+
+In these cases, sample size = 1. Note that in these cases, $Var(\hat{\theta}) = I(\theta)^{-1}$ --- the larger the information, the smaller the variance. (But in general, this equality is not true)
+- (\star) Recall that $A = \begin{bmatrix} a & b \\ c & d \end{bmatrix} \Leftrightarrow A^{-1} = \frac{1}{ad-bc} \begin{bmatrix} d & -b \\ -c & a \end{bmatrix}$
+
+* Large Sample Theory for MLE
+
+All MLEs are /consistent/ (asymptotically converges to what it's trying to estimate) and /asymptotically normal/;
+then we can form confidence intervals easily for MLEs
+- Multivariate: we have $X_1, \ldots, X_n$; univariate: one sample of $X$
+- \theta can be a constant or a vector
+
+** (\star) Asymptotic Normality of MLE ($\theta$ as a Constant)
+
+Let $X_1, \ldots, X_n$ be IID with density $f(\cdot|\theta)$, where $\theta$ is an unknown constant in $\Theta \subset \mathbb{R}$.
+
+Let $\hat{\theta}$ be the MLE of $\theta$. As $n \rightarrow \infty$, in distribution:
+
+$$\sqrt{nI(\theta)}(\hat{\theta}-\theta) \rightarrow N(0,1)$$ 
+
+For large $n$, approximately:
+
+$$\hat{\theta} \sim N\left(\theta, \frac{I(\theta)^{-1}}{n}\right)$$
+
+In particular, as $n\rightarrow{}\infty$, $\hat{\theta}\rightarrow\theta$ --- the MLE is consistent (asymptotically unbiased).
+
+** (\star) Asymptotic Normality of MLE ($\theta$ as a Vector)
+
+Now let $\theta$ an unknown /vector/ instead in $\Theta \subset \mathbb{R}^p$.
+
+As $n \rightarrow \infty$, in distribution:
+
+$$\sqrt{nI(\theta)}(\hat{\theta}-\theta) \rightarrow N(\textbf{0},\textbf{I}_p)$$
+
+For large $n$, approximately:
+
+$$\hat{\theta} \sim N\left(\theta, \frac{I(\theta)^{-1}}{n}\right)$$
+
+** Interpretation
+
+$nI(\theta)$ is amount of information in $n$ IID samples with density $f(\cdot|\theta)$
+- Asymptotic variance of MLE is inversely proportional to sample size $n$
+- $I(\theta)^{-1}$ is similar to $\sigma^2$ in a sample survey
+
+** Example: Poisson
+
+Let $X_1, \ldots, X_n$ be IID $Po(\lambda)$, where $\theta = \lambda$, $\hat{\theta} = \bar{X}$, $I(\theta) = \frac{1}{\lambda}$, so $I(\theta)^{-1} = \lambda$.
+
+By the theorem, if $n$ is large, then approximately $\bar{X} \sim N(\lambda, \frac{\lambda}{n})$.
+
+** Example: Normal Case (a) with $\theta=(\mu, \sigma)$
+
+Let $X_1, \ldots, X_n$ be IID $N(\mu, \sigma^2)$, where $\theta = (\mu, \sigma)$, $\hat{\theta} = (\bar{X}, \hat{\sigma})$, $I(\theta) = \begin{bmatrix} 1/\sigma^2 & 0 \\ 0 & 2/\sigma^2 \end{bmatrix}$.
+
+By the theorem, if $n$ is large, then approximately $\begin{bmatrix} \bar{X} \\ \hat{\sigma} \end{bmatrix} \sim N\left(\begin{bmatrix} \mu \\ \sigma \end{bmatrix}, \begin{bmatrix} \sigma^2/n & 0 \\ 0 & \sigma^2/(2n) \end{bmatrix}\right)$ --- bivariate normal distribution
+- We already know that $\bar{X} \sim N(\mu, \frac{\sigma^2}{n})$ and that $\bar{X}$ and $\hat{\sigma}$ are independent
+- But now we also know that $\hat{\sigma} \sim N(\sigma, \frac{\sigma^2}{2n})$
+- (Note that $Cov(X_1, X_2) = 0$ does not imply that $X_1$ and $X_2$ are independent, but this is true of normal distributions)
+
+** Example: Normal Case (a) with $\theta=(\mu, v=\sigma^2)$
+
+Let $X_1, \ldots, X_n$ be IID $N(\mu, \sigma^2)$, where $\theta = (\mu, v=\sigma^2)$, $\hat{\theta} = (\bar{X}, \hat{\sigma}^2)$, $I(\theta) = \begin{bmatrix} 1/\sigma^2 & 0 \\ 0 & 1/(2\sigma^4) \end{bmatrix}$.
+
+By the theorem, if $n$ is large, then approximately $\begin{bmatrix} \bar{X} \\ \hat{\sigma}^2 \end{bmatrix} \sim N\left(\begin{bmatrix} \mu \\ \sigma^2 \end{bmatrix}, \begin{bmatrix} \sigma^2/n & 0 \\ 0 & 2\sigma^4/n \end{bmatrix}\right)$
+- We already know that $\bar{X} \sim N(\mu, \frac{\sigma^2}{n})$ and that $\bar{X}$ and $\hat{\sigma}$ are independent
+- But now we also know that $\hat{\sigma}^2 \sim N(\sigma^2, \frac{2\sigma^4}{n})$ --- which makes sense, since $\hat{\sigma}^2$ follows a $\chi^2$ distribution
+
+** Example: HWE Trinomial
+
+Let $\textbf{W}_1, \ldots, \textbf{W}_n$ be IID $Multinomial(1, \textbf{p})$, where $\textbf{p} = ((1-\theta)^2, 2\theta(1-\theta), \theta^2))$.
+$\textbf{W}_i$ takes values (1,0,0), (0,1,0), (0,0,1) with probabilities as in $\textbf{p}$.
+
+Let $\textbf{X} = \textbf{W}_1 + \ldots + \textbf{W}_n \sim Multinomial(n, \textbf{p})$.
+- Random likelihood: $L(\theta) = \prod_{i=1}^{n} (p_1^{\textbf{W}_{i,1}} p_2^{\textbf{W}_{i,2}}  p_3^{\textbf{W}_{i,3}})$
+- Random loglikelihood: $\ell(\theta) = \sum_{i=1}^{n} (\textbf{W}_{i,1} \log p_1 +  \textbf{W}_{i,2} \log p_2  + \textbf{W}_{i,3} \log p_3) = \ldots = (2X_1 + X_2) \log (1-\theta) + (X_2 + 2X_3) \log \theta + X_2 \log 2$
+
+So we find that MLEs based on the $\textbf{W}\text{'s}$ is the same as based on $\textbf{X}$: $\hat{\theta} = \frac{X_2+2X_3}{2n}$
+
+*** Fisher Information for HWE Trinomial
+
+Let Fisher information based on $\textbf{W}\text{'s}$ be $I^*(\theta) = \frac{2}{\theta(1-\theta)}$.
+- By our theorem, for large $n$, approximately $\hat{\theta} \sim N(\theta, \frac{\theta(1-\theta)}{2n})$
+
+Let Fisher information based on $\textbf{X}$ be $I(\theta) = nI^*(\theta)$.
+- By our theorem, for large $n$, approximately $\hat{\theta} \sim N(\theta, I(\theta)^{-1})$
+- It would be hard to apply the theorem directly on $\textbf{X}$, since the sample size is 1 (similarly for 1 Binomial sample)
+
+** Example: General Trinomial
+
+Let $\textbf{W}_1, \ldots, \textbf{W}_n$ be IID $Multinomial(1, \textbf{p})$, where $\theta = (p_1, p_2)$.
+
+Let $\textbf{X} = \textbf{W}_1 + \ldots + \textbf{W}_n \sim Multinomial(n, \textbf{p})$.
+
+We also find that MLEs based on $\textbf{W}\text{'s}$ is the same as based on $\textbf{X}$: $\hat{\theta} = (\frac{X_1}{n}, \frac{X_2}{n})$
+
+Let Fisher information based on $\textbf{W}\text{'s}$ be $I^*(\theta) = \begin{bmatrix} 1/p_1 + 1/p_3 & 1/p_3 \\ 1/p_3 & 1/p_2 + 1/p_3 \end{bmatrix}$.
+- For large $n$, approximately $\hat{\theta} = \begin{bmatrix} X_1/n \\ X_2/n \end{bmatrix} \sim N \left( \begin{bmatrix} p_1 \\ p_2 \end{bmatrix}, \begin{bmatrix} p_1(1-p_1)/n & -p_1 p_2/n \\ -p_1 p_2/n & p_2(1-p_2)/n \end{bmatrix} \right)$
+- We already knew that expectation and variance are exact: $E(X_i) = np_i$, $Var(X_i) = np_i(1-p_i)$, $Cov(X_i, X_j) = -np_i p_j$ (but now we're looking at $X_i/n$, so the constants involving $n$ differ accordingly)
+- But the approximate normality is new
+
+** SE and Bootstrap
+
+Recall that SE of our estimate of $\theta$ is the SD of $\hat{\theta}$.
+
+$$SE = SD(\hat{\theta}) \approx \sqrt{\frac{I(\theta)^{-1}}{n}}$$ (approximately for large $n$)
+
+But now we have a problem: we don't actually know $\theta$. So use the /bootstrap/, by calculating Fisher information at the estimate instead of $\theta$:
+
+$$SE \approx \sqrt{\frac{I(\hat{\theta})^{-1}}{n}}$$ (where $\hat{\theta}$ here denotes the /estimate/ instead)
+
+** Random Intervals
+
+Let $\hat{\theta}$ be the ML estimator for $\theta$. For large $n$:
+
+$$1 - \alpha \approx P\left( -z_{\alpha/2} \le \frac{\hat{\theta}-\theta}{\sqrt{I(\theta)^{-1}/n}} \le z_{\alpha/2} \right)$$
+
+$$1 - \alpha \approx P\left( \hat{\theta} -z_{\alpha/2} \sqrt{\frac{I(\theta)^{-1}}{n}} \le \theta \le \hat{\theta} + z_{\alpha/2} \sqrt{\frac{I(\theta)^{-1}}{n}} \right)$$
+
+ We also estimate the approximate SE $\sqrt{\frac{I(\theta)^{-1}}{n}}$ with $\sqrt{\frac{I(\hat{\theta})^{-1}}{n}}$ (using bootstrap).
+
+Hence the $(1-\alpha)$ CI for $\theta$ is approximately $\left( \hat{\theta} - z_{\alpha/2} \sqrt{\frac{I(\hat{\theta})^{-1}}{n}}, \hat{\theta} + z_{\alpha/2} \sqrt{\frac{I(\hat{\theta})^{-1}}{n}}  \right)$ for large $n$.
+
+Note that $SD(\hat{\theta})$ here is not exactly $\sqrt{\frac{I(\theta)^{-1}}{n}}$ (unlike previously), only approximately true with large $n$.
+
+Three approximations, all good when $n$ is large:
+- Approximately normal (by MLE theorem)
+- Approximate SD
+- Approximate by bootstrap ($\hat{\theta}$ realisation is a good estimate for $\theta$, consistency when $n$ is large)
+
+** Example: CI for Poisson, $\theta = \lambda$
+
+$\theta = \lambda$, estimated by $\hat{\theta} = \bar{x}$
+
+$I(\theta)^{-1} = \lambda$, estimated by $I(\hat{\theta})^{-1} = \bar{x}$
+
+For large $n$, approximate $(1-\alpha)$ CI for $\theta=\lambda$ is $\left( \bar{x} - z_{\alpha/2} \sqrt{\frac{\bar{x}}{n}}, \bar{x} + z_{\alpha/2} \sqrt{\frac{\bar{x}}{n}} \right)$
+
+** Example: CI for Normal a), $\theta = (\mu, \sigma)$
+
+$\theta = (\mu, \sigma)$, estimated by $\hat{\theta} = (\bar{x}, \hat{\sigma})$
+
+$I(\theta)^{-1} = \ldots$, estimated by $I(\hat{\theta})^{-1} = \begin{bmatrix} \hat{\sigma}^2 & 0 \\ 0 & \hat{\sigma}^2/2 \end{bmatrix}$
+
+For large $n$, approximate $(1-\alpha)$ CI for $\mu$ is $\left( \bar{x} - z_{\alpha/2} \frac{\hat{\sigma}}{\sqrt{n}}, \bar{x} + z_{\alpha/2} \frac{\hat{\sigma}}{\sqrt{n}} \right)$
+
+For large $n$, approximate $(1-\alpha)$ CI for $\sigma$ is $\left( \hat{\sigma} - z_{\alpha/2} \frac{\hat{\sigma}}{\sqrt{2n}}, \hat{\sigma} + z_{\alpha/2} \frac{\hat{\sigma}}{\sqrt{2n}} \right)$
+
+** Example: CI for Normal a), $\theta = (\mu, \sigma^2)$
+
+$\theta = (\mu, \sigma^2)$, estimated by $\hat{\theta} = (\bar{x}, \hat{\sigma}^2)$
+
+$I(\theta)^{-1} = \ldots$, estimated by $I(\hat{\theta})^{-1} = \begin{bmatrix} \hat{\sigma}^2 & 0 \\ 0 & 2\hat{\sigma}^4 \end{bmatrix}$
+
+For large $n$, approximate $(1-\alpha)$ CI for $\mu$ is $\left( \bar{x} - z_{\alpha/2} \frac{\hat{\sigma}}{\sqrt{n}}, \bar{x} + z_{\alpha/2} \frac{\hat{\sigma}}{\sqrt{n}} \right)$ (same as previous)
+
+For large $n$, approximate $(1-\alpha)$ CI for $\sigma$ is $\left( \hat{\sigma}^2 - z_{\alpha/2} \hat{\alpha}^2 \sqrt{\frac{2}{n}}, \hat{\sigma} + z_{\alpha/2} \hat{\alpha}^2 \sqrt{\frac{2}{n}} \right)$
+
+** Example: Bivariate Normal Distribution
+
+$\mathbf{X} \sim N(\mathbf{\mu}, \Sigma)$, where $\mathbf{\mu} = \begin{bmatrix} \mu_1 \\ \mu_2 \end{bmatrix}$, $\Sigma = \begin{bmatrix} \sigma_1^2 & \rho\sigma_1 \sigma_2 \\ \rho\sigma_1 \sigma_2 & \sigma_2^2 \end{bmatrix}$, $\mathbf{x} = \begin{bmatrix} x_1 \\ x_2 \end{bmatrix}$. $|\Sigma|$ is the determinant.
+
+$$f(\textbf{x}) = \frac{1}{(2\pi)^{\frac{p}{2}}|\Sigma|^{\frac{1}{2}}} e^{-\frac{1}{2} (\textbf{x} - \mathbf{\mu})^{T} \Sigma^{-1} (\textbf{x}-\mathbf{\mu})}$$, where $p$ is the number of parameters ($p=2$ in the bivariate case)
+
+Any bivariate normal $\mathbf{X}$ can be written as $\mathbf{X} = \mathbf{AZ + b} \sim N(\mathbf{b, AA'})$ (i.e. linear combination of standard normals)
+
+** Linear Regression
+
+In linear regression (assuming independent normals), we minimize the squares because of MLEs!
+
+Let $Y_1, \ldots, Y_n$ be RVs with $Y_i = \beta_1 x_{i1} + \ldots + \beta_p x_{ip} + \epsilon_i$ or $Y_i = \mu_i + \epsilon_i$, ie. $\mathbf{Y} = \pmb{\mu} + \pmb{\epsilon}$, where $\pmb{\mu} = \pmb{\beta{}X}$
+- $\mathbf{X}$ is a fixed known $n \times p$ matrix
+- $\pmb{\beta}$ is a fixed unknown $p \times 1$ matrix
+- $\pmb{\epsilon} \sim N(\mathbf{0}, \sigma^2 \mathbf{I}_n)$ is a $n \times 1$ matrix, with fixed unknown $\sigma^2$
+- $\mathbf{Y} \sim N(\mathbf{\mu}, \sigma^2 \mathbf{I}_n)$
+
+Derivation: in the Multivariate Normal case, $\Sigma = \sigma^2 \pmb{I}_n$
+
+\begin{align*}
+L(\theta) &= \frac{1}{(2\pi)^{\frac{p}{2}} |\sigma^2 \pmb{I}_n|^{\frac{1}{2}}} \exp\{-\frac{1}{2}(\pmb{y}-\pmb{X\beta})' (\sigma^2 \pmb{I}_n)^{-1} (\pmb{y-X\beta})\} \\
+&= \frac{1}{(2\pi)^{\frac{p}{2}} |\sigma^2 \pmb{I}_n|^{\frac{1}{2}}} \exp\{-\frac{1}{2\sigma^2}(\pmb{y}-\pmb{X\beta}') (\pmb{y-X\beta})\} \\
+\ell(\theta) &= -\frac{p}{2} \log 2\pi - n \log \sigma - \frac{1}{2\sigma^2} ||\pmb{y-X\beta}||_2^2 \\
+\frac{\partial}{\partial\sigma} \ell(\theta) &= -\frac{n}{\sigma} - \frac{1}{\sigma^3} ||\pmb{y-X\beta}||_2^2 \\
+\end{align*}
+
+To find the MLE i.e. to maximise this log likelihood,
+we need to find $\pmb{\beta}$ that minimizes the quantity $||\pmb{y-X\beta}||_2^2$.
+
+Hence the MLE $\hat{\pmb{\beta}}$ minimizes $||\pmb{y-X\beta}||_2^2$, i.e. minimum squares (residual sum of squares)!
+
+* Efficiency
+
+** Cramer-Rao Inequality
+
+(\star) Theorem: If $\hat{\theta}$ is /unbiased/, then for every $\theta \in \Theta$, $Var(\hat{\theta}) \ge \frac{I(\theta)^{-1}}{n}$
+
+Cramer-Rao lower bound (CRLB) $\frac{I(\theta)^{-1}}{n}$ tells you the best (i.e. lowest variance) you can ask from any unbiased estimator.
+No unbiased estimator can do better than this.
+
+** Efficiency and Relative Efficiency of /Unbiased/ Estimators
+
+_Efficient unbiased estimators_
+- /Efficient/: an unbiased estimator $\hat{\theta}$ is /efficient/ if $Var(\hat{\theta}) = \frac{I(\theta)^{-1}}{n}$ for every $\theta\in{}\Theta$
+- Example of $X_1, \ldots, X_n$ IID Poisson: $\theta = \lambda$ estimated by $\bar{X}$ --- $Var(\bar{X}) = \frac{\lambda}{n} = \frac{I(\theta)^{-1}}{n}$
+- Example of $X_1, \ldots, X_n$ IID Bernoulli(p): $\theta = p$ estimated by $\hat{p}$ --- $Var(\hat{p}) = \frac{p(1-p)}{n} = \frac{I(\theta)^{-1}}{n}$
+- Example of $X_1, \ldots, X_n$ IID $N(\mu, \sigma^2)$: $\theta = (\mu, \sigma^2)$ estimated by $(\bar{X}, S^2)$ --- $Var(\bar{X}) = \frac{\sigma^2}{n} = \frac{[I(\theta)^{-1}]_{11}}{n}$
+  - But $Var(S^2) = \frac{2\sigma^4}{n-1} > \frac{[I(\theta)^{-1}]_{22}}{n} = \frac{2\sigma^4}{n}$
+  - ($S^2$ is an unbiased estimator for $\sigma^2$, though note it's not from MLE)
+
+_Efficiency of unbiased estimators_
+- $Eff(\hat{\theta}) = \frac{I(\theta)^{-1}/n}{Var(\hat{\theta})} \le 1$
+- Example of $S^2$ in normal case: $Eff(S^2) = \frac{n-1}{n}$
+
+_Unbiased ML Estimators_
+
+In general, an ML estimator $\hat{\theta}$ is usually biased.
+But by asymptotic normality theorem, for large $n$ it is approximately unbiased,
+and its variance is approximately $\frac{I(\theta)^{-1}}{n}$.
+Hence its efficiency is approximately 1 when $n$ is large. Wonderful!
+
+_Relative efficiency of unbiased estimators_
+- $Eff(\tilde{\theta}, \hat{\theta}) = \frac{Var(\hat{\theta})}{Var(\tilde{\theta})}$ --- allows for comparison without knowing the exact Fisher information
+- $Eff(\tilde{\theta}, \hat{\theta}) = Eff(\tilde{\theta})$ if $\hat{\theta}$ is efficient
+
+*** Relative Efficiency and Sample Sizes
+
+The efficiency usually depends on $n$, and relative efficiencies also depend on $n$.
+Then strictly speaking we should be talking about $\tilde{\theta}_n$ and $\hat{\theta}_n$.
+
+But a lot of the time, they have the form $\frac{k}{n}$, then the relative efficiency does NOT depend on $n$.
+- Then $Eff(\tilde(\theta), \hat{\theta})^{-1}$ tells you what sample size $m$ will make $Var(\tilde{\theta}_m) \approx Var(\hat{\theta}_n)$.
+
+** Example: Tutorial 5, Q3
+
+MOM estimator of $\theta$, $\tilde{\theta} = \frac{7}{6} - \frac{\bar{X}}{2}$ is unbiased; it is not efficient.
+- $Var(\tilde{\theta}) = \frac{1}{18n} + \frac{\theta(1-\theta)}{n}$
+- $I(\theta) = \frac{1}{\theta(1-\theta)}$ --- how did we get this?
+- $Eff(\tilde{\theta}) = \frac{I(\theta)^{-1}/n}{Var(\tilde(\theta))} = (1 + \frac{1}{18\theta(1-\theta)})^{-1}$ --- least efficient when $\theta=\frac{1}{2}$
+
+ML estimator of $\theta$, $\hat{\theta} = \frac{V_0 + V_1}{n}$ is unbiased; it is also efficient.
+- $Var(\hat{\theta}) = \frac{\theta(1-\theta)}{n} = \frac{I(\theta)^{-1}}{n}$
+
+Relative efficiency
+- $Eff(\tilde{\theta}, \hat{\theta}) = Eff(\tilde{\theta}) = (1 + \frac{1}{18\theta(1-\theta)})^{-1}$
+
+Let sample size for ML be $n$, sample size for MOM be $kn$.
+- $Var(\hat{\theta}) = \frac{\theta(1-\theta)}{n}$, $Var(\tilde{\theta}) = \frac{1}{18kn} + \frac{\theta(1-\theta)}{kn}$
+- Equating the variances gives $k = 1 + \frac{1}{18\theta(1-\theta)}$, which is $Eff(\tilde{\theta}, \hat{\theta})^{-1}$
+- For $\theta=0.5$, we get $k\approx1.22$, so the MOM needs 22% more samples than ML to have the same variance
+
+** Efficiency of /Consistent/ Estimators (Asymptotic Efficiency)
+
+Let $\tilde{\theta}$ and $\hat{\theta}$ be consistent estimators.
+
+_Efficiency of consistent estimators_
+- $Eff(\hat{\theta}) = \frac{I(\theta)^{-1}/n}{Var(\hat{\theta})}$
+- $Eff(\tilde{\theta}, \hat{\theta}) = \frac{Var(\hat{\theta})}{Var(\tilde{\theta})}$
+- (\star) Now it is possible for $Eff(\hat{\theta}) > 1$ for some values of $n$!
+
+_Efficiency of ML estimators_
+- (\star) $Eff(\hat{\theta}) \rightarrow 1$ as $n \rightarrow \infty$!
+
+** Bias vs. Variance
+
+_Bias-Variance tradeoff_
+- For an estimator to have lower variance than CRLB, it has to "pay" in terms of bias.
+- For an estimator to be unbiased, it has to "pay" in terms of variance.
+
+** Choice of Estimator
+
+How should we choose between estimators (e.g. MOM vs ML estimator)? What is the most important criteria?
+- One way is to choose the one the lowest /MSE/: $MSE = E(\hat{\theta}-\theta)^2 = Var(\hat{\theta}) + (E(\hat{\theta})-\theta)^2 = SE^2 + bias^2$
+- Since MSE is SE^2 + bias^2, choosing smaller MSE means reducing SE and bias in some way
+- But not always: sometimes, /unbiased/ estimators are the most important
+
+* Sufficiency
+
+(Recall: $f_{X|Y=y}(x|y) = \frac{f_{X,Y}(x,y)}{f_Y(y)}$)
+
+Let $X_1, \ldots, X_n$ be IID with density $f_{\theta}(x)$, $\theta\in{}\Theta$.
+
+Let $T(\pmb{X})$ be a function of $\pmb{X} = (X_1, \ldots, X_n)$.
+In general, the conditional distribution of $\pmb{X}$ given $T=t$ depends on $\theta$.
+
+** Definition of Sufficiency
+
+$T$ is /sufficient/ for $\theta$ if the conditional distribution is the same across $\theta\in{}\Theta$.
+- i.e. Conditional distibution of $\pmb{X}$ does not depend on $\theta$, for all possible values of $T=t$
+
+Intuitively, information about $\theta$ in $\pmb{X}$ is all contained in $T$ if it is sufficient.
+
+** Characterisation of Sufficiency
+
+$T$ is /sufficient/ for $\theta$ \leftrightarrow there is a function $q(\pmb{x})$ such that for every $\theta\in{}\Theta$ and $t$,
+$$f_{\theta}(\pmb{X} = \pmb{x} \ | \ T = t) = q(\pmb{x}), \ \pmb{x} \in S_t$$ (i.e. conditional distribution doesn't depend on $\theta$, only $\pmb{x}$)
+- For each $t$, let $S_t = \{ \pmb{x} \ | \ T(\pmb{x}) = t \}$.
+- The sample space of $\pmb{X}$, $S$, is the disjoint union of $S_t$ across all possible values of $T$.
+- If $\pmb{x} \notin S_t$, then $f_{\theta}(\pmb{X}=\pmb{x} \ | \ T=t) = 0$, which is not interesting
+
+i.e. we reduce it to only look at $\pmb{x}\in{}S_t$
+
+*** Example: Sum of Bernoullis
+
+Let $X_1, \ldots, X_n$ be IID $Ber(p)$, and let $T = X_1 + \ldots + X_n$.
+
+For $t \in \{0, \ldots, n\}$, $S_t = \{\pmb{x} \ | \ x_1 + \ldots + x_n = t\}$.
+
+For $\pmb{x}\in{}S_t$,
+
+\begin{align*}
+P_p(\pmb{X=x} \ | \ T=t) &= \frac{P_p(\pmb{X=x}, T=t)}{P_p(T=t)} = \frac{P_p(\pmb{X=x})}{P_p(T=t)} \\
+&= \frac{P_p(\pmb{X} = \text{a sequence of $t$ 1's, $n-t$ 0's})}{P_p(T=t)} \\
+&= \frac{p^t(1-p)^{n-t}}{{n \choose t}p^t(1-p)^{n-t}} = {n \choose t}^{-1} =: q(\pmb{x})
+\end{align*}
+
+The conditional distribution of $\pmb{X}$ given $T$ is the same for every $p\in(0,1)$, and this holds for every $t$.
+So $T$ is sufficient for $p$.
+
+*** Example of Insufficiency
+
+Let $X_1, X_2$ be IID $Ber(p)$, and let $T = X_1$.
+$S_0 = \{(0,0), (0,1)\}$, $S_1 = \{(1,0), (1,1)\}$.
+
+For $\pmb{x}\in{}S_0$,
+
+\begin{align*}
+P_p(\pmb{X=x} \ | \ T=0) &= \frac{P_p(X_1=0, X_2=x_2)}{P_p(X_1=0)} \\
+&= P_p(X_2 = x_2) \\
+&= p^{x_2} (1-p)^{1-x_2}
+\end{align*}
+
+The conditional distribution of $\pmb{X}$ given $T=0$ depends on $p$.
+So $T$ is not sufficient for $p$.
+
+** Factorisation Theorem
+
+$T$ is /sufficient/ for $\theta$ \leftrightarrow there exist functions $g(t, \theta)$ and $h(\pmb{x})$ such that for every $\theta\in{}\Theta$ and $t$,
+$f_{\theta}(\pmb{x}) = g(T(\pmb{x}), \theta) \cdot h(\pmb{x})$ for all possible $\pmb{x}$
+
+Idea: $T$ is sufficient if it can be used to /summarize/ our samples $\pmb{X}$,
+in a way that does not lose any information in our estimation of $\theta$.
+E.g. Summing $n$ IID Bernoullis loses no information in estimating parameter $p$
+
+*** Proof
+
+_Proof that factorisation implies sufficiency:_
+
+Suppose that for every $\theta\in{}\Theta$, $P_{\theta}(\pmb{X=x}) = g(T(\pmb{x}), \theta) \cdot h(\pmb{x})$ for all possible $\pmb{x}$.
+
+We show that the characterisation holds. For all $\pmb{x} \in{} S_t$:
+
+\begin{align*}
+P_\theta(\pmb{X=x}|T=t) &= \frac{P_\theta(\pmb{X=x}, T=t)}{P_{\theta}(T=t)} = \frac{P_{\theta}(\pmb{X=x})}{P_\theta(T=t)} = \frac{P_{\theta}(\pmb{X=x})}{\sum_{\pmb{x}^*\in{}S_t} P_\theta(\pmb{X=x^*})} \\
+&= \frac{g(t, \theta) \cdot h(\pmb{x})}{\sum_{\pmb{x}^*\in{}S_t} g(t,\theta) \cdot h(\pmb{x})} \\
+&= \frac{h(\pmb{x})}{\sum_{\pmb{x}^*\in{}S_t} h(\pmb{x}^*)} =: q(\pmb{x})
+\end{align*}
+
+This conditional distribution is the same for every $\theta\in{}\Theta$, and holds for every $t$, so $T$ is sufficient for $\theta$.
+
+_Proof that sufficiency implies factorisation:_
+
+Suppose that $T$ is sufficient for $\theta$, then it can be characterised: there is $q(\pmb{x})$ such that for every $\theta{}\in{}\Theta$ and $t$,
+$P_\theta(\pmb{X=x}|T=t) = q(\pmb{x})$, $\pmb{x}\in{}S_t$.
+
+We show the factorisation in each $S_t$. For $\pmb{x}\in{}S_t$:
+
+\begin{align*}
+P_\theta(\pmb{X=x}) &= P_\theta(\pmb{X=x}, T=t) \\
+&= P_\theta(T=t) P_\theta(\pmb{X=x}|T=t) \\
+&= P_\theta(T=t) \cdot q(\pmb{x})
+\end{align*}
+
+Then let $g(t,\theta) = P_\theta(T=t)$, and $h(\pmb{x})=q(\pmb{x})$. Hence $P_\theta(\pmb{X=x}) = g(T(\pmb{x}), \theta) \cdot h(\pmb{x})$.
+
+*** Example: Bernoulli
+
+Let $\pmb{x}$ be realisations from IID $Bernoulli(p)$ random variables $X_1, \ldots, X_n$
+
+$f_p(\pmb{x}) = \sum_{i=1}^{n} p^{x_i} (1-p)^{1-x_i} = p^{\sum_{i=1}^{n}x_i} (1-p)^{n-\sum_{i=1}^{n} x_i}$
+
+Let $T = X_1 + \ldots + X_n$ and $t=\sum_{i=1}^{n} x_i$, then let $g(t, p) = p^t (1-p)^{n-t}$, $h(\pmb{x}) \equiv 1$
+
+Then for every $p$ and $\pmb{x}$, $f_p(\pmb{x}) = g(T(\pmb{x}), p) \cdot h(\pmb{x})$
+
+*** Example: Poisson
+
+\begin{align*}
+P_\lambda(\pmb{X=x}) &= \prod_{i=1}^{n} \frac{e^{-\lambda}\lambda^{x_i}}{x_i!} \\
+&= \frac{e^{-n\lambda} \lambda^{\sum_{i=1}^{n}x_i}}{\prod_{i=1}^{n} (x_i!)} \\
+&= (e^{-n\lambda} \lambda^{\sum_{i=1}^{n}x_i}) \cdot \frac{1}{\prod_{i=1}^{n} (x_i!)}
+\end{align*}
+
+Hence $T(\pmb{X}) = \sum_{i=1}^{n} X_i$ is sufficient for $\lambda$.
+
+(Similarly, we can also show that $T(\pmb{X}) = \bar{X}$ is sufficient.)
+
+*** Example: Normal
+
+\begin{align*}
+f_{(\mu, \sigma^2)}(\pmb{x}) &= \prod_{i=1}^{n} \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x_i-\mu)^2}{2\sigma^2}} \\
+&= \left(\frac{1}{\sqrt{2\pi}\sigma}\right)^n e^{-\frac{1}{2\sigma^2} \sum_{i=1}^n (x_i-\mu)^2} \\
+&= \left(\frac{1}{\sqrt{2\pi}\sigma}\right)^n e^{-\frac{1}{2\sigma^2} [\sum_{i} x_i^2 - 2\mu\sum_{i}x_i + n\mu^2]} \\
+\end{align*}
+
+This shows that $(\sum_{i=1}^{n} X_i, \sum_{i=1}^{n} X_i^2)$ is sufficient for $(\mu, \sigma^2)$.
+- Let $g(t, \theta)$ be everything as above, let $h(\pmb{x}) \equiv 1$.
+- Notice that here we can't really separate functions of $\pmb{x}$ from our parameters $\mu$ and $\sigma^2$;
+so the functions of $\pmb{x}$ we need to keep here are $\sum_i x^2$ and $\sum_i x_i^2$
+
+\begin{align*}
+\ldots &= \left(\frac{1}{\sqrt{2\pi}\sigma}\right)^n e^{\frac{\mu}{\sigma}\sum_{i}x_i - \frac{n\mu^2}{2\sigma^2}} e^{-\frac{1}{2\sigma^2} \sum_{i}x_i^2}
+\end{align*}
+
+This shows that if $\sigma^2$ is known, then $\sum_{i=1}^n X_i$ is sufficient for $\mu$.
+- Let $g(t, \theta)$ be the LHS, let $h(\pmb{x})$ be $e^{-\frac{1}{2\sigma^2} \sum_i x_i^2}$.
+- Because we can separate the $\sum_i x_i$ and $\mu$ on the LHS from the $\sum_i x_i^2$ on the RHS
+
+** Significance of Sufficiency
+
+_Theorem_: If $T$ is sufficient of $\theta$, then the ML estimator is a function of $T$.
+
+_Proof_: Given realisations $\pmb{x}$, with summary $t$, the likelihood function is $g(t,\theta)h(\pmb{x})$. (WHY?)
+The ML estimate is the $\theta$ value that maximises $g(t,\theta)$, so it is a function of $t$.
+
+(\star) _Corollary_: For an estimator $\hat{\theta}$ which is not a function of a sufficient statistic $T$,
+there is a better estimator by conditioning on $T$.
+
+*** Example: Bernoulli
+
+Let $X_1, \ldots, X_n$ be IID $Bernoulli(p)$. Let $T=X_1+\ldots+X_n$ be sufficient for $p$.
+
+Let $\hat{p}=X_1$ --- this is not a very good estimator, but at least it's unbiased.
+
+What is the conditional distribution of $X_1$ given $T=t\in{}\{0, 1, \ldots, n\}$?
+
+\begin{align*}
+P_{p}(X_1=1|T=t) &= \frac{P_p(X_1=1, X_2+\ldots+X_n=t-1)}{P_p(T=t)} \\
+&= \frac{p\cdot{n-1 \choose t-1} p^{t-1} (1-p)^{n-t}}{{n \choose t} p^t (1-p)^{n-t}} \\
+&= \frac{t}{n} \\
+P_p(X_1=0|T=t) &= 1 - \frac{t}{n}
+\end{align*}
+
+Then $(X_1|T=t) \sim Bernoulli(\frac{t}{n})$.
+- $E(X_1|T=t) = \frac{t}{n}$
+- $Var(X_1|T=t) = \frac{t}{n} (1-\frac{t}{n})$
+
+Now take the /random conditional expectation/: $E(X_1|T) = \frac{T}{n}$
+- (We know distribution of $T \sim Bin(n, p)$)
+- Using the old estimator, take at its condition expectation over sufficient statistic $T$ \rightarrow new estimator!
+- $E(E(X_1|T)) = \frac{np}{n} = p$
+- $Var(E(X_1|T)) = \frac{np(1-p)}{n^2} = \frac{p(1-p)}{n}$
+- $E(Var(X_1|T)) = p(1-p)(1-\frac{1}{n}) = \frac{p(1-p)(n-1)}{n}$
+
+** Random Conditional Expectation
+
+Idea: take the random conditional expectation of our old estimator over sufficient statistic $T$ to give a new estimator
+- $E(X_1|T) = \frac{T}{n}$
+- $E(X_1) = E(E(X_1|T))$
+- $Var(X_1) = Var(E(X_1|T)) + E(Var(X_1|T))$
+- For Bernoulli example, $p(1-p) = \frac{p(1-p)}{n} + \frac{p(1-p)(n-1)}{n}$
+
+** General Definitions
+
+- $E(Y|x)$ is the /conditional expectation/ of $Y$ given $X=x$
+- $E(Y|X)$ is the /random conditional expectation/ $Y$ given $X$, which takes the value $E(Y|x)$ given $X=x$
+- $Var(Y|x) = E(Y^2|x) - E(Y|x)^2$ is the /conditional variance/ of $Y$ given $X=x$
+- $Var(Y|X)$ is the (random?) /conditional variance/ of $Y$ given $X$
+
+Note that $E(Y)=Y$ and $Var(Y)=0$ if and only if $Y$ is a constant.
+
+Similarly, $E(Y|X)=Y$ and $Var(Y|X)=0$ if and only if $Y$ is a function of $X$. Proof:
+- Suppose $Y=g(X)$. Then for any $X=x$, $E(Y|x)=g(x)$, so $E(Y|X)=g(X)=Y$ and $Var(Y|X)=0$
+- Suppose $E(Y|X)=Y$. Then for any $X=x$, $E(Y|x)=Y$, so $Y$ is a constant when $X=x$, i.e. $Y$ is a function of $X$.
+Then for any $x$, $Var(Y|x)=0$, so $Y$ is a constant when $X=x$.
+
+Let $Y=g(X)$.
+- $E[E(g(X)|X)] = g(X)$
+- $Var[E(g(X)|X)] + E[Var(g(X)|X)] = Var(g(X))$
+
+Two more important facts about conditional expectations:
+1. $E(Y) = E[E(Y|X)]$
+  - See proof in Rice p149
+2. $Var(Y) = Var[E(Y|X)] + E[Var(Y|X)]$
+  - Let $Z_k=E(Y^k|X)$. $Var(Y|X) = Z_2 - Z_1^2$
+  - $Var[E(Y|X)] = Var(Z_1) = E(Z_1^2)-E(Z_1)^2 = E(Z_1^2) - E(Y)^2$ (by 1)
+  - $E[Var(Y|X)] = E(Z_2-Z_1^2) = E(Z_2)-E(Z_1^2) = E(Y^2)-E(Z_1^2)$ (by 1)
+
+*** Example
+
+Let $X\sim{}N(\mu, \sigma^2)$ and $\epsilon\sim{}N(0,\tau^2)$ be independent, let $Y=X+\epsilon \sim N(\mu,\sigma^2+\tau^2)$. Verify the previous facts:
+1. $E(Y|X) = E(X+\epsilon|X) = X + E(\epsilon|X)$. Then $E[E(Y|X)] = E(X) = \mu$.
+2. $Var(Y|X) = Var(X+\epsilon|X) = 0 + Var(\epsilon|X) = \tau^2$. Then $Var[E(Y|X)] + E[Var(Y|X)] = Var(X) + E(\tau^2) = \sigma^2 + \tau^2 = Var(Y)$.
+
+** Rao-Blackwell Theorem
+
+_Idea_: your new estimator, made by taking the conditional expectation on $T$, will be strictly better than your old estimator in terms of MSE.
+
+Let $\hat{\theta}$ be an estimator of $\theta$ with finite variance, let $T$ be sufficient for $\theta$.
+Define $\tilde{\theta} = E(\hat{\theta}|T)$. Then for every $\theta\in{}\Theta$,
+
+$$E(\tilde{\theta}-\theta)^2 \le E(\hat{\theta}-\theta)^2$$ (smaller MSE!)
+
+(That $\tilde{\theta}$ is a function of $T$ complements the fact that ML estimator is a function of $T$)
+
+_Proof_:
+- $E(\tilde{\theta}) = E[E(\hat{\theta}|T)] = E(\hat{\theta})$, so estimators have the same bias
+- $Var(\hat{\theta}) = Var[E(\hat{\theta}|T)] + E[Var(\hat{\theta}|T)] = Var(\tilde{\theta}) + E[Var(\hat{\theta}|T)] \ge Var(\tilde{\theta})$
+- It is only the case that $Var(\hat{\theta}) = Var(\tilde{\theta})$ when $E[Var(\hat{\theta}|T)] = 0$, i.e. it's already based on a sufficient statistic $T$
+- Note: we need $T$ to be sufficient so that $\tilde{\theta} = E(\hat{\theta}|T)$ does not depend on the unknown $\theta$, and so $\tilde{\theta}$ is a well-defined estimator
+
+* Hypothesis Testing
+
+Let $X_1, \ldots, X_n$ be IID random variables with unknown mean $\mu$, density $f(x|\theta)$ where $\theta\in{}\Theta$ is an unknown constant
+
+Question: does the data support or refute our hypothesis that $\theta$ equals some value? To answer this, we use statistical tests
+
+** Definitions
+
+_Null hypothesis $H_0$_: the default belief, e.g. $\mu=40$.
+- (\star) In a hypothesis test, our goal is decide whether to either /reject/ or /NOT reject/ the null hypothesis.
+
+_Alternative hypothesis $H_1$_: the other belief, e.g. $\mu=43$.
+
+The statistical question is to choose between the null and alternative hypothesis.
+
+_Critical region_: a region of sample space, whereby if the data falls in the critical region, we /reject/ the null hypothesis. E.g. $\{x > c\}$
+
+_Type I error_: rejecting $H_0$ when it is true.
+- /Size/ i.e. /significance level/, is $\text{size} = P_0(X>c)$
+
+_Type II error_: not rejecting $H_0$ when it is false.
+- $P(\text{type II error}) = P_1(X<c)$
+- $\text{power} = P_1(X>c) = 1 - P_1(\text{type II error})$
+
+Size and power are of the same "form"; both deal with the critical region in rejecting the null hypothesis
+- You want size to be small: size is probability of rejection under /null/
+- You want power to be big: power is probability of rejection under /alternative/
+- E.g. size is $P_0(X>c)$, power is $P_1(X>c)$
+
+How do we choose an optimal critical region value?
+- Trade-off between size and power
+
+*** Control Size, Maximise Power
+
+Neyman-Pearson approach: among tests with /size/ less than $\alpha$, choose the /most powerful/ test.
+- We're more concerned with making sure that $\alpha$ is small, since $H_0$ is the "default" belief; given that $H_0$ is true, we then
+go about finding the one with the most power.
+- If $H_0$ is true, we have a small chance \alpha of rejecting it.
+- If $H_1$ is true, we have as high a chance of rejecting $H_0$ as possible.
+
+** General Setup
+
+Let $X_1, \ldots, X_n$ be IID with density $f(x|\theta)$. Suppose:
+- $H_0: \theta = \theta_0$
+- $H_1: \theta = \theta_1$
+
+Let the critical region of a test be $R \subset \mathbb{R}^n$. Then:
+- Size = $P_0(\mathbb{X} \in R)$
+- Power = $P_1(\mathbb{X} \in R)$
+
+Generally, it is hard to see if there is a most powerful test among those with size $\le{}\alpha$.
+
+*** Example: Amount of Custard in Egg Tart
+
+- For the /baker/, the amount of custard in each egg tart he makes is $X\sim{}N(40, 2^2)$
+- For the /trainee/, the amount of custard in each egg tart he maes is $N(43, 2^2)$
+- Question: given the amount of custard from a tart, can we tell if the baker or trainee made it?
+  
+Setup
+- Null hypothesis $H_0$: $\mu=40$ (the baker made it)
+- Alternative hypothesis $H_1$: $\mu=43$ (the baker made it)
+
+Let's have the critical region be $\{x > c\}$. Suppose $c=42$.
+- size = $P_0(X>42) = P(Z>1) \approx 0.16$
+- power = $P_1(X>42) = P(Z>-0.5) \approx 0.69$
+  
+Suppose we take the test i.e. critical region to be $\{x > 43.3\}$.
+- Then size = $0.05$, power = $0.44$; shown in the figure below
+
+#+ATTR_LATEX: :width 400px
+[[./img/hypo-test-custard.png]]
+
+Suppose we take the test i.e. critical region to be $\{42.6 < x < 43.3\}$.
+- Note that size is stil = $0.05$, but power = $0.14$ (worse!); shown in the figure below
+
+#+ATTR_LATEX: :width 400px
+[[./img/hypo-test-custard3.png]]
+
+*** Example: Normal
+
+$X_1, \ldots, X_n$ are IID $N(\mu, \sigma^2)$ with known $\sigma^2$ and unknown $\mu$.
+
+Let $H_0: \mu=\mu_0$. Possibilities for $H_1$:
+- $\mu=\mu_1$, where $\mu_1 \ne \mu_0$
+- $\mu>\mu_0$
+- $\mu\ne{}\mu_0$
+
+_Consider $n=1$, i.e. only one random variable._
+- $H_0: \mu=\mu_0$, $H_1 = \mu=\mu_1$, where $\mu_0 < \mu_1$
+
+$\wedge(x) = \frac{\exp\{-\frac{(x-\mu_0)^2}{2\sigma^2}\}}{\exp\{-\frac{(x-\mu_1)^2}{2\sigma^2}\}} = \exp\{-\frac{2x(\mu_1-\mu_0)-(\mu_1^2-\mu_0^2)}{2\sigma^2}\}$
+
+** Likelihood Ratio
+
+_Likelihood ratio_ of $H_0$ to $H_1$ based on $X_1, \ldots, X_n$ is
+
+$\Lambda(\pmb{x}) = \frac{f_0(x_1) \ldots f_0(x_n)}{f_1(x_1) \ldots f_1(x_n)}$
+
+The smaller $\Lambda(\pmb{x})$ is, the more evidence there is against $H_0$ (or for $H_1$). A reasonable critical region consists of $\pmb{x}$ with small $\Lambda(\pmb{x})$.
+
+** Likelihood ratio tests
+
+Consider critical regions to be $R_c = \{\pmb{x} \ | \ \Lambda(\pmb{x}) < c\}$, where $c > 0$.
+
+As $c$ increases, then what happens to size and power? $R_c$ gets bigger, so size and power also increases.
+
+For any $\alpha\in{}(0,1)$, there is a $c_\alpha$ such that size is $\alpha$.
+
+** Neyman-Pearson Lemma
+
+Consider the likelihood ratio test with critical region $\{\pmb{x} \ | \ \Lambda(\pmb{x}) < c_\alpha\}$.
+
+Among all tests with size $\le \alpha$, this test has the maximum power.
+
+*** Normal Case (A) $n$ Normals, $\mu_1>\mu_0$
+
+Assume $\mu_0<\mu_1$ and $\sigma^2$ is known.
+
+$\wedge(\pmb{x}) = \frac{\exp\{-\frac{\sum_{i=1}^n (x_i - \mu_0)^2}{2\sigma^2}\}}{\exp\{-\frac{\sum_{i=1}^{n} (x_i-\mu_1)^2}{2\sigma^2}\}} = \exp \{ -\frac{2n\bar{x}(\mu_1-\mu_0) - n(\mu_1^2-\mu_0^2)}{2\sigma^2} \}$
+
+By Neyman-Pearson lemma, the most powerful test of size $\le \alpha$ has critical region of the form $\{\pmb{x} \ | \ \Lambda(\pmb{x}) < c_\alpha\}$.
+
+In the normal case, this is the same as $\{\pmb{x} \ | \ \bar{x} > c'_{\alpha}\}$ for some related constant $c'_{\alpha}$. (Why? See tutorial question.)
+
+What is $c'_{\alpha}$?
+
+$\alpha = P_0(\bar{X} > c'_{\alpha}) = P(Z > \frac{c'_{\alpha}-\mu_0}{\sigma/\sqrt{n}})$
+
+Hence,
+
+$\frac{c'_{\alpha}-\m_0}{\sigma/\sqrt{n}} = z_{\alpha}$, $c'_{\alpha} = \mu_0 + z_{\alpha}\frac{\sigma}{\sqrt{n}}$
+
+What is the power?
+
+$P_1(\bar{X} > c'_{\alpha}) = P(Z > \frac{c'_{\alpha}-\mu_1}{\sigma/\sqrt{n}}) = P(Z > z_{\alpha} - \frac{\mu_1-\mu_0}{\sigma/\sqrt{n}})$
+
+i.e. smaller $\sigma/\sqrt{n}$ i.e. larger $n$ will increase our power!
+
+*** Simple vs Composite Hypotheses
+
+_Simple_: hypothesis completely specifies the distribution of the data
+
+_Composite_: hypothesis DOES NOT completely specify the distribution of the data
+- $\mu>\mu_0$ or $\mu<\mu_0$ or $\mu\ne{}\mu_0$
+
+*** Normal Case (B) $\mu>\mu_0$ (one-sided)
+
+Idea: reject $H_0$ if $\bar{x}$ is too large.
+
+Critical region for size $\alpha$: $\{\bar{x} > \mu_0 + z_{\alpha} \frac{\alpha}{\sqrt{n}}\}$
+
+Power of the test depends on the value of $\mu>\mu_0$; so the power is now a /function/ of $\mu$
+
+By Neyman-Pearson lemma, for any alternative $\mu_1>\mu_0$, this test is the most powerful as its power /function/ is the largest.
+
+_Uniformly most powerful test_, i.e. for any other test of size $\le{}\alpha$, its power function is smaller everywhere.
+
+*** Normal Case (C) $\mu\ne{}\mu_0$ (two-sided)
+
+How do we take into account not only $\mu>\mu_0$, but also $\mu<\mu_0$?
+
+Idea: reject $H_0$ if $\bar{x}$ is too far away from $\mu_0$ in both sides.
+
+Critical region for size $\alpha$: $\{ |\bar{x}-\mu_0| < c \}$
+
+$c = z_{\alpha/2}\frac{\alpha}{\sqrt{n}}$
+
+This test is NOT uniformly most powerful: by Neyman-Pearson lemma, for any alternative if $\mu_1>\mu_0$, there is a more powerful test.
+
+*** Summary of Neyman-Pearson Lemma
+
+Neyman-Pearson lemma gives a recipe for the /most powerful/ test of size $\le{}\alpha$ in the case of /simple/ null and alternative hypotheses,
+and the /uniformly most powerful/ test in some cases of /composite/ alternative hypotheses, but not in general.
+
+Likelihood ratio test is still very useful in many problems where the most powerful test may be powerful to get.
+
+*** Example: Custard Tarts
+
+Let $n=25$, $\alpha=0.05$ so $z_{\alpha} = 1.64$. Let $H_0: \mu=40$ and $H_1: \mu=43$.
+
+Most powerful test of size $\le\alpha$ has critical region $\bar{x} > 40 + 1.64 \times \frac{2}{\sqrt{25}} = 40.7$
+
+Suppose that $\bar{x}=40.3$, then we do not reject $H_0$ at level $\alpha$.
+
+95%-CI for $\mu$: $40.3 \pm 1.96 \times \frac{2}{\sqrt{25}} = (39.5, 41.1)$
+
+*** Duality of hypothesis tests and confidence intervals
+
+$(1-\alpha)$ CI for $\mu$ contains precisely the values $\mu_0$ for which $H_0: \mu=\mu_0$ is not rejected by two-sided test of size $\alpha$, against $H_1: \mu\ne{}\mu_0$.
+
+i.e. complement set of critical region in two-sided test
+
+** /p/-value
+
+Previously, we fixed an $\alpha$ at say 0.05 or 0.01, which then decides the critical region and hence whether to reject $H_0$ or not.
+
+But the choice of $\alpha$ is arbitrary. Are there any other options?
+
+Another way is to calculate /p/-value: the probability under $H_0$ that the test statistic (e.g. \bar{X}) is more extreme than the realisation.
+
+E.g. bakery example: $p = P_0(\bar{X} > 40.3) = P(Z > \frac{40.3-40}{2/5}) \approx 0.23$
+
+The smaller the /p/-value, the more likely one is to intuitively reject $H_0$
+
+Note, /p/-value is NOT the probability that $H_0$ is true; either $H_0$ is true or $H_0$ is false, there is no probability distribution.
+What we're computing is that /assuming/ $H_0$ is true, how likely is it that we get our $\theta$.
+
+*** /p/-value and size of test $\alpha$
+
+If size of test is smaller than /p/-value, then $H_0$ will not be rejected.
+If size of test is larger than /p/-value, then $H_0$ will be rejected.
+
+So /p/-value is the smallest $\alpha$ such that test of size $\alpha$ will be rejected.
+(E.g. if $p=0.2$, then any $\alpha>0.2$ size test will not reject $H_0$.)
+
+*** Example: Normal Case
+
+(A) and (B): $p = P_0(\bar{X} > \bar{x}) = P(Z > \frac{\bar{x}-\mu_0}{\sigma/\sqrt{n}})$
+
+(C): $p = P_0(|\bar{X} - \mu_0| > |\bar{x} - \mu_0|)$
+
+* Generalised Likelihood Ratio Test
+
+Let $H_0$ and $H_1$ be represented by subsets $\omega_0$ and $\omega_1$ of the parameter space $\Theta$.
+- E.g. Normal case (C): $X_1, \ldots, X_n$ IID $N(\mu, \sigma^2)$ with known $\sigma^2$. $H_0: \mu=\mu_0$, $H_1:\mu\ne{}\mu_0$. So $\omega_0 = \{\mu_0\}$, $\omega_1 = \{\mu|\mu\ne{}\mu_0\}$
+- E.g. $\pmb{X}\sim{}Multinomial(n,\pmb{p})$. $H_0: \pmb{p}\in{}\omega_0$, $H_1: \pmb{p}\in{}\omega_1$, where $\omega_0$ and $\omega_1$ are disjoint sets of probability vectors of length $r$
+- E.g. Poisson: $X_1, \ldots, X_n$ independent, where $X_i \sim{}Po(\lambda_i)$. $H_0: \lambda$ are the same, $H_1: \lambda$ are different.
+So $\omega_0 = \{(\lambda_1, \ldots, \lambda_n) \ | \ \lambda_1=\ldots=\lambda_n\}$, $\omega_1 = \{(\lambda_1, \ldots, \lambda_n) \ | \ \lambda_i \ne \lambda_j \ \text{for some } i,j \text{ in } 1\ldots{}n\}$
+
+_Generalised Likelihood Ratio_
+
+Let $L(\theta)$ be the likelihood function based on the data.
+
+One way: $\Lambda^* = \frac{\max_{\theta\in{}\omega_0} L(\theta)}{\max_{\theta\in{}w_1} L(\theta)}$
+
+Neyman-Pearson idea: small $\Lambda^*$ value is evidence for $H_1$.
+
+Let $\Omega = \omega_0 \cup \omega_1$; it is more convenient to use
+
+$\Lambda = \frac{\max_{\theta\in{}\omega_0} L(\theta)}{\max_{\theta\in{}\Omega} L(\theta)}$
+
+Note that $\Lambda \le \Lambda^*$ and $0 \le \Lambda \le 1$. The closer $\Lambda$ is to 0, the stronger the evidence is for $H_1$.
+
+** Large-sample null distribution of $\Lambda$
+
+(\star) Under $H_0$, if $n$ is large, approximately
+$-2 \log \Lambda \sim \chi_k^2$, where $k = dim(\Omega) - dim(\omega_0)$ (dimension refers to number of ways we can change the parameters freely)
+- E.g. $Multinomial(n, p)$ has dimension of $n-1$ (last one is wholly determined by the previous $n-1$ ones)
+
+*** Example: Normal Case (C)
+
+$\omega_0 = \{\mu_0\}$, $\omega_1 = \{\mu \ | \ \mu \ne \mu_0\}$, so $\Omega=\mathbb{R}$
+
+\begin{align*}
+\max_{\mu\in{}\omega_0} L(\mu) &= \frac{1}{\sigma^n(2\pi)^{n/2}} \exp\{ - \frac{\sum_{i=1}^{n}(X_i - \mu_0)^2}{2\sigma^2} \} \\
+\max_{\mu\in{}\Omega} L(\mu) &= \frac{1}{\sigma^n(2\pi)^{n/2}} \exp\{ - \frac{\sum_{i=1}^{n}(X_i - \bar{X})^2}{2\sigma^2} \} \ \text{(recall $\sum_{i}(x_i-c)$ is minimized at $c=\bar{x}$)} \\
+-2 \log \Lambda &= \ldots = \frac{n(\bar{X}-\mu_0)^2}{\sigma^2} = \left(\frac{\bar{X}-\mu_0}{\sigma/\sqrt{n}}\right)^2
+\end{align*}
+
+Under $H_0$, $\bar{X} \sim N(\mu_0, \sigma^2/n)$, so $-2\log \Lambda \sim \chi_1^2$ for any $n$. Check $k=1$.
+
+We want to reject for small $\Lambda$, i.e. reject for large $-2 \log \Lambda$. 
+
+For size $\alpha$, critical region is $\{ \frac{(\bar{x}-\mu_0)^2}{\sigma^2/n} > \chi_{1, \alpha}^2 \} = \{ |\bar{x}-\mu_0| > z_{\alpha/2}\frac{\sigma}{\sqrt{n}} \}$
+
+#+ATTR_LATEX: :width 200px
+[[./img/normal-large-sample-null.png]]
+
+Let the realised sample mean be $\bar{x}$. The /p/-value is $P(\chi_1^2 > \frac{(\bar{x}-\mu_0)^2}{\sigma^2/n})$
+
+*** Example: Multinomial
+
+Let $\omega_0$ consist of $\pmb{p}(\theta)$, where $\theta\in{}\Theta$ is a constant.
+Let $\omega_1$ consist of all $\pmb{p}$ not in $\omega_0$, so $\Omega$ is the set of all probability vectors.
+
+Let $\hat{\theta}$ be the ML estimator of $\theta$. Then ML estimator of $\pmb{p}$ under $\omega_0$ is $\pmb{p}(\hat{\theta})$; ML estimator of $\pmb{p}$ under $\Omega$ is $\frac{\pmb{X}}{n}$
+
+\begin{align*}
+\max_{\pmb{p}\in{}\omega_0} L(\pmb{p}) &= {n \choose X_1 \ldots X_r} \prod_{i=1}^{r} p_i(\hat{\theta})^{X_i} \\
+\max_{\pmb{p}\in{}\Omega} L(\pmb{p}) &= {n \choose X_1 \ldots X_r} \prod_{i=1}^{r} p_i(\frac{X_i}{n})^{X_i} \\
+\Lambda &= \prod_{i=1}^{r} \left( \frac{np_i(\hat{\theta})}{X_i} \right)^{X_i} = \prod_{i=1}^{r} \left(\frac{E_i}{X_i}\right)^{X_i} \\
+- 2 \log \Lambda &= 2 \sum_{i=1}^{r} X_i \log \left(\frac{X_i}{E_i}\right) \\
+&\approx \sum_{i=1}^{r} \frac{(X_i-E_i)^2}{E_i} \ \text{(for large $n$)}
+\end{align*}
+
+the Pearson's chi-squared statistic $X^2$.
+
+where $E_i = np_i(\hat{\theta})$ is the expected frequency of the /i/-th event under $H_0$.
+
+*** Example: Multinomial HWE
+
+$\pmb{p} \in \omega_0 = \{((1-\theta)^2, 2\theta(1-\theta), \theta^2) \ | \ \theta \in (0,1)\}$ --- dimension 1
+
+Let $\Omega$ be the set of all probability vectors, of dimension 2
+
+Recall our observed data with $n=1029$:
+- $x_1 = 342$, $x_2 = 500$, $x_3 = 187$
+
+Since ML estimate of $\theta$ is 0.4247, expected counts are:
+- Of AA: $E_1 = 1029 \times 0.5753^2 \approx 340.6$
+- Of Aa: $E_2 \approx 502.8$
+- Of aa: $E_3 \approx 185.6$
+
+So $-2\log\Lambda \approx X^2 \approx 0.0319$.
+
+$P(\chi_1^2 > 3.84) \approx 0.05$ => critical region is $>3.84$. Since $n=1029$ is large, we do not reject $H_0$ at $\alpha=0.05$.
+
+/p/-value is $P(\chi_1^2 > 0.0319) \approx 0.86$.
+
+*** Example: Rice page 344 Example B
+
+Assume a Poisson model
+- $H_0: \pmb{x} \ \text{is determined by Poisson distribution}$ --- $\omega_0$ has dimension 1
+- $H_1: \pmb{x} \ \text{is arbitrary}$ --- $\Omega$ has dimension 7 (last one, the eighth probability, is determined by previous seven)
+
+We get the estimate for $\lambda$ to be $2.44$.
+
+Chi-square statistic $X^2 = 75.4$.
+
+First, in our data, we group the tail categories together to give 8 remaining categories, otherwise $n$ is too small
+(Rule of thumb: expected counts should be at least $5$ for good approximation?)
+
+Since $P(\chi_6^2>18.55) \approx 0.05$, our /p/-value is less than 0.05, so we reject the Poisson model.
+
+*** Example: Poisson dispersion test
+
+Let $X_i \sim Po(\lambda_i)$ be independent.
+
+- $H_0: \text{the } \lambda \text{ are the same}$
+- $H_1: \text{the } \lambda \text{ are different}$
+- $\omega_0 = \{(\lambda_1, \ldots, \lambda_n) \ | \ \lambda_1 = \ldots = \lambda_n\}$
+- $\omega_1 = \{(\lambda_1, \ldots, \lambda_n) \ | \ \lambda_i \ne \lambda_j\}$
+- In $\omega_1$, the MLE is $\hat{\lambda} = \bar{X}$
+- In $\Omega$, the MLEs are $\hat{\lambda}_i = X_i$
+
+\begin{align*}
+\max_{\theta_\in{}\omega_0} L(\theta) &= \prod_{i=1}^{n} \bar{X}^{X_i} e^{-X}/X_i! \\
+\max_{\theta_\in{}\Omega} L(\theta) &= \prod_{i=1}^{n} X^{X_i} e^{-X}/X_i! \\
+\Lambda &= \prod_{i=1}^{n} \left( \frac{\bar{X}}{X_i}\right)^{X_i} e^{X_i-\bar{X}} \\
+- 2 \log \Lambda &= -2 \sum_{i=1}^{n} \left[ X_i \log \left( \frac{\bar{X}}{X_i} \right) + X_i - \bar{X} \right] \\
+&= 2 \sum_{i=1}^{n} X_i \log \left( \frac{X_i}{\bar{X}} \right)
+\end{align*}
+
+It can be shown that
+$-2\log\Lambda \approx \frac{\sum_{i=1}^{n}(X_i-\bar{X})^2}{\bar{X}}$
+
+Under $H_0$, numerator is around $(n-1)\lambda$, denominator is around $\lambda$ (whut lol)
+
+* Comparing 2 Samples: Independent Samples
+
+** Normal Theory: Same Variance
+
+$X_1, \ldots, X_n \sim N(\mu_X, \sigma^2)$ and $Y_1, \ldots, Y_n \sim N(\mu_Y, \sigma^2)$, independent
+
+Test $H_0: \mu_X = \mu_Y$ vs $H_1: \mu_X \ne \mu_Y$
+
+Test statistic: $\bar{X} - \bar{Y}$, which is normal
+- $E(\bar{X} - \bar{Y}) = \mu_X - \mu_Y$
+- $Var(\bar{X} - \bar{Y}) = \sigma^2 \left( \frac{1}{n} + \frac{1}{m} \right)$
+
+*** If variance $\sigma^2$ is known
+
+Define $Z = \frac{\bar{X} - \bar{Y}}{\sigma \sqrt{\frac{1}{n} + \frac{1}{m}}}$
+- Reject $H_0$ when $|Z| > z_{\alpha/2}$
+
+More generally, to test for $H_0: \mu_X - \mu_Y = d$, we use:
+- $Z = \frac{\bar{X} - \bar{Y} - (\mu_X - \mu_Y)}{\sigma \sqrt{\frac{1}{n} + \frac{1}{m}}}$
+
+*** If variance $\sigma^2$ is unknown
+
+Estimate $\sigma^2$ by the /pooled sample variance/:
+- $s_p^2 = \frac{(n-1)s_X^2 + (m-1)s_Y^2}{m+n-2}$, where $s_X^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2$
+- $s_p^2$ is an unbiased estimator of $\sigma^2$
+
+Distribution of $s_p^2$: $\chi_{m+n-2}^2$
+
+*** /t/-statistic
+
+Define $t = \frac{\bar{X}-\bar{Y}-(\mu_X-\mu_Y)}{s_p \sqrt{\frac{1}{n}+\frac{1}{m}}}$: has a $t$ distribution with $m+n-2$ degrees of freedom
+
+*** Confidence Intervals
+
+Construct $(1-\alpha)$ CI for $(\mu_X-\mu_Y)$
+
+$(\bar{X}-\bar{Y}) \pm z_{\alpha/2} \cdot \sigma\sqrt{\frac{1}{n} + \frac{1}{m}}$ (if \sigma is known)
+
+$(\bar{X}-\bar{Y}) \pm t_{m+n-2,\alpha/2} \cdot s_p \sqrt{\frac{1}{n} + \frac{1}{m}}$ (if \sigma is unknown)
+
+*** One-sided vs Two-sided tests
+
+Two-sided tests where $H_1: \mu_X \ne \mu_Y$ was covered earlier: reject when $|t| > t_{n+m-2,\alpha/2}$ ($\alpha/2$ level)
+
+One-sided tests where $H_1: \mu_X > \mu_Y$: reject when $t > t_{n+m-2, \alpha}$ ($\alpha$ level)
+
+Hence a two-sided test at $\alpha$ level is equivalent to one-sided test at $\alpha/2$ level.
+Important part is not to choose which test to use, but to clearly report which test you use.
+
+** Normal Theory: Unequal Variance
+
+*** If variances $\sigma_X^2$ and $\sigma_Y^2$ are known
+
+$Var(\bar{X}-\bar{Y}) = \frac{\sigma_X^2}{n} + \frac{\sigma_Y^2}{m}$
+
+$Z = \frac{\bar{X}-\bar{Y}-(\mu_X-\mu_Y)}{\sqrt{\frac{\sigma_X^2}{n} + \frac{\sigma_Y^2}{n}}}$, still standard normal
+
+*** If variances $\sigma_X^2$ and $\sigma_Y^2$ are unknown
+
+Estimate them with $s_X^2$ and $s_Y^2$.
+
+$t = \frac{\bar{X}-\bar{Y}-(\mu_X-\mu_Y)}{\sqrt{\frac{s^2}{n} + \frac{s^2}{n}}}$, approximately /t/ distributed with degrees of freedom $df$
+- $df = \frac{(a+b)^2}{\frac{a^2}{n-1} + \frac{b^2}{m-1}}$, where $a = \frac{s_X^2}{n}$, $b=\frac{s_Y^2}{n}$
+
+** Summary
+
+When variances are known, use /Z/-test
+
+When variances are unknown, use /t/-test
+- If we assume variances are the same, estimate $\sigma^2$ with $s_p^2$
+- If we assume variances are different, estimate $\sigma_X^2$ and $\sigma_Y^2$ with $s_X^2$ and $s_Y^2$
+- We may assume variances are the same if we check that $s_X^2$ and $s_Y^2$ are not too different; i.e. $s_X$ and $s_Y$ are within factor of 2
+
+What if samples are NOT drawn from normal distributions?
+- $\bar{X}-\bar{Y}$ still approximately normal by CLT if $n$ and $m$ are large
+- Also, if $n$ and $m$ are large, /t/-statistics are also approximately normal,
+so even in the unknown variance case we sometimes call it the /Z/-test
+
+*** Example: Mining
+
+Mine 1: 8260, 8130, 8350, 8070, 8340
+Mine 2: 7950, 7890, 7900, 8140, 7920, 7840
+
+Use 1% LOS to test whether the means are different.
+- $H_0: \mu_1 = \mu_2$
+- $H_1: \mu_1 \ne \mu_2$
+
+Small sample size, so /assume/ they are from a normal distribution.
+
+Data:
+- $s_1 \approx 125.5$
+- $s_2 \approx 104.5$
+- Since $\frac{1}{2} < s_1 / s_2 < 2$, we use equal variance assumption
+- $\bar{x} = \ldots$, $\bar{y} = \ldots$
+
+T-test:
+- $t = \frac{\bar{X}-\bar{Y}-0}{s_p \sqrt{\frac{1}{n_1} + \frac{1}{n_2}}} \sim t_{n_1+n_2-2}$
+- Rejection region: $|t| > t_{n_1+n_2-2, 0.01/2} = 3.250$
+- Plugging in everything, we get $t = 4.19$
+- Since $t=4.19$ is in the critical region, we reject $H_0$
+
+** Non-Parametric Test
+
+Now we do not assume that $X_i$ and $Y_i$ are normal.
+
+Let $X_1, \ldots, X_n$ be IID with CDF $F$,
+let $Y_1, \ldots, Y_n$ be IID with CDF $G$, $X$ and $Y$ are independent
+
+Consider the null hypothesis $H_0: F=G$.
+
+We are interested in whether $X$ values are larger than $Y$ values on the whole, or vice versa:
+often phrased as $H_0: \mu_X = \mu_Y$.
+Note that when we reject the former, we don't necessarily reject the latter, but in most practical situations we think of them as equivalent.
+
+** Mann-Whitney (Wilcoxon) Test
+
+Let $(Z_1, \ldots, Z_{m+n})$ be the pooled sample of $X$ and $Y$ values, and assume the values are distinct.
+- If there are tied values, we can assign them the /average/ of the ranks; if there are only a few tied values, significance levels not greatly affected
+- For large $m$ and $n$, why not just use /Z/-test? If you think the normal approximation is not good enough ($m$ and $n$ not large enough for a very bad underlying distribution)
+
+Define $Rank(Z) = i$ if $Z$ is the /i/-th /smallest/ value within the pooled sample.
+
+Define the rank sum scores:
+- $T_X = \sum_{i=1}^{n} Rank(X_i)$
+- $T_Y = \sum_{i=1}^{m} Rank(Y_i)$
+- Note that $T_X + T_Y = \sum_{i=1}^{m+n} i = \frac{(m+n)(m+n+1)}{2}$ is fixed
+
+Idea: if $H_0: F=G$ is true, the ranks should be uniformly distributed from $\{1, \ldots, m+n\}$,
+so the rank sums should not be too small or too large.
+
+Take the smaller sample of size $n_1 = min(m,n)$, and compute sum of ranks $R$ from that. Then $R' = n_1(m+n+1)-R$.
+
+_Mann-Whitney test statistic_: $R^* = min(R, R')$
+- Reject $H_0: F=G$ if $R^*$ is too small
+- Can be either one-sided or two-sided test
+
+*** Example: Mining
+
+Mine 1: ranks are 9, 7, 11, 6, 10
+Mine 2: ranks are 5, 2, 3, 8, 4, 1
+
+Then:
+- $R = 9+7+11+6+10 = 43$
+- $R' = 5(12) - 43 = 17$
+- $R^* = \min(R, R') = 17$
+
+Rejection region at $\alpha=0.01$ is $R \le 16$, so do not reject $H_0$. (actual /p/-value is 0.017)
+
+*** Performance of Mann-Whitney Test
+
+- Works for /all/ distributions, not only normal (non-parametric)
+- Robust against outliers (unlike normal tests)
+  - So more powerful than /t/-test: this is because outliers in /t/-test inflate sample variance, resulting in small /t/-value
+- If the underlying distribution is indeed normal, this test is only slightly less efficient than 2-sample /t/-test
+  - Asymptotic efficiency is about 0.955 => to achieve the same power as 2-sample /t/-test, need only about 5% more samples
+
+* Comparing 2 Samples: Paired Samples
+
+** Normal Theory
+
+In paired samples, $X$ and $Y$ values are /paired up/, related to the same individual/object
+- Assume that $(X_i, Y_i)$ is independent of $(X_j, Y_j)$
+- Let $D_i = Y_i - X_i$
+- Let $\mu_D$ be unknown population mean of $D$ values
+- To test $H_0: \mu_D = 0$, compute /t/-test statistic $t = \frac{\bar{D}}{s_D/\sqrt{n}}}$, where $\bar{D}$ is sample mean and $s_D^2$ is sample variance
+- Reject $H_0$ when $|t| > t_{n-1, \alpha/2}$ (two-tailed test)
+- If $n$ is large, don't need normal assumption and reject $H_0$ when $|t| > z_{\alpha/2}$
+
+In general, to test $H_0: \mu_D = d$, we use:
+- $t = \frac{\bar{D} - d}{s_D/\sqrt{n}}$
+- $(1-\alpha)$ CI for $\mu_D$: $\bar{D} \pm t_{n-1, \alpha/2} s_D/\sqrt{n}$
+
+*** Example: Smoking
+
+| ID  |  1 |  2 |  3 |  4 |  5 |  6 |
+|-----+----+----+----+----+----+----|
+| $X$ | 25 | 25 | 27 | 44 | 30 | 60 |
+| $Y$ | 27 | 31 | 37 | 56 | 43 | 57 |
+
+2 6 10 12 13 -3
+4 36 100 144 169 9
+sum=40
+sum^2=462
+n=6
+462-(1600/6)
+
+Test the hypothesis that $H_0: \mu_D = 0$ (i.e. $\mu_X = \mu_Y$)
+- $\bar{D} = 6.67$
+- $s_D = 6.25$
+- $t = \frac{6.67}{6.25/\sqrt{6}} = 2.61$
+- This value is in the rejection region $|t| > t_{5, 0.025} = 2.57$, so reject $H_0$
+
+** Non-Parametric test: Wilcoxon Signed-Rank Test
+
+Wilcoxon signed-rank test based on differences $D_i$
+
+Assumption: under $H_0$, distribution of $D_i$ is symmetrically distributed around 0
+
+_Performing the test_
+- Let $D_1, \ldots, D_n$ be the sample of differences
+- Let $Rank(D) = i$ if $D$ has /i/-th smallest absolute value in the sample
+- Let $W_+$ be sum of ranks among positive $D_i$
+- Let $W_-$ be sum of ranks among negative $D_i$
+- (Note that $W_+ + W_- = 1 + \ldots + n = \frac{n(n+1)}{2}$)
+- Let $W = min(W_+, W_-)$
+- Reject $H_0$ when $W_+$ is too large or too small
+
+*** Example: Smoking
+
+| ID        | 1 | 2 |  3 |  4 |  5 |  6 |
+|-----------+---+---+----+----+----+----|
+| $D=Y-X$   | 2 | 6 | 10 | 12 | 13 | -3 |
+| $Rank(D)$ | 1 | 3 |  4 |  5 |  6 |  2 |
+
+- From the data, $W_+ = 19$, and $W_- = 2$
+- Rejection region for $\alpha=0.05$ is $W \le 0$ (we don't have enough data points!), hence we fail to reject $H_0$
+
