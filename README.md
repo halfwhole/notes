@@ -1,6 +1,6 @@
 # Notes
 
-These are notes, cheatsheets, and other resources I've made for modules taken at the National University of Singapore (NUS).
+These are notes, cheatsheets, and other resources I've made for modules taken at the National University of Singapore.
 They're written mostly in Org mode, then exported to LaTeX/PDF.
 
 They may contain errors. Use them at your own peril! 🙃
@@ -30,3 +30,8 @@ They may contain errors. Use them at your own peril! 🙃
 - CS4232: Theory of Computation
 - CS4234: Optimisation Algorithms
 - ST2132: Statistics
+
+#### AY2020/21 Semester 2
+
+- CS3243: Introduction to Artificial Intelligence
+

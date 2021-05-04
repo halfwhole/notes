@@ -1,0 +1,1164 @@
+#+TITLE: CS3243 Notes
+#+LATEX_HEADER: \usepackage{parskip}  \setlength{\parindent}{15pt}
+#+LATEX_HEADER: \usepackage{sectsty}  \setcounter{secnumdepth}{3}
+#+LATEX_HEADER: \usepackage{titlesec} \newcommand{\sectionbreak}{\clearpage}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+#+LATEX_HEADER: \usepackage{bm}
+#+OPTIONS: toc:2 author:nil date:nil
+
+# * Assessment
+
+# | Weekly quizzes     | 10% |
+# | Weekly assignments | 10% |
+# | Project 1          | 10% |
+# | Midterm quiz       | 20% |
+# | Project 2          | 20% |
+# | Final quiz         | 30% |
+
+# Projects 1 and 2 in groups of 4 (same group)
+
+* Lecture 1: Introduction
+
+** Intelligent Agents
+
+Agents interact with their environment
+- _Sensors_ take in percepts
+- _Actuators_ perform actions
+- _Agent function_ maps /percept histories/ to /actions/: $f: P^* \rightarrow A$
+
+** Rationality
+
+_Rational_ if selected actions are:
+- Based on evidence (prior knowledge/percept sequence)
+- Maximise performance measure
+
+_Performance measure_: defining and measuring 'performance' is difficult
+- Task specificity: easier to define 'performance' for a narrower than more general task
+
+Can be rational to explore (perform actions that gather information)
+
+Agent is /autonomous/ if behaviour is determined by its own experience
+
+** Task Environment: PEAS
+
+_PEAS_: Performance measure, Environment, Actuators, Sensors
+
+E.g. Automated Taxi
+- _Performance measure_: safe, fast, comfort, revenue
+- _Environment_: roads, traffic, pedestrians
+- _Actuators_: steering wheel, accelerator, brake
+- _Sensors_: sonar, speedometer, gps, engine sensors
+
+** Properties of Task Environments
+
+- _Observability_: fully or partially observable? (e.g. fog of war)
+- _Deterministic vs. stochastic_: are there random elements?
+  - Still deterministic if random elements do not affect the transition function
+  - Not deterministic if some elements are unobservable to player
+- _Episodic vs. sequential_
+  - _Episodic_: choice of current action does not depend on actions in past episodes
+  - _Sequential_: need to consider previous actions too (e.g. chess); current action affects future actions
+  - /Order/ is important in sequential, not in episodic
+- _Static vs. dynamic_: is environment changing as agent deliberates?
+- _Discrete vs. continuous_: finite/infinite number of distinct states/percepts/actions
+  - We prefer solving discrete problems
+- _Single vs. multi agent_
+
+** Building an Agent
+
+_Lookup table agent_
+- For each possible percept, write its optimal action
+- Problem: huge table with many many possible percepts
+- Problem: no autonomy, hard to change on-the-fly if action is wrong. Unmaintainable and rigid
+
+_Types of agents (in increasing complexity)_:
+1. Simple reflex agent: passive, only acts when it observes a percept
+2. Model-based reflex agent: passive, has state/internal model of the world
+3. Goal-based agent: not just passive and based on percept; has goals and acts to achieve them
+4. Utility-based agent: has utility function, acts to maximise it
+
+State is updated based on percept, current state, most recent action, model of the world
+
+(*) Utility function is /internal/, performance measure is /external/ and used to assess agent
+
+_Learning agent_
+- Critic + learner => adapt based on performance standard
+
+_Exploration vs. exploitation_: a classic trade-off the agent must make
+- Exploration: get more knowledge to improve future gains
+- Exploitation: make use of knowledge to maximise current gains
+
+* Lecture 2: Uninformed Search
+
+*Problem-solving agent*: one kind of goal-based agent
+
+_Environment_: fully observable, deterministic, discrete
+
+_Uninformed search_: no additional knowledge incorporated
+
+** (\star) Search Problem Formulation
+
+- _State_: including initial state
+  - Abstract ONLY the relevant information, and nothing else
+  - Everything in the state should be a variable that can change, no constants
+- _Actions_: $\textsc{actions(s)}$ gives set of all valid actions that can be executed in state $s$
+  - Define it for every possible state $s$
+- _Transition model_: $\textsc{result(s,a)}$ gives new state $s'$ upon doing action $a$ in state $s$
+  - Define it for every possible state $s$ and its valid action $a$
+- _Goal test_: test if a state $s$ is the goal state
+  - E.g. $IsCheckmate(s)$ or $IsSolved(s)$
+- _Path cost_: path cost is additive sum of step costs
+  - Step cost $c(s, a, s')$ --- e.g. 1 per action taken
+
+** Searching for Solutions
+
+_Solution_: sequence of actions leading from initial to goal state
+
+_Example: route planning_
+- Reduce map down to nodes with edges between them of certain weights
+
+_Example: 8-puzzle_
+- State: an arrangement of numbers in 3x3 grid, represented as matrix/array
+- Actions: moving one filled square to a blank adjacent square
+- Transition model: [depends on representation] --- function that takes in state + action => new state
+- Goal test: whether each cell matches the goal state, one-for-one
+- Cost function: uniform cost of 1 for each action
+
+[[./img/8-puzzle.png]]
+
+_State vs node_
+- State: represents physical configuration
+- Node: data structure constituting part of search tree: includes state, parent node, action, path cost $g(n)$
+- Two different nodes can contain the same world state
+
+** Search Strategies
+
+Which order should we expand the nodes in?
+
+_Evaluation criteria_
+- Completeness: always find a solution if it exists
+- Optimality: finds a least-cost solution
+- Time complexity: number nodes generated
+- Space complexity: max number of nodes in memory
+
+_Problem parameters_
+- $b$: maximum # of successors for each node --- branching factor
+- $d$: depth of /shallowest/ goal node
+- $m$: maximum depth of search tree
+
+** Breadth-First Search (BFS)
+
+_Frontier_: Queue
+
+_Properties of BFS_
+- Complete: yes, as long as $b$ is finite
+- Optimal: no, unless uniform step cost, or uniform across each level
+- Time: $O(b^d) = O(b) + O(b^2) + \ldots + O(b^d)$
+- Space: $O(b^d)$ (max size of frontier)
+
+Applies goal test when pushing to frontier: reduces time and space complexity from $O(b^{d+1})$ to $O(b^d)$
+
+** Uniform-Cost Search (UCS)
+
+_Frontier_: Priority queue, by path cost
+- Idea: explore unexpanded node with /least-path-cost/ (equivalent to BFS if all step costs are equal)
+
+_Properties of UCS_
+- Complete: yes, if all step costs are $\ge\epsilon$
+  - If not, ever-decreasing step costs may get you stuck infinitely on a suboptimal path
+  - Still yes even if $b$ or $d$ is infinite, or search space is infinite
+- Optimal: yes (when it is complete)
+- Time: $O(b^{1 + \lfloor \frac{C^*}{\epsilon} \rfloor}})$ where $C^*$ is the optimal cost
+  - Reach nodes at distance 0, $\epsilon$, $2\epsilon$, $\ldots$, $\lfloor \frac{C^*}{\epsilon} \rfloor \epsilon$ of goal => total $\lfloor \frac{C^*}{\epsilon} \rfloor + 1$ steps
+- Space: $O(b^{1 + \lfloor \frac{C^*}{\epsilon} \rfloor}})$
+
+** Depth-First Search (DFS)
+
+_Frontier_: Stack
+
+_Properties of DFS_
+- Complete: yes, as long as depth is finite
+- Optimal: no
+- Time: $O(b^m)$
+- Space: $O(bm)$ (can be $O(m)$ --- at each level, just keep track of self and parent)
+
+** Depth-Limited Search (DLS)
+
+_Idea_: run DFS with depth limit $\ell$
+- Only works if we know the goal is within $\ell$ steps
+- Time: $O(b^\ell)$
+- Space: $O(b\ell)$ (can be $O(\ell)$)
+
+** Iterative Deepening Search (IDS)
+
+_Idea_: keep performing DLSs with increasing depth limit, until goal node is found
+- Better if state space is large and depth of solution is unknown
+- It can be wasteful with repeated effort
+- But overhead is not that large (e.g. $b=10, d=5$ --- 11%)
+
+_Properties of IDS_
+- Complete: yes, if $b$ is finite
+- Optimal: no, unless step cost is uniform
+- Time: $O(b^d)$
+- Space: $O(bd)$ (can be $O(d)$)
+
+[[./img/search-strategy-summary.png]]
+
+1. Complete if $b$ is finite
+2. Complete $b$ is finite and step cost $\ge \epsilon$
+3. Optimal if step costs are identical 
+
+** Choosing a Search Strategy
+
+Depends on the problem
+- Depth: finite/infinite?
+- Solution depth: known/unkwown?
+- Repeated states
+- Step costs: identical/different?
+- Completeness and optimality -- are they needed?
+- Resource constraints (time/space)?
+
+** Search Tracing Problems
+
+_Tree-Search_
+
+| Frontier              |
+|-----------------------|
+| S(0)                  |
+| A(1) B(5) C(15)       |
+| S(2) B(5) G(11) C(15) |
+| \ldots                |
+
+_Graph-Search_
+
+| Frontier         | Explored |
+|------------------+----------|
+| S(0)             |          |
+| A(1) B(5) C(15)  | S        |
+| B(5) G(11) C(15) | S, A     |
+| G(10) C(15)      | S, A, B  |
+
+* Lecture 3: Informed Search
+
+_Informed search_: exploits problem-specific knowledge, uses /heuristics/ to guide search
+
+(AIMA Chapter 3.5.1-2, 3.6.1-...)
+
+** Best-First Search
+
+_Idea_: use an /evaluation function/ $f(n)$ for each node $n$
+- Measures /cost estimate/
+- Expand node with the lowest estimated cost first
+
+_Implementation_: priority queue, ordered by non-decreasing cost $f$
+
+** Greedy Best-First Search (special case of Best-FS)
+
+_Evaluation function_: $f(n) = h(n)$
+- $h(n)$: cost estimate from $n$ to goal (heuristic)
+- Idea: expand the node that appears the closest to goal
+
+_Properties_
+- Complete: yes, if $b$ is finite
+- Optimal: no
+- Time: $O(b^m)$, but if heuristic is good can reduce complexity substantially
+- Space: $O(b^m)$ (max size of frontier)
+
+** A* Search (special case of Best-FS)
+
+_Idea_: avoid expanding paths that are already expensive
+- Expand the path that appears the cheapest
+
+NOTE: remember we use a /priority queue/ on $f(n) = g(n) + h(n)$; pick the smallest one
+
+_Evaluation function_: $f(n) = g(n) + h(n)$
+- $g(n)$: cost of reaching $n$ from start node, under the current path (not necessarily the smallest among all paths!)
+- $h(n)$: cost estimate from $n$ to goal (heuristic)
+- $f(n)$: estimated cost of cheapest path /through/ $n$ to goal
+
+_Properties_
+- Complete: yes, if there is finite number of nodes and $f(n) \le f(G)$
+- Optimal: yes, if you have an admissible/consistent heuristic
+- Time (no great detail): $O(b^{h^*(s_0)-h(s_0)})$ where $h^*(s_0)$ is actual cost from root to goal
+- Space: $O(b^m)$ (max size of frontier)
+
+** Heuristic Design
+
+*** Admissibility
+
+_Admissible heuristics_
+- $h(n)$ is /admissible/ if it never overestimates the cost to reach goal
+- Definition: $\forall{}n, h(n) \le h^*(n)$, where $h^*(n)$ is the true cost from $n$ to goal state
+
+_Theorem_: if $h(n)$ is admissible, then A* using $\textsc{Tree-Search}$ is optimal
+- (Proof: see lecture 3 slide 22)
+
+*** Consistency
+
+_Consistent heuristic_:
+- $h(n)$ is /consistent/ if it means that $f(n)$ is non-decreasing along any path (triangle inequality)
+- Definition: $h(n) \le d(n,n') + h(n')$, where $n'$ is a successor of $n$
+- Lemma: if $h$ is consistent, then $f(n') \ge f(n)$
+- (???)
+
+_Theorem_: if $h(n)$ is consistent, then A* using $\textsc{Graph-Search}$ is optimal
+- Claim: when A* selects a node $n$ for expansion, the shortest path to $n$ has been found
+- (Proof: see lecture 3 slide 26)
+
+*** Admissibility & Consistency
+
+All consistent heuristics are admissible, but not the other way round.
+
+_Example: 8-puzzle_
+- Heuristic 1: number of misplaced tiles
+- Heuristic 2: total Manhattan distance
+
+*** Dominance
+
+$h_2$ /dominates/ $h_1$ if $h_2(n) \ge h_1(n)$ for all $n$, where both heuristics are admissible
+- Dominating heuristics are better: incur lower search costs under A*
+
+*** Deriving Admissible Heuristics
+
+Common exam question: given a problem, derive an admissible heuristic
+
+Solution: /relax/ the problem --- then it'll only be 'easier' to reach the goal.
+Heuristic that uses this relaxed problem can NEVER over-estimate goal
+
+** Local Search
+
+Path to the goal is irrelevant; we only want to reach the goal state
+
+_Local search algorithms_: maintain single "current best" state, and try to improve it
+
+Advantages
+- Very little/constant memory
+- Find reasonable solutions in large state space
+
+*** Hill-Climbing Algorithm
+
+$\textsc{Hill-Climbing}$
+- current \leftarrow initial state
+- while True:
+  - neighbour \leftarrow best successor of current
+  - if neighbour's value \le current's value: return current
+  - current \leftarrow neighbour
+
+_Problem_: depending on initial state, can get stuck in local maxima (or minima)
+
+_Solution_: try random restarts or sideway moves
+
+* Lecture 4: Adversarial Search
+
+** Adversarial Search Problems (Games)
+
+_Game_: agent vs. agent(s)
+- Unlike a /search problem/, which is agent vs. environment
+- There are other utility-maximising agents
+- Solution is a strategy that specifies a move for every possible opponent response
+
+_Zero-sum game_: agent utilities sum to zero
+- Completely adversarial game
+
+_Two-player zero-sum game_
+- /MAX/ player: wants to maximise value
+- /MIN/ player: wants to minimise value
+
+_Problem formulation_
+- Initial state $s_0$
+- States $s$
+- (\star NEW) /Player/ $\textsc{Player}(s)$: defines which player has the move in state $s$
+- Actions $\textsc{Actions}(s)$: returns set of legal moves in state $s$
+- Transition model $\textsc{Result}(s,a)$: returns state that results from move $a$ in state $s$
+- Terminal test $\textsc{Terminal}(s)$: check whether the game has ended
+- (\star NEW) Utility function $\textsc{Utility}(s,p)$: final numeric value for game with terminal state $s$ for player $p$
+
+For now, we assume 2-player, deterministic, turn-taking  
+
+** Strategies
+
+_Strategy_
+- Strategy $s$ for player $i$: for every node of the tree that the player can make a move in, specify what player will do
+- Need to define strategy in states that will never be reached (I think this means instead that it needs to be defined for all possible states)
+
+_Winning strategy_
+- _Winning_: $s_1^*$ for player $1$ is /winning/ --- if for any strategy $s_2$ by player $2$, game ends with player $1$ as the winner
+- _Non-losing_: $t_1^*$ for player $1$ is /non-losing/ --- if for any strategy $s_2$ by player $2$, game ends with EITHER player $1$ as the winner or tie
+
+** Optimal Decisions (Minimax)
+
+[[./img/minimax-nim.png]]
+
+$\textsc{Minimax}(s)$
+- $\textsc{Utility}(s)$ if $\textsc{TerminalTest}(s)$
+- $\max_{a\in{}\textsc{Actions(s)}} \textsc{Minimax(Result}(s,a))$ if $\textsc{Player}(s) = MAX$
+- $\min_{a\in{}\textsc{Actions(s)}} \textsc{Minimax(Result}(s,a))$ if $\textsc{Player}(s) = MIN$
+
+_Properties_
+- Complete: yes, if game tree is finite
+- Optimal: yes
+- Time: $O(b^m)$ (similar to DFS)
+- Space: $O(bm)$ (similar to DFS)
+
+** \alpha-\beta Pruning
+
+- \alpha: largest value so far for MAX
+- \beta: smallest value so far for MIN
+
+[[./img/alpha-beta-pruning-eg.png]]
+
+Example above: in the bottom branch, \beta=-7, but \alpha=-2 > \beta. So no need to explore the remaining branches
+
+[[./img/alpha-beta-pruning-eg2.png]]
+
+_\alpha-\beta pruning_
+- MAX node $n$: $\alpha(n)$ = highest observed value found on path from $n$. Initially $\alpha(n) = -\infty$
+- MIN node $n$: $\beta(n)$ = lowest observed value found on path from $n$. Initially $\alpha(n) = -\infty$
+- (\star) Given MIN node $n$, stop searching below $n$ if there is some MAX ancestor $i$ of $n$ with $\alpha(i) \ge \beta(n)$
+- (\star) Given MAX node $n$, stop searching below $n$ if there is some MIN ancestor $i$ of $n$ with $\beta(i) \le \alpha(n)$
+
+_Analysis of \alpha-\beta pruning_
+- "Perfect" ordering: time complexity = $O(b^{\frac{m}{2}})$ --- can search twice as deep!
+- Random ordering: time complexity = $O(b^{\frac{3}{4}m})$ for $b<1000$
+
+_Summary_
+- Initially, $\alpha(n) = -\infty$, $\beta(n) = +\infty$
+- $\alpha(n)$ is MAX along search path containing $n$
+- $\beta(n)$ is MIN along search path containing $n$
+- If a MIN node has value $v\le{}\alpha(n)$, no need to explore further
+- If a MAX node has value $v\ge{}\beta(n)$, no need to explore further
+
+** Imperfect, Real-Time Solutions
+
+_Time limit_
+- How to deal with super large search trees? \Rightarrow Limit maximum depth of tree
+- _Evaluation function_: estimated expected utility of state (similar to heuristic)
+- _Cutoff test_: e.g. depth limit
+
+_Cutting-Off Search_: similar to Depth-Limited Search (DLS)
+- Previously: $\textsc{Minimax}(s) = \textsc{Utility}(s)$ if $\textsc{Terminal-Test}(s)$
+- Now: $\textsc{H-Minimax}(s) = \textsc{Eval}(s)$ if $\textsc{Cutoff-Test}(s)$
+- i.e. run minimax until depth $d$, then use evaluation function to choose nodes
+- Can also consider iterative deepening approach
+
+_Stochastic Games_
+- How to deal with games with /randomisation/?
+- Game tree now has added /chance layers/ --- even more complex
+- Calculating the expected value of a state --- MUCH harder than deterministic games
+
+* Lecture 5: Constraint Satisfaction Problems
+
+AIMA Chapter 6.1-6.4
+
+** CSP Formulation
+
+_CSP representation_
+- Variables $\vec{X} = X_1, \ldots, X_n$
+- Domain $D$ for variables --- $X_i$ has domain $D_i$ --- list of values a variable can take
+- Constraints $\vec{C}$ --- restrictions on values a variable can take
+  - Defined by constraint language: algebra/logic (don't give abstract english description)
+
+_CSP objective_
+- Find a legal assignment $(y_1, \ldots, y_n)$ --- $y_i \in D_i$ for all $i \in n$
+- /Complete/: all variables assigned values
+- /Consistent/: all constraints satisfied
+
+*** Example: Graph Colouring
+
+_Constraint graph_: node are variables, edges are constraints
+- Variables: $\vec{X} = \langle WA, NT, Q, NSW, V, SA, T \rangle$
+- Domains: $D_i = \{R, G, B\}$
+- Constraints: if $(X_i, X_j) \in E$ then $color(X_i) \ne color(X_j)$
+
+_Binary constraint_: involves 2 variables
+
+[[./img/graph-colouring.png]]
+
+*** Example: Job-Shop Scheduling
+- Car assembly consists of 15 tasks
+- Variables: Axle_F, Axle_B, Wheel_LF, Wheel_RF, Wheel_LB, Wheel_RB, Nuts_LF, Nuts_RF, Nuts_LB, Nuts_RB, Cap_LF, Cap_RF, Cap_LB, Cap_RB, Inspect
+- Domain: $D_i = \{1, 2, \ldots, 27\}$
+- Precendence constraints: e.g. $Axle_F + 10 \le Wheel_{RF}$
+- Disjunctive constraints: e.g. $(Axle_F + 10 \le Axle_B) or (Axle_B + 10 \le Axle_F)$
+
+** CSP Variants
+
+_Discrete variables_
+- Finite domains: e.g. sudoku
+- Infinite domains: integers, strings etc. e.g. job-shop scheduling
+
+_Continuous variables_
+- E.g. start/end times for Hubble Space Telescope observations
+- Linear programming problems can be solved in polynomial time
+
+** Constraint Variants
+
+- _Unary constraints_: 1 variable e.g. $SA \ne Green$
+- _Binary constraints_: 2 variables e.g. $SA \ne WA$
+- _Global/higher-order constraints_: 3 or more variables e.g. $X_1 + X_2 - 4X_7 \le 15$
+
+*** Example: Cryptarithmetic Puzzle
+
+- Each letter represents one digit (base 10)
+- Different letters should correspond to different digits
+- T and F cannot be 0
+
+[[./img/cryptarithmetic.png]]
+
+(Also, $C_1, C_2, C_3$ should be either 0 or 1)
+
+_Drawing constraints_
+- Global constraints: draw using square
+  - E.g. $AllDiff(F, T, U, W, R, O)$ --- one square linking them all
+- Binary constraints: can draw using square, if not just draw an edge directly
+- Unary constraints: don't need to draw
+
+*** Example: Sudoku
+
+[[./img/sudoku.png]]
+
+** CSP Search
+
+*** Search Formulation
+
+- _State and initial state_: initially empty assignment $[]$
+- _Transition function_: assign a valid value to an unassigned variable, fail if no valid assignments
+- _Goal test_: all variables assigned
+- Every solution appears at exactly depth $n$
+- Search path is irrelevant
+
+*** Search Tree
+
+Each level: pick any remaining variable, give it any possible assignment.
+
+Maximum size i.e. total number of leaves: $n! \times d^n$
+- E.g. 4 Variables and 3 Values --- size = $4! \times 3^4 = 1944$
+
+** Backtracking Search Algorithm
+
+_Backtracking search_
+- More efficient than the search above
+- Perform DFS with single-variable/level assignments: at every level, consider assignments to a /single/ variable
+- Order of variable assignment is irrelevant
+
+$\textsc{Backtracking-Search}(csp)$ returns a solution, or failure
+- return $\textsc{Backtrack}(\{\}, csp)$
+
+$\textsc{Backtrack}(assignment, csp)$ returns a solution, or failure
+- if assignment is complete, return it
+- var \leftarrow $\textsc{Select-Unassigned-Variable}(csp)$
+- for each value in $\textsc{Order-Domain-Values}(var, assignment, csp)$:
+  - if value is consistent with assignment:
+    - add $\{var = value\}$ to assignment
+    - inferences \leftarrow $\textsc{Inference}(csp, var, value)$
+    - if inferences == failure: continue
+    - add inferences to assignment
+    - result \leftarrow $\textsc{Backtrack}(assignment, csp)$
+    - if result \ne failure: return result
+  - remove $\{var = value\}$ and inferences from assignment
+- return failure
+
+** Backtracking Heuristics: Variable and Value Ordering
+
+*** Variable-Order Heuristics: $\textsc{Select-Unassigned-Variable}$
+
+1. _Most constraining variable a.k.a. degree heuristic_: choose the variable that imposes the most constraints on the remaining unassigned variables
+   - This is best: it reduces the branching factor => likely get to terminal state faster
+[[./img/degree-heuristic.png]]
+2. _Most constrained variable a.k.a. Minimum-Remaining-Values (MRV) heuristic_: choose the variable with the fewest remaining legal values
+   - Use as tiebreaker
+ 
+*** Value-Order Heuristic: $\textsc{Order-Domain-Values}$
+
+1. _Least constraining value_: choose the value that rules out the fewest values for the neighbouring unassigned variables
+   - Because we're "actually trying to solve the problem" in this stage, unlike the variable stage
+
+[[./img/least-constraining-value.png]]
+
+** Inference: $\textsc{Inference}$
+
+Idea: check for failures early.
+
+*** Forward Checking
+
+_Forward checking_
+- Keep track of remaining legal values for unassigned variables
+- (\star) Terminate search when any variable has no legal values left
+
+[[./img/forward-checking.png]]
+
+E.g. here SA has no remaining valid assignments => failure.
+
+*** Constraint Propagation
+
+_Constraint propagation_: 'move ahead' with the constraints
+- Repeatedly locally enforce constraints
+- Infer illegal values for assignments early on
+
+[[./img/constraint-propagation.png]]
+
+E.g. here NT and SA both have to be blue, but by constraints, they can't be both blue
+
+* Lecture 6: Project Details
+
+** Reinforcement Learning
+
+1. \leftarrow Agent receives input information
+2. \rightarrow Agent performs valid action
+3. \leftarrow Agent obtains reward
+
+State $s_t$ \rightarrow action $a_t$ \rightarrow reward $r_t$ (also takes you to state $s_{t+1}$)
+
+** Supervised vs Unsupervised Learning
+
+_Unsupervised_: data are unlabelled => perform things like clustering
+
+_Supervised_: data are labelled => perform things like predicting labels for new unlabelled data
+- _Classification problems_: supervised learning problem with discrete-valued class
+
+| $\#$     | x_1       | $\ldots$ | x_q       | y        |
+|----------+----------+----------+----------+----------|
+| 1        | x_{1,1}     | $\ldots$ | x_{1,q}     | y_1       |
+| $\vdots$ | $\vdots$ |          | $\vdots$ | $\vdots$ |
+| p        | x_{p,1}     | $\ldots$ | x_{p,q}     | y_p       |
+
+Goal: build a model $F$ such that $F(X) = y$ with high accuracy, where $X$ is a new unseen instance
+
+** Evaluating Classification Models
+
+Generating models and evaluating models are different!
+
+_Idea behind evaluation_: measure generalisation performance
+- Assume instances are governed by overarching distribution $D$
+- Want to determine, the probability of accurately classifying ANY instance drawn from $D$
+
+Example methods
+- Hold-out testing, i.e. training and testing sets
+- k-fold cross-validation
+
+** Algorithm Selection
+
+Given a classification dataset $S$, and a set of algorithms we'll use $A$,
+determine which algorithm $a^* \in A$ is optimal
+
+Meta-learning: pose algorithm selection problem as another classification problem
+
+Generate meta-dataset
+- Each $x_i$ corresponds to a /characteristic/ of a dataset (e.g. number of instances, $r^2$, mutual information, etc.)
+- Each $y_i$ corresponds to the optimal algorithm $a^*$ for that dataset
+
+_Problem_: what is the /overarching distribution/ governing the algorithm selection problem?
+- Which datasets are properly representative for this problem?
+- Where can we draw them from?
+- Repositories exist, but are these representative of all possible problems?
+
+Just ensure that the model built has /good coverage/; uniform distribution of datasets
+- At least have many instances representing different patterns of when one algorithm will be better than another
+
+[[./img/project-1-search-problem.png]]
+
+* Lecture 7: Constraint Satisfaction Problems II
+
+** Inference in CSPs: Arc Consistency and AC-3
+
+Constraint propagation: node consistency for unary constraints, arc conistency for binary constraints
+
+*** Arc Consistency
+
+_Arc consistency_: $X$ is arc-consistent wrt $X_j$ i.e. arc $(X_i, X_j)$ is consistent,
+iff for every value $x\in{}D_i$ there exists some value $y\in{}D_j$ that satisfies binary constraint on arc $(X_i, X_j)$
+- Note that arcs are /directed/.
+- To maintain AC: remove a value if it makes a constraint impossible to satisfy.
+
+[[./img/arc-consistency-dir1.png]]
+(SA, NSW): OK
+
+[[./img/arc-consistency-dir2.png]]
+(NSW, SA): Need to remove blue value from NSW
+
+After an update on $X_i$ where it loses a value, we MUST /re-check/ the neighbours of $X_i$.
+[[./img/arc-consistency-recheck.png]]
+(V, NSW): Now that NSW cannot be blue, V cannot be red
+
+*** AC-3 Algorithm
+
+$\textsc{AC-3}(csp)$ returns $false$ if inconsistency is found, otherwise $true$
+- $queue$ \leftarrow all the arcs in $csp$
+- while $queue$ is not empty:
+  - $(X_i, X_j) \leftarrow \textsc{Remove-First}(queue)$
+  - if $\textsc{Revise}(csp, X_i, X_j)$:
+    - if size of $D_i = 0$ then return $false$
+    - for each $X_k$ in $\textsc{Neighbours}(X_i) - \{X_j\}$:
+      - add $(X_k, X_i)$ to $queue$
+
+$\textsc{Revise}(csp, X_i ,X_j)$ returns $true$ if we revise the domain of $X_i$
+- $revised \leftarrow false$
+- for each $x$ in $D_i$:
+  - if no value $y$ from $D_j$ allows $(x,y)$ to satisfy constraint between $X_i$ and $X_j$:
+    - delete $x$ from $D_i$
+    - $revised \leftarrow true$
+- return $revised$
+
+_Time complexity_: $O(n^2 d^3)$
+- CSP has at most $n^2$ directed arcs
+- Each arc $(X_i, X_j)$ can be inserted at most $d$ times into the queue, since $X_i$ has at most $d$ values
+- $\textsc{Revise}$: checking consistency of arc takes $O(d^2)$ time
+- $\textsc{AC-3}$: $O(n^2 \times d \times d^2) = O(n^2 d^3)$
+
+*** Maintaining AC (MAC)
+
+Search procedure
+- Establish AC at root
+- When AC-3 terminates, choose a new variable and value
+- Re-establish AC given the new variable choice --- maintain AC
+- Repeat;
+- Backtrack if AC gives /empty domain/
+
+We could use AC-3 purely as preprocessing, or do it at every step
+
+_AC-3 with preprocessing_
+- Add all arcs
+
+_AC-3 with backtracking_
+- If domain of variable $X'$ is updated, then only need to add all arcs leading to $X'$
+- i.e. check each arc $(X_i, X')$
+
+*** Generalised Arc Consistency (not covered in CS3243)
+
+What if our arcs are global and not binary constraints?
+- Can reduce to binary constraints if possible
+- Otherwise, we can extend arc consistency (2-consistency) to k-consistency
+
+* Logical Agents
+
+AIMA Chapter 7
+
+** Knowledge-based Agents
+
+_Previously_: we use search; no real model of what the agent knows
+_Now_: we represent agent domain knowledge using logical formulas
+
+Logical agent: Inference Engine + Knowledge Base
+- _Inference Engine_: domain-indepenedent algorithms
+- _Knowledge Base_: domain-specific content --- /set of sentences/ in a formal language
+  - Pre-populate with background/domain knowledge (e.g. game rules)
+
+$\textsc{KB-Agent}(percept)$ returns an $action$
+- persistent: $KB$, a knowledge base; $t$, a counter for time initally set to 0
+- $\textsc{Tell}(KB, \textsc{Make-Percept-Sequence}(percept, t))$
+- $action \leftarrow \textsc{Ask}(KB, \textsc{Make-Action-Query}(t))$
+- $\textsc{Tell}(KB, \textsc{Make-Action-Sequence}(action, t))$
+- $t \leftarrow t+1$
+- return $action$
+
+** Example: Wumpus World
+
+[[./img/wumpus-world.png]]
+
+Wumpus and pits will kill you
+- Beside wumpus: stench
+- Beside pit: breeze
+
+Task environment (PEAS)
+- Performance measure: +1000 for gold, -1000 for dying, -1 for each action, -10 for using arrow
+- Environment: 4x4 grid of rooms
+- Actuators: forward, turn left, turn right, grab gold, shoot arrow
+- Sensors: perceive stench/breeze/glitter/scream
+
+Environment
+- Fully observable: no --- only local perception
+- Deterministic: yes
+- Episodic: no --- sequential actions
+- Static: yes
+- Discrete: yes
+- Single-Agent: yes
+
+_Initial KB_
+- If there is a PIT, there is a BREEZE beside it
+- If there is a WUMPUS, there is a STENCH beside it
+- It's a 4x4 grid world
+- ...
+
+** Logic
+
+_Logic_: formal language for KR, consists of syntax + semantics
+- _Syntax_: defines valid sentences in language: $S_1$, $S_2$, etc.
+  - Provides logical connectives for constructing complex sentences from simpler ones, e.g. $S_1 \wedge S_2$ etc.
+  - e.g $x+y=4$ is a sentence
+- _Semantics_: defines the meaning of a sentence; the "truth of each sentence with respect to each possible world"
+  - i.e. defines truth (validity) of a sentence in a given world (for some given value assignments in an environment)
+  - e.g. $x + y = 4$ is true in a world where $x=2$ and $y=2$, but false in a world where $x=1$ and $y=1$
+
+*** Logical Reasoning: Entailment
+
+_Modelling_: $m$ models/satisfies sentence $\alpha$ if $\alpha$ is true under $m$
+- A model represents the idea of a "possible world" --- it assigns a truth value to all the variables
+- Let $M(\alpha)$ be the set of all models satisfying $\alpha$
+- E.g. $\alpha = (q\in{}\mathbb{Z}_{+}) \wedge (\forall{}n,m\in{}\mathbb{Z}_{+}: q=nm \Rightarrow n \vee m = 1)$
+
+_Entailment $\vDash$_: means that one sentence follows logically from another sentence
+- $\alpha \vDash \beta$ is equivalent to $M(\alpha) \subseteq M(\beta)$
+- E.g. $\alpha = (q \ \text{is prime})$ entails $\beta = (q \ \text{is odd}) \vee (q = 2)$
+
+KB is true \Leftrightarrow all its rules are true, i.e. $\bigwedge_{k=1}^{n} R_k$ is true
+
+Key takewaway: if our model is a subset of a sentence $\alpha$, then $\alpha$ is true
+
+[[./img/entailment-subset.png]]
+
+_Example: Wumpus World_
+- Suppose we move right to (2,1) to detect a breeze
+- Consider 8 possible models for KB with pits (3 boolean choices \Rightarrow 8 possible models
+- KB is only true 
+
+[[./img/wumpus-kb.png]]
+
+- Suppose we want to infer sentence $\alpha_1 =$ "(1,2) is safe".
+- True: proved by model checking. Worlds satisfying KB $\subseteq$ worlds where (1,2) is safe
+
+[[./img/wumpus-kb-2.png]]
+
+- Let $P_{ij}$ be whether there's a pit in $(i,j)$.
+- Let $B_{ij}$ be whether there's a breeze in $(i,j)$.
+
+_Rules_
+- $R_1: \neg P_{1,1}$
+- $R_4: \neg B_{1,1}$
+- $R_5: P_{2,1}$
+
+_"Pits cause breezes in adjacent squares"_
+- $R_2: B_{1,1} \Rightarrow (P_{1,2} \vee P_{2,1})$
+- $R_3: B_{2,1} \Rightarrow (P_{1,1} \vee P_{2,2} \vee P_{3,1})$
+
+*** Inference Algorithm
+
+Let $KB \vdash_{A} \alpha$ be "sentence $\alpha$ is derived/inferred from KB by inference algorithm $A$".
+- $A$ is /sound/ if $KB \vdash_{A} \alpha$ implies $KB \vDash \alpha$
+  - If $KB$ derives $\alpha$, then $KB$ entails $\alpha$
+  - Whatever is derived is correct, i.e. "don't infer nonsense"
+- $A$ is /complete/ if $KB \vDash \alpha$ implies $KB \vdash_{A} \alpha$
+  - If $KB$ entails $\alpha$, then $KB$ derives $\alpha$
+  - Whatever is correct is derived, i.e. if it's implied it will be inferred
+
+We want an inference algorithm that is both /sound/ and /complete/.
+- Let $X =$ all sentences derived from $KB$ using $A$
+- Let $Y =$ all possible sentences entailed by $KB$
+- $X=Y$: sound and complete
+- $X \subset Y$: sound and not complete
+- $Y \subset X$: not sound and complete
+- Otherwise: not sound and not incomplete
+
+*** Inference!
+
+- Given a knowledge base, infer something about the world
+- Inference: deriving new knowledge out of percepts
+- Given $KB$ and $\alpha$, we want to know if $KB \vDash \alpha$, i.e. can we infer $\alpha$ from $KB$?
+
+*** Truth Table for Inference
+
+[[./img/truth-table.png]]
+
+- Build a truth table of all possible values
+- Evaluate the models where the $KB$ is true
+- Does $KB$ entail $\alpha_1$: See if the remaining rows are true for $\alpha_1$. If so, we can infer it
+
+_Inference by Truth Table Enumeration_
+- Sound: directly implements entailment, and calculates all possible inferences from KB by brute force
+- Complete: only finitely many combinations of truth assignments, and goes through all
+- (For above 2, see diagnostic quiz 8/Sam's slides W10)
+- Time complexity: $O(2^n)$
+- Space complexity: $O(n)$ --- because the enumeration is depth-first
+
+** Validity and Satisfiability
+
+_Validity_: a sentence is /valid/ if it is true in /all/ models
+- E.g. statements that are true regardless of truth assignments (tautology), e.g. $True$, $A \vee \neg{}A$
+- $KB \vDash \alpha$ iff $(KB \Rightarrow \alpha)$ is valid
+
+_Satisfiability_: a sentence is /satisfiable/ if it is true in /some/ model
+
+_Unsatisfiability_: a sentence is /unsatisfiable/ if it is true in /no/ models
+- $KB \vDash \alpha$ iff $(KB \wedge \neg{}\alpha)$ is unsatisfiable
+
+** Applying Inference Rules
+
+Form of search problem: search for more knowledge (search grows our KB)
+- States: KBs
+- Actions: inference rules
+- Transition: add sentence to current KB
+- Goal: KB contains sentence to prove
+
+Examples of inference rules
+- And-elimination: $a \wedge b \vDash a$
+- Modus ponens: $a \wedge (a \Rightarrow b) \vDash b$
+- Logical equivalences: $(a \vee b) \vDash \neg(\neg a \wedge \neg b)$
+
+** Resolution (for CNF)
+
+_CNF_: conjunction of disjunctions i.e. 'and's of 'or's
+- E.g. $(x_1 \vee \neg{}x_2) \wedge (x_2 \vee x_3 \vee \neg{}x_4)$
+- Conversion to CNF: simple standard stuff
+
+_Resolution_: if $x$ appears in $C_1$ and $\neg{}x$ appears in $C_2$, it can be deleted ($x$ must be a literal)
+- $(P \vee x) \wedge (Q \vee \neg{}x)$ is the same as $(P \vee Q)$
+- Resolution is /sound/ and /complete/ for propositional logic
+
+(\star) _Resolution algorithm_
+- Proof by contradiction: to prove $\alpha$, suppose otherwise add $\neg{}\alpha$ into the KB
+- Step 1: add $\neg{}\alpha$ into KB
+- Step 2: convert KB to CNF
+- Step 3: pick 2 rules and reduce; repeat
+- Use resolution to see if the eventual KB is $\emptyset$ i.e. contradiction
+
+Resolution algorithm is sound and complete
+- Soundness: why (???)
+- Completeness: why (???)
+
+*** Example
+
+Assume we are at (1,1), and we want to infer if there is no pit at (1,2)
+- $KB = \neg{}B_{1,1} \wedge B_{1,1} \Leftrightarrow (P_{1,2} \vee P_{2,1})$
+- $\alpha = \neg{}P_{1,2}$
+
+Resolution algorithm
+- Step 1: add $\neg{}\alpha$ to KB
+  - $KB = \neg{}B_{1,1} \wedge (B_{1,1} \Leftrightarrow (P_{1,2} \vee P_{2,1})) \wedge P_{1,2}$
+- Step 2: convert KB to CNF
+  - $KB = \neg{}B_{1,1} \wedge P_{1,2} \wedge (\neg{}B_{1,1} \vee P_{1,2} \vee P_{2,1} ) \wedge (\neg{}P_{1,2} \vee B_{1,1}) \wedge (\neg{}P_{2,1} \vee B_{1,1})$
+- Step 3: pick two rules and reduce
+  - Reduce rule 2 and rule 4: $P_{1,2}$ in rule 2 and $\neg{}P_{1,2}$ in rule 4
+  - Reduced to rule 6: $B_{1,1}$
+  - Reduce rule 1 and rule 6: $\neg{}B_{1,1}$ in rule 1 and $B_{1,1}$ in rule 6
+  - Reduce to $\emptyset$
+
+** KB and Horn Clauses
+
+_Horn clauses_: of form $B_1 \wedge B_2 \wedge \ldots \wedge B_{k} \Rightarrow A$
+- Forward/backward chaining is /sound/ and /complete/ for KB comprised of horn clauses
+
+Clauses with at most 1 positive literal
+- Clause is a sentence comprising disjunctions: e.g. $A \vee \neg{}B$, $\neg{}A \vee \neg{}C \vee D$
+
+Three forms of horn clauses
+- Literals (facts): e.g. $A$
+- Definite clause (rules): e.g. $B_1 \wedge B_2 \wedge \ldots \wedge B_k \Rightarrow A$ i.e. $\neg{}B_1 \vee \neg{}B_2 \vee \ldots \vee \neg{}B_k \vee A$
+
+** Forward Chaining
+
+Idea: keep adding literals/facts
+
+Idea: fire any rule whose premise is satisfied in the KB, add its conclusion to the KB, repeat until query $Q$ is found
+
+_AND-OR graph_
+
+[[./img/fc-horn-and-or.png]]
+
+_FC algorithm_
+- For every rule $c$, let $count(c)$ be the number of literals in its premise
+- For every literal $s$, let $inferred(s)$ be initially false
+- Let $agenda$ be a queue of literals, initally containing all literals known to be true
+- While $agenda \ne \emptyset$:
+  - Pop literal $p$ from $agenda$; if it is $Q$, we are done
+  - Set $inferred(p)$ to be true
+  - For each clause $c\in{}KB$ such that $p$ is in the premise of $c$, decrement $count(c)$
+  - If $count(c) = 0$, add conclusion of $c$ to $agenda$
+
+_Example_
+- Iteration 1: agenda = [A, B]
+- Iteration 2: agenda = [B]
+- Iteration 3: agenda = [] \Rightarrow [L]
+- Iteration 4: agenda = [] \Rightarrow [M]
+- Iteration 5: agenda = [] \Rightarrow [P]
+- Iteration 6: agenda = [] \Rightarrow [Q]
+
+_Proof of completeness_
+- FC derives every atomic sentence/literal entailed by a horn KB
+- Suppose FC reaches a fixed point, where no new atomic sentences are derived
+- Consider the final state as a model $m$ that assigns true/false to symbols based on inferred table
+- Every clause in the original KB is true in $m$
+- Hence $m$ is a model of KB
+- If $KB \Vdash q$, then $q$ is true in /every/ model of KB, including $m$
+
+** Backward Chaining
+
+Idea: work backwards from the query $Q$
+
+To prove $Q$ by backwards chaining,
+- Check if $Q$ is known already, or
+- Prove by backwards chaining the premise of some rule concluding in $Q$
+- We need to avoid loops: check if the new subgoal is already on the goal stack
+- Backtracking DFS
+
+** Forward vs Backward Chaining
+
+- FC: data-driven reasoning
+  - When you don't know the goal, but want to try to build towards it
+  - May do a lot of work that is irrelevant to the goal
+- BC: goal-driven reasoning
+  - When you know the goal, and want to work backwards to prove it
+  - Complexity of BC can be sublinear in size of KB
+
+* Uncertainty
+
+** Probability Basics
+
+Probability
+- Random variable $X$: quantifies an outcome of a random occurrence
+- Domain $D_X$: set of all outcomes of a random variable
+- Event: subset of a domain
+- Probability distribution: assigns a probability value $p(x) \in [0,1]$ to every $x\in{}D_X$
+
+Axioms of probability
+- Total probability is 1: $\sum_{x\in{}D_X} p(x) = 1$
+- $P(A \cup B) = P(A) + P(B) - P(A \cap B)$
+
+Multiple random variables
+- Joint probability: $p(x,y) = P(X=x, Y=y)$ (discrete)
+- Marginal probability: $p(x) = \sum_{y\in{}D_Y} p(x,y)$
+- Conditional probability: e.g. $P(A|B) = \frac{P(A\cap{}B)}{P(B)}$
+
+Bayes' rule: $P(A|B) = \frac{P(B|A)\times{}P(A)}{P(B)}$
+Chain rule: $P(X_1, X_2, \ldots, X_k) = \prod_{i=1}^{k} P(X_i|X_1, \ldots, X_{i-1})$
+
+Independence
+- $P(A\cap{}B) = P(A) \times P(B)$, i.e. $P(A|B) = P(A)$
+- Conditional independence: $P(X\cap{}Y|Z) = P(X|Z) \times P(Y|Z)$
+
+** Bayesian Inference
+
+$P(X|Y_1, \ldots, Y_k)$ --- we want to find the probability of event $X$, given probabilities of other events $Y_i$
+
+Inference by enumeration
+- Find $P(X)$ by summing over all atomic events
+- $P(X) = \sum_{x\in{}X} P(X=x)$
+
+Bayes' rule and conditional independence
+- $P(C|E_1, \ldots, E_n) = \frac{P(C) \times P(E_1, \ldots, E_n|C)}{P(E_1, \ldots, E_n)} \propto \prod_{i=1}^{n} P(E_i|C)$
+- This is an example of the naive Bayes' model
+
+Normalisation
+- $P(X|Y_1, Y_2) = \frac{P(Y_1, Y_2|X) \times P(X)}{P(Y_1, Y_2)}$
+- But we don't care about $P(Y_1, Y_2)$, so set it to $\alpha$
+- Then $P(X=healthy|A) = \alpha \times P(X=healthy) \times P(Y_1=y_1|X=healthy) \times P(Y_2=y_2|X=healthy) = \ldots$
+- Then $P(X=sick|A) = \alpha \times P(X=sick) \times P(Y_1=y_1|X=sick) \times P(Y_2=y_2|X=sick) = \ldots$
+
+* Bayesian Networks
+
+Represent joint distributions via a graph
+- Nodes: random variables
+- Edges: assume $X$ causes/influences $Y$
+- For each node $X$, we can get a conditional distribution for $X$ given its parents, i.e. $P(X|Parents(X))$
+- Conditional probability table (CPT): the conditional distribution of $X$ for each combination of parent values
+
+Then $P(X_1, \ldots, X_n) = \prod_{i=1}^{n} P(X_i|Parents(X_i))$
+- The fewer parents overall, the better (the less complex the graph is)
+
+Complexity
+- If each variable has $\le{}k$ parents, then network representation requires $O(n2^k)$ values, compared to $O(2^n)$ for full joint distribution
+
+** Examples
+
+_Example: independent causes/common effect_
+
+$P(A,B,C) = P(C|A,B) \cdot P(A) \cdot P(B)$
+- $A$ and $B$ are pairwise independent, /unless/ you condition on observing the effect $C$: then $A$ and $B$ are conditionally dependent
+
+[[./img/bn-independent-causes.png]]
+
+_Example: independent events_
+
+$P(A,B,C) = P(A) \cdot P(B) \cdot P(C)$
+
+[[./img/bn-independent-events.png]]
+
+_Example: conditionally independent effects/common cause_
+
+$P(A,B,C) = P(C|A) \cdot P(B|A) \cdot P(A)$
+- $B$ and $C$ are conditionally independent given $A$
+
+[[./img/bn-conditionally-independent-effects.png]]
+
+_Example: causal chain_
+
+$P(A,B,C) = P(C|B) \cdot P(B|A) \cdot P(A)$
+- $C$ is conditionally independent of $A$ given $B$ -- note that $P(C|B) = P(C|B,A)$
+
+[[./img/bn-causal-chain.png]]
+
+_Example: burglary_
+- $A$: Alarm goes off
+- $E$: Alarm sometimes set off by minor earthquake
+- $B$: Alarm set off by burglar
+- $J$: John calls to say my house alarm is ringing
+- $M$: Mary calls to say my house alarm is ringing
+
+[[./img/bn-example-burglar.png]]
+
+$P(B=1|J=1, M=0) = \frac{P(B=1,J=1,M=0)}{P(J=1,M=0)} = ?$
+- To find $P(B=1, J=1, M=0)$: sum over 4 cases of A=0/1, E=0/1
+- To find $P(J=1, M=0)$: sum over 8 cases of A=0/1, E=0/1, B=0/1
+- whereby $P(J,M,A,B,E) = P(J|A) \cdot P(M|A) \cdot P(A|B,E) \cdot P(B) \cdot P(E)$
+
+** Inference in Bayesian Networks
+
+Bayesian network represents the full joint distribution.
+
+Infer any query by summing over all cases of the other variables.
+
+** Algorithm for Constructing Bayesian Network
+
+Algorithm
+- Choose an ordering for variables $X_1, \ldots, X_n$
+- For i=1 to n:
+  - Add node $X_i$ to network
+  - Select minimal set of parents from $X_1, \ldots, X_{i-1}$ such that $P(X_i|Parents(X_i)) = P(X_i|X_1, \ldots, X_{i-1})$
+  - Add edges from every parent to $X_i$
+  - Write down CPT for $P(X_i|Parents(X_i))$
+
+Variable order matters!
+- Choosing a 'good' variable order can reduce the number of edges required
+
+** Markov Blanket
+
+A node is conditionally independent of everything else given the values of its:
+- Parents
+- Children
+- Children's parents
+
+[[./img/markov-blanket.png]]
+
+** d-Separation
+
+Given variables $X$ and $Y$ and known variables $\epsilon=\{E_1, \ldots, E_k\}$,
+are $X$ and $Y$ surely independent given $\epsilon$?
+
+Idea: any general graph can be broken down into three cases (causal chain/common cause/common effect)
+to determine conditional independence of $X$ and $Y$ given knowledge of $\epsilon$
+
+Check every undirected path between $X$ and $Y$, ignoring direction of arcs
+- (\star) If all paths are not active, then $X$ and $Y$ are independent given $\epsilon$
+
+_Active path_: Path is active iff every triple on the path is active
+- I.e. if /any/ triple on the path is inactive, the /entire path/ is inactive
+
+_Active triple_: see the chart
+- Dark means we know $B$, light means we don't know $B$
+- Note: only take into account knowledge of $B$, not $A$ or $C$ in these triples
+
+[[./img/active-triples.png]]
+
+_Example_
+- Here, all 3 potential paths are inactive => 2 red-marked nodes are independent given $\epsilon$
+
+[[./img/d-separation-example.png]]
+
+# * Exam Tips
+
+# Resolution: usually worth few marks. Practice and do it quickly
+# Bayesian Networks: practice doing it fast
+# AC-3 constraint propagation: practice doing it fast
+
+# CSPs: may be worth holding out until end of paper if hard
+# Deriving admissible heuristics: just some is good enough, not necessarily best, usually quite simple
+# Proofs: e.g. for (un)-informed search (!) e.g. a* search or completeness/optimality, or conditional probability
+
