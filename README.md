@@ -34,4 +34,5 @@ They may contain errors. Use them at your own peril! 🙃
 #### AY2020/21 Semester 2
 
 - CS3243: Introduction to Artificial Intelligence
+- ST4234: Bayesian Statistics
 

@@ -1,0 +1,363 @@
+#+TITLE: ST4234 Cheatsheet
+#+LATEX_CLASS: article
+#+LATEX_HEADER: \usepackage{parskip}  \setlength{\parindent}{0pt} \setlength{\parskip}{2pt}
+#+LATEX_HEADER: \usepackage{sectsty} \setcounter{secnumdepth}{1} \allsectionsfont{\raggedright}
+#+LATEX_HEADER: \usepackage{enumitem} \setlist[1]{itemsep=-2pt} \setlist[itemize]{leftmargin=*} \setlist[enumerate]{leftmargin=*}
+#+LATEX_HEADER: \usepackage{titlesec} \titleformat{\section}{\normalsize\bfseries\raggedright}{\thesection.}{\hspace{5pt}}{} \titleformat*{\subsection}{\footnotesize\bfseries\raggedright} \titlespacing{\section}{0pt}{6pt}{2pt} \titlespacing{\subsection}{0pt}{4pt}{0pt}
+#+LATEX_HEADER: \usepackage[a4paper, landscape, margin=0.3in]{geometry}
+#+LATEX_HEADER: \usepackage{multicol}
+#+LATEX_HEADER: \usepackage{bm}
+#+OPTIONS: author:nil title:nil toc:nil date:nil
+
+\centering
+\header{ST4234 Cheatsheet}
+
+\raggedright
+\begin{multicols*}{4}
+\scriptsize
+
+* Miscellaneous
+
+** Beta Distribution: $X \sim Beta(\alpha, \beta)$
+- $\pi(x) = \frac{1}{B(\alpha,\beta)} x^{\alpha-1} (1-x)^{\beta-1} = \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)} x^{\alpha-1} (1-x)^{\beta-1}$
+- $E[X] = \frac{\alpha}{\alpha+\beta}$, $Var(X) = \frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}$
+- Normal approx: when both $\alpha$ and $\beta$ are large
+
+** Gamma Distribution: $X\sim{}Gamma(\alpha,\frac{1}{\beta})$
+- $\alpha$ is the /shape/, $\frac{1}{\beta}$ is the /rate/
+- $\pi(x) = \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1} e^{-\beta{}x}$
+- $E[X] = \frac{\alpha}{\beta}$, $Var(X) = \frac{\alpha}{\beta^2}$
+- $\Gamma(\alpha)=\int_{0}^{\infty} x^{\alpha-1} e^{-x} \ dx = (\alpha-1)!$, $\frac{\Gamma(\alpha+1)}{\Gamma(\alpha)} = \alpha$, $\Gamma(\frac{1}{2}+n) = \frac{(2n)!}{4^n n!}\sqrt{\pi}}$
+- Normal approx: when $\alpha$ is large
+
+** Poisson Distribution: $X\sim{}Po(\lambda)$
+- $\pi(x) = \frac{e^{-\lambda} \lambda^{x}}{x!}$
+- $E[X] = \lambda$, $Var(X) = \lambda$
+
+** Exponential Distribution: $X\sim{}Exp(\frac{1}{\lambda})$
+- $\pi(x) = \lambda{}e^{-\lambda{}x}$ where $x>0$
+- $E[X] = \frac{1}{\lambda}$
+- $Var(X) = \frac{1}{\lambda^2}$
+
+** Normal Distribution: $X\sim{}N(\mu, \frac{1}{\tau})$
+- $\pi(x) = \sqrt{\frac{\tau}{2\pi}} e^{-\frac{\tau}{2}(x-\mu)^2}$
+
+** T-Distribution (Standard): $X \sim t_v$
+- $\pi(x) = \frac{1}{B(v/2, 1/2)} \frac{1}{\sqrt{v}} (1+\frac{x^2}{v})^{-\frac{v+1}{2}}$
+- $E[X] = 0$ for $v>1$ else $\infty$
+- $Var(X) = \frac{v}{v-2}$ for $v>2$ else $\infty$ for $1<v\le2$ else undefined
+
+** T-Distribution (General): $X\sim{}t_v(m, \frac{1}{c})$
+- $\pi(x) = \frac{1}{B(v/2,1/2)} \sqrt{\frac{c}{v}} (1 + c\frac{(x-m)^2}{v})^{-\frac{v+1}{2}}$
+- $E[X] = m$ for $v>1$ else $\infty$
+- $Var(X) = \frac{1}{c} \cdot \frac{v}{v-2}$ for $v>2$ else \ldots
+
+** Dirichlet: $\mathbf{X} \sim Dirichlet(\alpha_1, \alpha_2, \alpha_3)$
+- Generalisation of /beta/ distribution
+- $\pi(x_1, x_2, x_3) = \frac{\Gamma(\alpha_1+\alpha_2+\alpha_3)}{\Gamma(\alpha_1)\Gamma(\alpha_2)\Gamma(\alpha_3)} x_1^{\alpha_1-1} x_2^{\alpha_2-1} x_3^{\alpha_3-1}$ where $\sum_{i=1}^{N} x_i = 1$
+
+** Pareto: $X\sim{}Pareto(m,a)$ ($m>0, a>0$)
+- $\pi(x) = \frac{am^a}{x^{a+1}}$ where $x>m$
+- $E[X] = \frac{am}{a-1}$ for $a>1$ else $\infty$, mode at $m$
+- $Var(X) = \frac{am^2}{(a-1)^2(a-2)}$ for $a>2$ else $\infty$
+- $F(x) = 1 - (\frac{m}{x})^{a}$ for $x>m$
+
+* Introduction
+
+- Prior: $\pi(\theta)$
+- Likelihood: $f(x|\theta)$
+- Posterior: $\pi(\theta|x)$
+- $\text{Posterior} \ \propto \ \text{Prior} \times \text{Likelihood}$, i.e. $\pi(\theta|x) \propto \pi(\theta) \times f(x|\theta)$
+
+** Bayes' Theorem
+
+_Bayes' Theorem_: $P(A_i|B) \propto P(A_i) \times P(B|A_i)$
+- Norm constant is marginal density $P(B)$
+
+_Bayes' Theorem for Several RVs_: $\pi(y|x_1, \ldots, x_k) \propto \pi(y, x_1, \ldots, x_k)$
+- Sequential updating: $\pi(y|x_1, \ldots, x_k) \propto \pi(y|x_1, \ldots, x_{k-1}) \cdot \pi(x_k|y, x_1, \ldots, x_{k-1})$
+
+* Bayesian Inference
+
+** Bayesian Approach
+
+- _Prior_: assume $\theta$ has prior density $\pi(\theta)$
+- _Posterior_: $\pi(\theta|\mathbf{x}) \propto \pi(\theta) \times \prod_{i=1}^{n} f(x_i|\theta)$
+- _Posterior mean_: $E[\theta|\mathbf{x}]$ --- estimates $\theta$
+- _Posterior variance_: $Var(\theta|\mathbf{x})$
+- _(1-\alpha) credible set/highest density region (HDR)_: there is $(1-\alpha)$
+  chance that interval contains true parameter $\theta$
+
+** Useful Identity
+
+- $r(\mu-a)^2 + t(\mu-b)^2 = (r+t)(\mu-\bar{m})^2 + \frac{(a-b)^2}{t^{-1} + r^{-1}}$
+- $\bar{m} = \frac{r}{t+r} a + \frac{t}{t+r}b$ --- weighted average of $a$ and $b$
+
+** Normal Pop: Known Variance $\tau=r$, Unknown $\mu$
+
+_Conjugate family_: Normal for mean $\mu$
+- _Prior_: $\mu\sim{}N(m, \frac{1}{t})$
+- _Observations_: $n$ iid from $X\sim{}N(\mu,\frac{1}{\tau} = \frac{1}{r})$
+- _Likelihood_: $L(\mu|\mathbf{x}) \propto e^{-\frac{nr}{2}(\mu-\bar{x})^2}$
+- _Posterior_: $\mu|\mathbf{x}\sim{}N(m_n, \frac{1}{t_n})$
+  - $t_n = t + nr$
+  - $m_n = w_{n}m+(1-w_n)\bar{x}$
+  - $w_n = \frac{t}{t+nr}$
+- _Predictive_: $X_{n+1}|\mathbf{X=x} \sim N(m_n, \frac{1}{t_n}+\frac{1}{r})$
+
+** Normal Pop: Known Mean $\mu=h$, Unknown $\tau$
+
+_Conjugate family_: Gamma for precision $\tau$
+- _Prior_: $\tau\sim{}Gamma(\alpha, \frac{1}{\beta})$
+- _Observations_: $n$ iid from $X|\tau\sim{}N(\mu=h, \frac{1}{\tau})$
+- _Likelihood_: $L(\mu|\mathbf{x}) \propto \tau^{\frac{n}{2}} e^{-[\frac{1}{2}\sum_{i=1}^{n}(x_i-h)^2]\tau}$
+- _Posterior_: $\tau|\mathbf{x}\sim{}Gamma(\alpha_n, \frac{1}{\beta_n})$
+  - $\alpha_n = \alpha + \frac{n}{2}$
+  - $\beta_n = \beta + \frac{1}{2} \sum_{i=1}^{n} (x_i-h)^2$
+- _Predictive_: ???
+
+** Normal Pop: Unknown Mean and Variance
+
+_Conjugate family_: Gamma-Normal for $(\mu,\tau)$
+- _Prior_: $(\mu,\tau)\sim{}Gamma-Normal(\alpha,\frac{1}{\beta};m,\frac{1}{t})$
+  - $\tau\sim{}Gamma(\alpha,\frac{1}{\beta})$, $\mu|\tau\sim{}N(m, \frac{1}{\tau{}t})$
+  - $\pi(\mu,\tau) \propto \tau^{\alpha-1} e^{-\beta\tau} \cdot \sqrt{\tau} e^{-\frac{\tau{}t}{2}(\mu-m)^2}$
+- _Observations_: $n$ iid from $X|(\mu,\tau)\sim{}N(\mu,\frac{1}{\tau})$
+- _Likelihood_: $L(\mu,\tau|\mathbf{x}) \propto \tau^{\frac{n}{2}} e^{-\frac{n\tau}{2}(\mu-\bar{x})^2 - \frac{\tau}{2}\sum_{i=1}^{n} (x_i-\bar{x})^2}$
+- _Posterior_: $(\mu,\tau|\mathbf{x})\sim{}Gamma-Normal(\alpha_n, \frac{1}{\beta_n}; m_n, \frac{1}{t_n})$
+  - $\alpha_n = \alpha + \frac{n}{2}$
+  - $\beta_n = \beta + \frac{1}{2} [\sum_{i=1}^{n} (x_i-\bar{x})^2 + \frac{(m-\bar{x})^2}{1/t+1/n}]$
+  - $m_n = \frac{t}{t+n}m + \frac{n}{t+n}\bar{x}$
+  - $t_n = t + n$
+- _Posterior_: $\mu|\mathbf{x} \sim t_{2\alpha_n} \left( m_n, (\frac{\alpha_{n}t_n}{\beta_n})^{-1} \right)$
+  - $\pi(\mu|\mathbf{x}) \propto \left[ 1 + (\frac{\alpha_n t_n}{\beta_n}) \frac{(\mu-m_n)^2}{2\alpha_n} \right]^{-(2\alpha_n+1)/2}$
+  - $E[\mu|\mathbf{x}] = m_n$
+  - $Var(\mu|\mathbf{x}) = (\frac{\alpha_n t_n}{\beta_n})^{-1} \frac{2\alpha_n}{2\alpha_n-2} = \frac{\beta_n}{t_n(\alpha_n-1)}$
+- _Predictive_: $X_{n+1}|\mathbf{X=x} \sim t_{2\alpha_n} \left( m_n, (\frac{\alpha_n t_n}{\beta_n(1+t_n)})^{-1} \right)$
+
+** Bernoulli Pop: Unknown Parameter $\theta$
+
+_Conjugate family_: Beta for $\theta$
+- _Prior_: $\theta\sim{}Beta(a,b)$
+  - $\pi(\theta) = \theta^{a-1} (1-\theta)^{b-1}$
+- _Observations_: $n$ iid from $X|\theta\sim{}Ber(\theta)$
+- _Posterior_: $\theta|\mathbf{x}\sim{}Beta(a_n, b_n)$
+  - $a_n = a + n\bar{x}$ --- add successes
+  - $b_n = b + n - n\bar{x}$ --- add failures
+  - $n\bar{x} = \sum_{i=1}^{n} x_i$
+- _Predictive_: $X_{n+1}|\mathbf{x}\sim{}Ber(\frac{a_n}{a_n+b_n})$
+  - $f_{X_{n+1}}(1|\mathbf{X=x}) = \frac{a_n}{a_n+b_n}$
+  - $f_{X_{n+1}}(0|\mathbf{X=x}) = \frac{b_n}{a_n+b_n}$
+
+** Poisson Pop: Unknown Parameter $\lambda$
+
+_Conjugate family_: Gamma for $\lambda$
+- _Prior_: $\lambda\sim{}Gamma(\alpha,\frac{1}{\beta})$
+- _Observations_: $n$ iid from $X|\lambda\sim{}Po(\lambda)$
+- _Posterior_: $\lambda|\mathbf{X=x}\sim{}Gamma(\alpha_n, \frac{1}{\beta_n})$
+  - $\alpha_n = \alpha + n\bar{x}$ --- add sum of observations
+  - $\beta_n = \beta + n$ --- add number of observations
+  - $n\bar{x} = \sum_{i=1}^{n} x_i$
+
+** Exponential Pop: Unknown Parameter $\lambda$
+
+_Conjugate family_: Gamma for $\lambda$
+- _Prior_: $\lambda\sim{}Gamma(\alpha, \frac{1}{\beta})$
+- _Observations_: $n$ iid from $X|\lambda\sim{}Exp(\lambda)$
+- _Posterior_: $\lambda|\mathbf{x}\sim{}Gamma(\alpha_n, \frac{1}{\beta_n})$
+  - $\alpha_n = \alpha+n$ --- add number of observations
+  - $\beta_n = \beta+n\bar{x}$ -- add sum of observations
+  - $n\bar{x} = \sum_{i=1}^{n} x_i$
+- _Predictive_: $X_{n+1}|\mathbf{X=x} + \beta_n \sim Pareto(\beta_n, \alpha_n)$
+  - $P(X_{n+1} \le x|\mathbf{X=x}) = 1 - \left( \frac{\beta_n}{x+\beta_n} \right)^{\alpha_n}$
+
+** Uniform Pop: Unknown Parameter $\theta$
+
+_Conjugate family_: Pareto for $\theta$
+- _Prior_: $\theta\sim{}Pareto(m,a)$
+  - $\pi(\theta) = \frac{am^a}{\theta^{a+1}} \mathbf{I}_{\theta>m}$
+- _Observations_: $n$ iid from $X|\theta\sim{}U(0,\theta)$
+  - $f(x|\theta) = \frac{1}{\theta} \mathbf{I}_{0<x<\theta}$
+- _Posterior_: $\theta|\mathbf{x}\sim{}Pareto(m_n, a_n)$
+  - $m_n = \max(m, x_{\max})$ --- set to max of self/obs
+  - $a_n = a + n$ --- add number of observations
+  - $x_{\max} = \max_{i=1}^{n} x_i$
+
+** Multinomial Pop: Unknown Parameter $\mathbf{p}$
+
+_Conjugate family_: Dirichlet for $(p_1, \ldots, p_k)$
+- _Prior_: $(p_1, \ldots, p_k)\sim{}Dirichlet(\alpha_1, \ldots, \alpha_k)$
+- _Observations_: $M$ iid $\mathbf{x}_i$ from $X\sim{}Multinomial(n;p_1, \ldots, p_k)$
+- _Posterior_: $(p_1, \ldots, p_k|\mathbf{x}_1, \ldots, \mathbf{x}_M) \sim Dirichlet(\alpha_{n1}, \ldots, \alpha_{nk})$
+  - $\alpha_{nj} = \alpha_j + m_j$ --- within each category, add sum of $x$ across it
+  - $m_j = \sum_{i=1}^{M} x_{ij}$
+
+* Conjugate Prior Distributions
+
+_Conjugate family_: A class $\Pi$ of probability distributions forms a /conjugate family/
+if the posterior density $\pi(\theta|x) \propto \pi(\theta) \cdot f(x|\theta)$ is in $\Pi$ for all $x$,
+whenever the prior density $\pi(\theta)$ is in $\Pi$
+
+* Predictive Distributions
+
+** Proposition: Predictive Distribution
+
+- $F_{X_{n+1}}(x|\mathbf{X=x}) = E[F(x|\theta)|\mathbf{X=x}]$
+- $f_{X_{n+1}}(x|\mathbf{X=x}) = E[f(x|\theta)|\mathbf{X=x}] = \int_{\theta\in\Theta} f(x|\theta) \cdot \pi(\theta|\mathbf{X=x})$
+
+** Double expectation formula
+
+Standard form: $E(Y) = E[E(Y|Z)]$
+- Inner $E(Y|Z)$ is expectation wrt $Y$, yields function of $Z$
+- Outer $E[E(Y|Z)]$ is expectation wrt $Z$
+- Conditional form: $E(Y|X) = E[E(Y|Z,X)|X]$
+- E.g. $E[x_{n+1}|\mathbf{x}] = E[E[x_{n+1}|\theta]|\mathbf{x}]$
+
+$Var(Y) = E[Var(Y|Z)] + Var(E[Y|Z])$
+- E.g. $Var(x_{n+1}|\mathbf{x}) = Var(E[x_{n+1}|\theta]|\mathbf{x}) + E[Var(x_{n+1}|\theta)|\mathbf{x}]$
+
+* Hypothesis Testing
+
+** Test between $\{\theta=\theta_1\}$ and $\{\theta=\theta_2\}$
+
+- $O_n = \frac{P(\theta=\theta_1|\mathbf{x})}{P(\theta=\theta_2|\mathbf{x})}$
+- Favour $\theta_1$ if $P(\theta=\theta_1|\mathbf{x}) > 0.5 \ \Leftrightarrow \ O_n > 1$
+- Favour $\theta_2$ if $P(\theta=\theta_2|\mathbf{x}) > 0.5 \ \Leftrightarrow \ O_n < 1$
+
+** Test between $\{\theta\in\Theta_1\}$ and $\{\theta\in\Theta_2\}$
+
+Case 1: $\Theta_1 \cup \Theta_2 = \Theta$
+- $P(\theta\in\Theta_1|\mathbf{x}) = \int_{\theta\in\Theta_1} \pi(\theta|\mathbf{x}) \ d\theta$
+- $P(\theta\in\Theta_2|\mathbf{x}) = \int_{\theta\in\Theta_2} \pi(\theta|\mathbf{x}) \ d\theta$
+
+Case 2: $\Theta_1 \cup \Theta_2 \ne \Theta$
+- Probabilities need to be re-normalised
+- $P(\theta\in\Theta_1|\mathbf{x}, \theta\in\Theta_1 \cup \Theta_2) = \frac{P(\theta\in\Theta_1|\mathbf{x})}{P(\theta\in\theta_1|\mathbf{x}) + P(\theta\in\theta_2|\mathbf{x})}$
+- $P(\theta\in\Theta_2|\mathbf{x}, \theta\in\Theta_1 \cup \Theta_2) = \frac{P(\theta\in\Theta_2|\mathbf{x})}{P(\theta\in\theta_1|\mathbf{x}) + P(\theta\in\theta_2|\mathbf{x})}$
+
+** Mixture Priors
+
+For some choice of $P(\theta\in\Theta_1)$ and $P(\theta\in\Theta_2)$:
+- $P(\theta\in\Theta_1|\mathbf{x}) \propto P(\theta\in{}\Theta_1) \cdot \int_{\Theta_1} \pi(\theta|\theta\in\Theta_1) \cdot f(\mathbf{x}|\theta) \ d\theta$
+- $P(\theta\in\Theta_2|\mathbf{x}) \propto P(\theta\in{}\Theta_2) \cdot \int_{\Theta_2} \pi(\theta|\theta\in\Theta_2) \cdot f(\mathbf{x}|\theta) \ d\theta$
+
+** Test between $\{\theta=\theta_1\}$ and $\{\theta\in\Theta_2\}$
+
+Let $\theta|\theta\in{}\Theta_2$ be some proper density.
+- $\theta=\theta_1 \ \text{with probability} \ P(\theta=\theta_1) = p$
+- $\theta\in{}\Theta_2 \ \text{with probability} \ P(\theta\in{}\Theta_2) = 1-p$
+- $P(\theta=\theta_1|\mathbf{x}) &\propto P(\theta=\theta_1) \cdot f(\mathbf{x}|\theta_1)$
+- $P(\theta\in\Theta_2|\mathbf{x}) &\propto P(\theta\in\Theta_2) \cdot \int_{\Theta_2} \pi(\theta|\theta\in\Theta_2) \cdot f(\mathbf{x}|\theta) \ d\theta$
+
+_Normalisation constant_: $p\pi(\mathbf{x}|\theta_1) + (1-p) \int_{\Theta_2} \pi(\theta|\theta\in\Theta_2) \pi(\mathbf{x}|\theta) \ d\theta$
+
+** Nuisance Parameters
+
+- Get likelihood by integrating over nuisance parameters, e.g. $\pi(\mathbf{x}|\theta) = \int \pi(\mathbf{x}|\theta,\lambda) \cdot \pi(\lambda|\theta) \ d\lambda$
+- $P(\theta\in{}\Theta_i|\mathbf{x}) \propto P(\theta\in\Theta_i) \cdot [\int L(\theta,\lambda|\mathbf{x}) \cdot \pi(\lambda|\theta\in{}\Theta_i) \ d\lambda]$
+
+* Bayesian Computation
+
+** Monte Carlo Integration
+
+$$E[g(\theta)|\mathbf{x}] \approx \frac{1}{M} \sum_{i=1}^{M} g(\theta_i) \ \text{as} \ M\rightarrow\infty$$
+- Here, $\theta_i$ is drawn from posterior $\pi(\theta|\mathbf{x})$
+- E.g. $E[\theta|\mathbf{x}] \approx \frac{1}{M} \sum_{i=1}^{M} \theta_i$
+- E.g. $E[\theta^k|\mathbf{x}] \approx \frac{1}{M} \sum_{i=1}^{M} \theta_i^k$
+
+** Importance Sampling
+
+- Importance density: $h(\theta)$
+- Importance weights: $\omega(\theta) = \frac{\pi(\theta) \cdot \pi(\mathbf{x}|\theta)}{h(\theta)}$ 
+- So $\omega(\theta) h(\theta) = \pi(\theta) \pi(\mathbf{x}|\theta)$
+
+Sampling $\theta_i$ from $h(\theta)$:
+
+$$E[g(\theta)|\mathbf{x}] \approx \frac{\sum_{i=1}^{M} g(\theta_i) \cdot \omega(\theta_i)}{\sum_{i=1}^{M} \omega(\theta_i)}$$
+
+Note: it's OK to have something proportional to $\omega(\theta)$
+instead of the actual, it'll cancel out
+
+* Markov Chain Monte Carlo
+
+** MCMC Approximation
+
+Sampled Markov chain: $(x_0, y_0), (x_1, y_2), \ldots, (x_M, y_M)$
+- Stationary distribution of Markov chain must be identical to desired $\pi(x,y)$
+- Then $(x_i, y_i)$ is approximately sampled i.i.d. from $\pi(x,y)$ as $M\rightarrow\infty$
+
+** Gibbs Sampler
+
+$$E[g(X,Y)] \approx \frac{1}{M} \sum_{i=1}^{M} g(x_{w+i}, y_{w+i})$$
+
+1. Start with some valid initial state $(x_0, y_0)$
+2. For $w+M$ times, from state $(x_i, y_i)$ to next state $(x_{i+1}, y_{i+1})$
+3. Discard the first $w$ members of the chain, keeping $M$ members $(x_{w+1}, y_{w+1}), \ldots, (x_{w+M}, y_{w+M})$ to calculate estimates
+
+_Example_
+1. Let $\mu_0=0$, $\tau_0=1$
+2. Generate $\mu_{i+1}$ from $\pi(\mu|\tau_i, \mathbf{x})$; generate $\tau_{i+1}$ from $\pi(\tau|\mu_{i+1}, \mathbf{x})$
+3. If $i<w+M$, set $i=i+1$ and go back to (2). Else, stop
+
+* Other Useful Things
+
+$$\sum_{i=1}^{n} (x_i - \bar{x})^2 = \sum_{i=1}^{n} x_i^2 - \sum_{i=1}^{n} x_i$$
+
+Let $(X_1, \ldots, X_k) \sim Multinomial(n, p_1, \ldots, p_k)$.
+Find $X_{k-1}|X_1, \ldots, X_{k-2}$.
+- $\pi(x_1, \ldots, x_k) = \frac{n!}{x_1! \ldots x_k!} p_1^{x_1} \ldots p_k^{x_k}$
+- Let $n^* = n - \sum_{i=1}^{k-2} x_i$ and $p^* = 1 - \sum_{i=1}^{k-2} p_i$
+- $\pi(x_{k-1}|x_1, \ldots, x_{k-2}) \propto \pi(x_1, \ldots, x_k) \propto \frac{1}{x_{k-1}! (n^*-x_{k-1})!} p_{k-1}^{x_k-1} (p^*-p_{k-1})^{n^*-x_{k-1}} \propto \frac{n^{*}}{x_{k-1}! (n^*-x_{k-1})!} \tilde{p}^{x_{k-1}} (1-\tilde{p})^{n^*-x_{k-1}}$ where $\tilde{p} = p_{k-1}/p^*$
+- Then $x_{k-1}|x_1, \ldots, x_{k-2} \sim Bin(n^*, \tilde{p})$
+
+\begin{align*}
+\text{For} \ & Y=\frac{1}{X}, \\
+f_Y(y) &= f_X(\frac{1}{y}) \cdot \frac{1}{y^2}
+\end{align*}
+
+\begin{align*}
+\text{For} & \ X \sim Po(\lambda), \\
+E[X] &= \sum_{x=0}^{\infty} x \cdot \frac{\lambda^x e^{-\lambda}}{x!} \\
+&= e^{-\lambda} \sum_{x=1}^{\infty} \frac{x\lambda^x}{x!} \\
+&= \lambda{}e^{-\lambda} \sum_{x=1}^{\infty} \frac{\lambda^{x-1}}{(x-1)!} \\
+&= \lambda{}e^{-\lambda} \sum_{y=0}^{\infty} \frac{\lambda^y}{y!} \\
+&= \lambda{}e^{-\lambda} e^{\lambda} = \lambda
+\end{align*}
+
+Sampling from posterior distribution $\pi(\mu|\mathbf{x})$:
+\begin{align*}
+\widehat{Var}(\mu|\mathbf{x}) &= \frac{1}{M-1} \sum_{i=1}^{M} (\mu_i-\hat{\mu})^2 \\
+&= \frac{1}{M-1} \left[ \sum_{i=1}^{M} \mu_i^2 - M\hat{\mu}^2 \right] \\
+\end{align*}
+
+Sampling from importance density $h(\mu)$:
+\begin{align*}
+\widehat{Var}(\mu|\mathbf{x}) &= \hat{E}(\mu^2|\mathbf{x}) - \hat{E}^2(\mu|\mathbf{x}) \\
+&= \frac{\sum_{i=1}^{M} \mu_i^2 \cdot \omega(\mu_i)}{\sum_{i=1}^{M} \omega(\mu_i)} - \left( \frac{\sum_{i=1}^{M} \mu_i \cdot \omega(\mu_i)}{\sum_{i=1}^{M} \omega(\mu_i)} \right)^2
+\end{align*}
+
+\end{multicols*}
+
+# *** Example: Joint given Conditional (Beta \rightarrow Dirichlet)
+
+# What is the joint distribution of $(X_1 \ldots X_k)$, given the following?
+# - Let $\alpha_1 \ldots \alpha_k = 0$, $\alpha_{i+} = \alpha_i + \ldots + \alpha_k$.
+# - Let $X_1 \sim Beta(\alpha_1, \alpha_{2+})$
+# - Let $(\frac{X_2}{1-X_1} | X_1) \sim Beta(\alpha_2, \alpha_{3+})$
+# - Let $(\frac{X_{k-1}}{1-X_1-\ldots-X_{k-2}} | X_1, \ldots, X_{k-2}) \sim Beta(\alpha_{k-1}, \alpha_{k+}_{})$
+
+# If $X \sim f(x)$, then $Y = aX \sim \frac{1}{a} f(\frac{y}{a})$.
+# - If $Y = \frac{X}{c} \sim Beta(a,b)$, then we have $f_Y(y) = \frac{y^{a-1} (1-y)^{b-1}}{B(a,b)}$
+# - Then $X = cY$, then we have $f_X(x) = \frac{1}{c} f_Y(\frac{X}{c}) = \frac{1}{c} \frac{(x/c)^{a-1} (1-x/c)^{b-1}}{B(a,b)}$
+
+# - $X_1 \sim Beta(\alpha_1, \alpha_{2+})$
+#   - So $\pi(x_1) = \frac{\Gamma(\alpha_{1+})}{\Gamma(\alpha_1) \Gamma(\alpha_{2+})} x_1^{\alpha_1-1} (1-x_1)^{\alpha_{2+}-1}$
+# - $\frac{X_2}{1-X_1}|X_1 \sim Beta(\alpha_2, \alpha_{3+})$ and $X_2|X_1 = (1-X_1)(\frac{X_2}{1-X_1}|X_1)$
+#   - So $\pi(x_2|x_1) = \frac{1}{1-X_1} \frac{\Gamma(\alpha_{2+})}{\Gamma(\alpha_2)\Gamma(\alpha_{3+})} (\frac{x_2}{1-x_1})^{\alpha_2-1} (1-\frac{x_2}{1-x_1})^{\alpha_{3+}-1} = \frac{\Gamma(\alpha_{2+})}{\Gamma(\alpha_2)\Gamma(\alpha_{3+})} \frac{x_2^{\alpha_2-1} (1-x_1-x_2)^{\alpha_{3+}-1}}{(1-x_1)^{\alpha_{2+}-1}}$
+#   - Then $\pi(x_1, x_2) = \pi(x_1) \cdot \pi(x_2|x_1) = \frac{\Gamma(\alpha_{1+})}{\Gamma(\alpha_1)\Gamma(\alpha_2)\Gamma(\alpha_{3+})} x_1^{\alpha_1-1} x_2^{\alpha_2-1} (1-x_1-x_2)^{\alpha_{3+}-1}$
+# - $\frac{X_3}{1-X_1-X_2} \sim Beta(\alpha_3, \alpha_{4+})$ ...
+#   - So $\pi(x_3|x_1, x_2) = \frac{\Gamma(\alpha_{3+})}{\Gamma(\alpha_3)\Gamma(\alpha_{4+})} \frac{x_3^{\alpha_3-1} (1-x_1-x_2-x_3)^{\alpha_{4+}-1}}{(1-x_1-x_2)^{\alpha_{3+}-1}}$
+#   - Then $\pi(x_1, x_2, x_3) = \pi(x_1) \cdot \pi(x_2|x_1) \cdot \pi(x_3|x_1, x_2) = \frac{\Gamma(\alpha_{1+})}{\Pi_{i=1}^{3}\Gamma(\alpha_i) \cdot \Gamma(\alpha_{4+})} \Pi_{i=1}^{3} x_i^{\alpha_i-1} \cdot (1-\Pi_{i=1}^{3} x_i)^{\alpha_{4+}-1}$
+#   - Notice that when $k=3$, we have $\pi(x_1, x_2, x_3) = \frac{\Gamma(\alpha_1 + \alpha_2 + \alpha+3)}{\Gamma(\alpha_1)\Gamma(\alpha_2)\Gamma(\alpha_3)} x_1^{\alpha_1-1} x_2^{\alpha_2-1} x_3^{\alpha_3-1}$, therefore it $\sim Dirichlet(\alpha_1, \alpha_2, \alpha_3)$
+# - In general, $\pi(x_1, \ldots, x_k) \sim Dirichlet(\alpha_1, \ldots, \alpha_k)$
+
